@@ -1,28 +1,54 @@
 # Workout Log
 
-Phone-first workout logger for the Upper/Lower split in `index.html`.
+Static, no-framework workout logger hosted on GitHub Pages.
 
-## Free Hosting Path
+Live app: https://richhank.github.io/workout-log/
 
-1. Create a public GitHub repository, for example `workout-log`.
-2. Upload or push these files to the repository root:
-   - `index.html`
-   - `manifest.webmanifest`
-   - `sw.js`
-   - `icon.svg`
-   - `.nojekyll`
-3. In GitHub, open `Settings -> Pages`.
-4. Set `Build and deployment` to `Deploy from a branch`.
-5. Choose `main` and `/root`, then save.
-6. Open `https://YOUR-GITHUB-USERNAME.github.io/workout-log/`.
-7. On iPhone Safari, tap Share, then Add to Home Screen.
+## Current Architecture
 
-## Storage
+- Static SPA in `index.html`.
+- Permanent dark UI.
+- PWA shell with `manifest.json`, install icons, and `sw.js`.
+- Offline-first browser storage using IndexedDB with localStorage fallback.
+- Full-state JSON export/import is the canonical round-trip format.
+- CSV export/import is for set rows only.
+- Gist sync fallback stores one JSON blob in a GitHub Gist and merges records by `updated_at`.
 
-The app stores workout entries in IndexedDB first, with a localStorage fallback copy. It also has:
+## Implemented In This Slice
 
-- CSV export for sending weekly logs to Claude.
-- JSON backup for restoring the app data later.
-- JSON import that merges backed-up sets back into the app.
+- PWA shell and offline cache.
+- Dark-only palette, no theme toggle.
+- Exercise database/editor.
+- Program/day/block data model.
+- Add exercise and swap exercise flows.
+- Basic plan editor with drag reorder, rest-day type, and new-plan wizard.
+- Rest timer based on `Date.now()` deltas with vibrate/audio notification and mute-ready settings storage.
+- CSV schema:
 
-Local browser storage is still device/browser storage. It can be cleared if the user deletes site data, uses private browsing, or resets the phone. The JSON backup is the free recovery path.
+```csv
+date,exercise,set_number,reps,weight_lb,rpe,notes
+2026-05-03,Back Squat,1,5,225,7.5,felt fast
+```
+
+- CSV import preview with added/changed/unchanged/errored counts.
+- JSON backup/import.
+- PR trendline canvas view using Epley e1RM.
+- Gist sync fallback screen.
+
+## Supabase TODO
+
+The requested primary sync path needs a Supabase project URL, anon key, auth configuration, and table policies. Once those exist, wire these tables:
+
+- `profiles`
+- `exercises`
+- `programs`
+- `program_days`
+- `program_blocks`
+- `sessions`
+- `sets`
+
+The local state model now mirrors that shape closely enough to map records into those tables.
+
+## Notes
+
+The Gist fallback asks for a GitHub PAT with `gist` scope only. The app does not remember the token unless the user explicitly selects that option.
