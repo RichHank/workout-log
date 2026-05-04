@@ -1217,7 +1217,6 @@
       const [modal, setModal] = useState(null);
       const [clock, setClock] = useState(Date.now());
       const [listening, setListening] = useState(false);
-      const [liveTimer, setLiveTimer] = useState("00:00");
       const recognitionRef = useRef(null);
       const stateRef = useRef(null);
       const fileJsonRef = useRef(null);
@@ -1235,31 +1234,6 @@
       useEffect(() => {
         const id = window.setInterval(() => setClock(Date.now()), 100);
         return () => window.clearInterval(id);
-      }, []);
-
-      // Live timer display updated every second (like Strong/Hevy)
-      // Uses localStorage timestamp so it survives page refreshes
-      useEffect(() => {
-        function tick() {
-          const startTime = localStorage.getItem('session_start_time');
-          if (startTime) {
-            const elapsedSeconds = Math.floor((Date.now() - Number(startTime)) / 1000);
-            const hours = Math.floor(elapsedSeconds / 3600);
-            const minutes = Math.floor((elapsedSeconds % 3600) / 60);
-            const seconds = elapsedSeconds % 60;
-            let formatted = '';
-            if (hours > 0) {
-              formatted += hours + ':';
-            }
-            formatted += minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
-            setLiveTimer(formatted);
-          } else {
-            setLiveTimer("00:00");
-          }
-        }
-        tick();
-        const id = setInterval(tick, 1000);
-        return () => clearInterval(id);
       }, []);
 
       // Auto-pause session when app goes to background (like Strong/Hevy)
@@ -1342,6 +1316,11 @@
       const program = getProgram(state);
       const day = getDay(state);
       const activeSets = setsForDate(state, state.activeDate);
+      // Derive topbar timer from the same state + clock that SessionPanel uses
+      const activeSessionForTimer = state ? sessionForActiveDate(state) : null;
+      const liveTimer = (!activeSessionForTimer || activeSessionForTimer.finished_at)
+        ? "00:00"
+        : formatDuration(sessionElapsedMs(activeSessionForTimer, clock));
       const views = [
         ["log", "Log"],
         ["progress", "Stats"],
@@ -1445,8 +1424,8 @@
                 active.finished_at = nowISO();
                 active.updated_at = nowISO();
               });
-              localStorage.removeItem('session_start_time');
               showToast("Workout finished! Time saved.");
+
             } }, "Finish"),
           h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
         )
@@ -1954,9 +1933,8 @@
           notes: ""
         };
         state.sessions.push(session);
-        // Persist start timestamp to localStorage so timer survives page refreshes
-        localStorage.setItem('session_start_time', Date.now());
       }
+
       return session;
     }
 
