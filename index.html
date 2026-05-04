@@ -1242,7 +1242,8 @@
             setState((prev) => {
               if (!prev) return prev;
               const session = sessionForActiveDate(prev);
-              if (session && !session.paused_at) {
+              // Don't auto-pause if session is already finished
+              if (session && !session.paused_at && !session.finished_at) {
                 const next = cloneState(prev);
                 const active = next.sessions.find((s) => s.id === session.id);
                 if (active) {
@@ -1383,7 +1384,8 @@
       const elapsed = session ? sessionElapsedMs(session, clock) : 0;
       const setCount = setsForDate(state, state.activeDate).length;
       const isPaused = session?.paused_at != null;
-      const isActive = session && !isPaused;
+      const isFinished = session?.finished_at != null;
+      const isActive = session && !isPaused && !isFinished;
       if (!session) {
         return h("article", { class: "session-strip panel" },
           h("div", { class: "session-strip-main" },
@@ -1392,26 +1394,29 @@
           )
         );
       }
-      const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : "");
+      const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : isFinished ? "" : "");
       return h("article", { class: stripClass },
         h("div", { class: "session-strip-main" },
-          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") }, isPaused ? "PAUSED" : "LIVE"),
+          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") }, isFinished ? "COMPLETED" : isPaused ? "PAUSED" : "LIVE"),
           h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
           h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
           session?.notes && h("span", { class: "pill green" }, "notes")
         ),
         h("div", { class: "session-controls" },
+          isFinished ? h("span", { class: "session-meta", style: "font-size:0.78rem;padding:0 8px" }, "Done ✓") :
           isPaused ?
             h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { resumeSession(draft); showToast("Workout resumed!"); }) }, "Resume") :
             h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { pauseSession(draft); showToast("Workout paused."); }) }, "Pause"),
-          h("button", { class: "session-finish-btn", type: "button", onClick: () => {
-            updateState((draft) => {
-              const active = activeSession(draft);
-              active.manual_duration_ms = sessionElapsedMs(active);
-              active.updated_at = nowISO();
-            });
-            showToast("Workout finished! Time saved.");
-          } }, "Finish"),
+          isFinished ? null :
+            h("button", { class: "session-finish-btn", type: "button", onClick: () => {
+              updateState((draft) => {
+                const active = activeSession(draft);
+                active.manual_duration_ms = sessionElapsedMs(active);
+                active.finished_at = nowISO();
+                active.updated_at = nowISO();
+              });
+              showToast("Workout finished! Time saved.");
+            } }, "Finish"),
           h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
         )
       );
@@ -2333,7 +2338,7 @@
       const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
       if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
 
     function parseDurationInput(value) {
