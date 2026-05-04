@@ -36,7 +36,8 @@ date,exercise,set_number,reps,weight_lb,rpe,notes
 - Daily workout notes and editable session duration tracking.
 - Exercise-level duration and average-rest summaries.
 - Strength standards comparison using bundled starter data in `strength-standards.json`.
-- Google Drive sync screen using the Drive `appDataFolder` scope.
+- Google Drive sign-in using the Drive `appDataFolder` scope.
+- Automatic Drive sync after sign-in, after local changes, when the app comes back online, and when the tab becomes visible.
 
 ## Google Drive Setup
 
@@ -46,9 +47,9 @@ To make Drive sync work for everyone, create one Google Cloud project for the ap
 2. Configure the OAuth consent screen.
 3. Create an OAuth Client ID with application type `Web application`.
 4. Add `https://richhank.github.io` to Authorized JavaScript origins.
-5. Paste the Client ID into the app's Drive screen.
+5. Paste the public Client ID into `GOOGLE_OAUTH_CLIENT_ID` near the top of `index.html`, then commit and push.
 
-Every user clicks `Connect Google Drive` and approves app-specific Drive access. Their workout data is saved to their own Google Drive `appDataFolder`, separate from every other user.
+Every user opens the Drive screen, taps `Sign in with Google`, and approves app-specific Drive access. Their workout data is saved to their own Google Drive `appDataFolder`, separate from every other user. If `GOOGLE_OAUTH_CLIENT_ID` is still blank, the Drive screen shows an owner setup field so you can test with a Client ID before baking it into the hosted app.
 
 ## Notes
 
