@@ -1319,6 +1319,14 @@
       const session = sessionForActiveDate(state);
       const elapsed = session ? sessionElapsedMs(session, clock) : 0;
       const setCount = setsForDate(state, state.activeDate).length;
+      if (!session) {
+        return h("article", { class: "session-strip panel" },
+          h("div", { class: "session-strip-main" },
+            h("span", { class: "session-label" }, "Session not started"),
+            h("button", { class: "primary-btn", type: "button", onClick: () => updateState((draft) => { activeSession(draft); showToast("Workout started!"); }) }, "Start Workout")
+          )
+        );
+      }
       return h("article", { class: "session-strip panel" },
         h("div", { class: "session-strip-main" },
           h("span", { class: "session-label" }, "Session"),
@@ -1450,7 +1458,7 @@
         h("div", { class: "set-num" }, set.set_number),
         h("div", { class: "row-main" },
           h("b", null, `${formatWeight(set.weight_lb)} x ${set.reps}`),
-          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}`)
+          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}${set.time_logged ? ` at ${set.time_logged}` : ""}`)
         ),
         h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
           draft.sets = draft.sets.filter((item) => item.id !== set.id);
@@ -1792,6 +1800,7 @@
       const session = activeSession(state);
       const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === block.exercise_id);
       const now = nowISO();
+      const timeLogged = new Date().toTimeString().slice(0, 8);
       state.sets.push({
         id: cryptoId(),
         session_id: session.id,
@@ -1803,6 +1812,7 @@
         weight_lb: weight,
         rpe,
         notes,
+        time_logged: timeLogged,
         created_at: now,
         updated_at: now
       });
@@ -1931,8 +1941,8 @@
     }
 
     function toCSV(sets) {
-      const headers = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes"];
-      const rows = sets.slice().sort(sortRecords).map((set) => [set.date, set.exercise, set.set_number, set.reps, set.weight_lb, set.rpe, set.notes]);
+      const headers = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes", "time_logged"];
+      const rows = sets.slice().sort(sortRecords).map((set) => [set.date, set.exercise, set.set_number, set.reps, set.weight_lb, set.rpe, set.notes, set.time_logged]);
       return [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
     }
 
@@ -1962,10 +1972,11 @@
       const lines = text.split(/\r?\n/).filter((line) => line.trim());
       const headers = lines.shift()?.split(",").map((item) => item.trim()) || [];
       const expected = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes"];
-      if (expected.some((item, index) => headers[index] !== item)) throw new Error("CSV headers must be date,exercise,set_number,reps,weight_lb,rpe,notes");
+      const hasTimeLogged = headers.includes("time_logged");
+      if (!expected.every((item) => headers.includes(item))) throw new Error("CSV headers must include date,exercise,set_number,reps,weight_lb,rpe,notes");
       return lines.map((line, index) => {
         const cells = line.split(",");
-        const record = Object.fromEntries(expected.map((key, keyIndex) => [key, (cells[keyIndex] || "").trim()]));
+        const record = Object.fromEntries(headers.map((key, keyIndex) => [key, (cells[keyIndex] || "").trim()]));
         const errors = [];
         if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) errors.push("bad ISO date");
         if (!record.exercise) errors.push("missing exercise");
@@ -1995,6 +2006,7 @@
             weight_lb: Number(record.weight_lb),
             rpe: record.rpe,
             notes: record.notes,
+            time_logged: record.time_logged || "",
             created_at: existing >= 0 ? state.sets[existing].created_at : nowISO(),
             updated_at: nowISO()
           };
