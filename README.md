@@ -12,7 +12,7 @@ Live app: https://richhank.github.io/workout-log/
 - Offline-first browser storage using IndexedDB with localStorage fallback.
 - Full-state JSON export/import is the canonical round-trip format.
 - CSV export/import is for set rows only.
-- Gist sync fallback stores one JSON blob in a GitHub Gist and merges records by `updated_at`.
+- Google Drive sync stores one JSON blob in each user's hidden Drive app data folder and merges records by `updated_at`.
 
 ## Implemented In This Slice
 
@@ -36,22 +36,20 @@ date,exercise,set_number,reps,weight_lb,rpe,notes
 - Daily workout notes and editable session duration tracking.
 - Exercise-level duration and average-rest summaries.
 - Strength standards comparison using bundled starter data in `strength-standards.json`.
-- Gist sync fallback screen.
+- Google Drive sync screen using the Drive `appDataFolder` scope.
 
-## Supabase TODO
+## Google Drive Setup
 
-The requested primary sync path needs a Supabase project URL, anon key, auth configuration, and table policies. Once those exist, wire these tables:
+To make Drive sync work for everyone, create one Google Cloud project for the app:
 
-- `profiles`
-- `exercises`
-- `programs`
-- `program_days`
-- `program_blocks`
-- `sessions`
-- `sets`
+1. Enable the Google Drive API.
+2. Configure the OAuth consent screen.
+3. Create an OAuth Client ID with application type `Web application`.
+4. Add `https://richhank.github.io` to Authorized JavaScript origins.
+5. Paste the Client ID into the app's Drive screen.
 
-The local state model now mirrors that shape closely enough to map records into those tables.
+Every user clicks `Connect Google Drive` and approves app-specific Drive access. Their workout data is saved to their own Google Drive `appDataFolder`, separate from every other user.
 
 ## Notes
 
-The Gist fallback asks for a GitHub PAT with `gist` scope only. The app does not remember the token unless the user explicitly selects that option.
+The app uses `https://www.googleapis.com/auth/drive.appdata`, which limits access to files this app creates in the hidden app data folder. It does not request full Drive file access.

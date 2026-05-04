@@ -10,6 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.svg">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <title>Workout Log</title>
   <style>
     :root {
@@ -900,7 +901,8 @@
     const DB_NAME = "workout-log-db";
     const DB_VERSION = 2;
     const DB_STORE = "keyval";
-    const GIST_FILE = "workout-log-state.json";
+    const DRIVE_STATE_FILE = "workout-log-state.json";
+    const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
 
     const views = [
       ["log", "Log", "plus"],
@@ -908,7 +910,7 @@
       ["plan", "Plan", "calendar"],
       ["exercises", "Exercises", "dumbbell"],
       ["export", "Export", "download"],
-      ["sync", "Sync", "cloud"]
+      ["sync", "Drive", "cloud"]
     ];
 
     const icons = {
@@ -977,6 +979,8 @@
     let uiClock = null;
     let chartStart = 0;
     let dragData = null;
+    let googleAccessToken = "";
+    let googleTokenClient = null;
 
     function ex(id, name, primary, secondary, pattern, rest, sets, reps, aliases = []) {
       return {
@@ -1011,7 +1015,7 @@
         sets: [],
         drafts: {},
         profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
-        settings: { muted: false, sync: { provider: "gist", gistId: "", rememberToken: false, token: "", fileName: GIST_FILE, lastSyncAt: "" } },
+        settings: { muted: false, drive: { provider: "google-drive", clientId: "", fileName: DRIVE_STATE_FILE, fileId: "", connectedAt: "", lastSyncAt: "", lastStatus: "" } },
         command: "",
         rest: null,
         csvPreview: null
@@ -1104,7 +1108,7 @@
         merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
         merged.sessions = saved.sessions || [];
         merged.sets = saved.sets || [];
-        merged.settings = { ...fallback.settings, ...(saved.settings || {}), sync: { ...fallback.settings.sync, ...(saved.settings?.sync || {}) } };
+        merged.settings = { ...fallback.settings, ...(saved.settings || {}), drive: { ...fallback.settings.drive, ...(saved.settings?.drive || {}) } };
         merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
         if (!merged.activeProgramId || !getProgram(merged.activeProgramId, merged)) merged.activeProgramId = merged.programs[0]?.id;
         if (!merged.activeDayId || !getDay(merged.activeDayId, merged)) merged.activeDayId = merged.programs[0]?.days[0]?.id;
@@ -1605,22 +1609,22 @@
     }
 
     function renderSyncView() {
-      const sync = state.settings.sync;
+      const drive = state.settings.drive || {};
       document.getElementById("app").innerHTML = `
         <section class="panel" style="padding:12px">
-          <div class="section-title" style="margin-top:0"><h2>Gist Sync Fallback</h2><span>${sync.lastSyncAt ? `Last sync ${sync.lastSyncAt}` : "Not synced"}</span></div>
-          <p class="muted">Supabase real-time sync needs a project URL and anon key. Until those exist, this fallback stores the full app state in one private Gist JSON file and merges by updated_at.</p>
+          <div class="section-title" style="margin-top:0"><h2>Google Drive Sync</h2><span>${drive.lastSyncAt ? `Last sync ${drive.lastSyncAt}` : "Not synced"}</span></div>
+          <p class="muted">Each person signs in with Google and the tracker stores one JSON state file in that Google account's hidden Drive app data folder. The app asks only for app-specific Drive data access, not full Drive access.</p>
           <div class="form-grid">
-            <div class="field"><label>Gist ID</label><input id="gistId" value="${escapeHtml(sync.gistId)}" placeholder="gist id"></div>
-            <div class="field"><label>File name</label><input id="gistFile" value="${escapeHtml(sync.fileName || GIST_FILE)}"></div>
-            <div class="field"><label>GitHub PAT</label><input id="gistToken" type="password" value="${sync.rememberToken ? escapeHtml(sync.token) : ""}" placeholder="gist scope only"></div>
-            <div class="field"><label>Remember token</label><select id="rememberToken"><option value="false">No</option><option value="true" ${sync.rememberToken ? "selected" : ""}>Yes</option></select></div>
+            <div class="field"><label>Google OAuth Client ID</label><input id="googleClientId" value="${escapeHtml(drive.clientId || "")}" placeholder="paste web client id"></div>
+            <div class="field"><label>Drive file name</label><input id="driveFileName" value="${escapeHtml(drive.fileName || DRIVE_STATE_FILE)}"></div>
           </div>
           <div class="actions" style="margin-top:12px">
-            <button class="primary-btn" type="button" id="syncNowBtn">Sync</button>
-            <button class="ghost-btn" type="button" id="pullGistBtn">Pull</button>
-            <button class="ghost-btn" type="button" id="pushGistBtn">Push</button>
+            <button class="primary-btn" type="button" id="driveConnectBtn">Connect Google Drive</button>
+            <button class="ghost-btn" type="button" id="driveSyncBtn">Sync</button>
+            <button class="ghost-btn" type="button" id="drivePullBtn">Pull</button>
+            <button class="ghost-btn" type="button" id="drivePushBtn">Push</button>
           </div>
+          <p class="muted">${escapeHtml(drive.lastStatus || "Setup required: enable the Google Drive API, create a Web OAuth client, add https://richhank.github.io as an authorized JavaScript origin, then paste the Client ID here.")}</p>
         </section>
       `;
     }
@@ -2230,39 +2234,151 @@
       showToast("JSON import complete.");
     }
 
-    async function syncGist(mode) {
-      const sync = state.settings.sync;
-      const token = cleanValue(document.getElementById("gistToken")?.value || sync.token);
-      sync.gistId = cleanValue(document.getElementById("gistId")?.value || sync.gistId);
-      sync.fileName = cleanValue(document.getElementById("gistFile")?.value || sync.fileName || GIST_FILE);
-      sync.rememberToken = document.getElementById("rememberToken")?.value === "true";
-      sync.token = sync.rememberToken ? token : "";
-      if (!sync.gistId || !token) {
-        showToast("Gist ID and PAT are required.");
+    function saveDriveSettingsFromInputs() {
+      state.settings.drive ||= { provider: "google-drive", clientId: "", fileName: DRIVE_STATE_FILE, fileId: "", connectedAt: "", lastSyncAt: "", lastStatus: "" };
+      state.settings.drive.clientId = cleanValue(document.getElementById("googleClientId")?.value || state.settings.drive.clientId);
+      state.settings.drive.fileName = cleanValue(document.getElementById("driveFileName")?.value || state.settings.drive.fileName || DRIVE_STATE_FILE);
+      saveState();
+    }
+
+    async function connectGoogleDrive() {
+      saveDriveSettingsFromInputs();
+      await ensureGoogleDriveToken(true);
+      state.settings.drive.connectedAt = new Date().toISOString();
+      state.settings.drive.lastStatus = "Google Drive connected for this browser session.";
+      render();
+      showToast("Google Drive connected.");
+    }
+
+    async function syncDrive(mode) {
+      saveDriveSettingsFromInputs();
+      await ensureGoogleDriveToken(false);
+      if (mode === "pull" || mode === "sync") await pullDriveState();
+      if (mode === "push" || mode === "sync") await pushDriveState();
+      state.settings.drive.lastSyncAt = new Date().toISOString();
+      state.settings.drive.lastStatus = `${mode === "sync" ? "Synced" : mode === "pull" ? "Pulled" : "Pushed"} with Google Drive.`;
+      render();
+      showToast(state.settings.drive.lastStatus);
+    }
+
+    function ensureGoogleDriveToken(forcePrompt = false) {
+      return new Promise((resolve, reject) => {
+        const clientId = state.settings.drive?.clientId;
+        if (!clientId) {
+          reject(new Error("Paste a Google OAuth Client ID first."));
+          return;
+        }
+        if (googleAccessToken && !forcePrompt) {
+          resolve(googleAccessToken);
+          return;
+        }
+        if (!window.google?.accounts?.oauth2) {
+          reject(new Error("Google Identity Services is still loading. Try again in a few seconds."));
+          return;
+        }
+        googleTokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: GOOGLE_DRIVE_SCOPE,
+          callback: (response) => {
+            if (response.error) {
+              reject(new Error(response.error_description || response.error));
+              return;
+            }
+            googleAccessToken = response.access_token;
+            resolve(googleAccessToken);
+          }
+        });
+        googleTokenClient.requestAccessToken({ prompt: forcePrompt ? "consent" : "" });
+      });
+    }
+
+    async function pullDriveState() {
+      const file = await findDriveStateFile();
+      if (!file) {
+        state.settings.drive.lastStatus = "No Drive backup found yet. Push from the device with the latest data first.";
         return;
       }
-      if (mode === "pull" || mode === "sync") await pullGist(sync.gistId, token, sync.fileName);
-      if (mode === "push" || mode === "sync") await pushGist(sync.gistId, token, sync.fileName);
-      sync.lastSyncAt = new Date().toISOString();
-      render();
+      const response = await googleDriveRequest(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`);
+      const text = await response.text();
+      const parsed = JSON.parse(text);
+      state = mergeStates(state, normalizeState(parsed.state || parsed));
+      state.settings.drive.fileId = file.id;
     }
 
-    async function pullGist(gistId, token, fileName) {
-      const response = await fetch(`https://api.github.com/gists/${gistId}`, { headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" } });
-      if (!response.ok) throw new Error("Gist pull failed");
-      const gist = await response.json();
-      const content = gist.files?.[fileName]?.content;
-      if (!content) return;
-      state = mergeStates(state, normalizeState(JSON.parse(content).state || JSON.parse(content)));
+    async function pushDriveState() {
+      const file = await findDriveStateFile();
+      const content = backupPayload();
+      if (file) {
+        await googleDriveRequest(`https://www.googleapis.com/upload/drive/v3/files/${file.id}?uploadType=media&fields=id,name,modifiedTime`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: content
+        });
+        state.settings.drive.fileId = file.id;
+        return;
+      }
+      const created = await createDriveStateFile(content);
+      state.settings.drive.fileId = created.id;
     }
 
-    async function pushGist(gistId, token, fileName) {
-      const response = await fetch(`https://api.github.com/gists/${gistId}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
-        body: JSON.stringify({ files: { [fileName]: { content: backupPayload() } } })
+    async function findDriveStateFile() {
+      const fileName = state.settings.drive?.fileName || DRIVE_STATE_FILE;
+      const q = encodeURIComponent(`name='${fileName.replace(/'/g, "\\'")}'`);
+      const response = await googleDriveRequest(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&pageSize=1&fields=files(id,name,modifiedTime)`);
+      const data = await response.json();
+      return data.files?.[0] || null;
+    }
+
+    async function createDriveStateFile(content) {
+      const boundary = `workout-log-${Date.now()}`;
+      const metadata = {
+        name: state.settings.drive?.fileName || DRIVE_STATE_FILE,
+        parents: ["appDataFolder"],
+        mimeType: "application/json"
+      };
+      const body = [
+        `--${boundary}`,
+        "Content-Type: application/json; charset=UTF-8",
+        "",
+        JSON.stringify(metadata),
+        `--${boundary}`,
+        "Content-Type: application/json",
+        "",
+        content,
+        `--${boundary}--`
+      ].join("\r\n");
+      const response = await googleDriveRequest("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime", {
+        method: "POST",
+        headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+        body
       });
-      if (!response.ok) throw new Error("Gist push failed");
+      return response.json();
+    }
+
+    async function googleDriveRequest(url, options = {}) {
+      const token = await ensureGoogleDriveToken(false);
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.status === 401) {
+        googleAccessToken = "";
+        throw new Error("Google session expired. Tap Connect Google Drive again.");
+      }
+      if (!response.ok) throw new Error(await googleErrorMessage(response));
+      return response;
+    }
+
+    async function googleErrorMessage(response) {
+      try {
+        const data = await response.json();
+        return data.error?.message || `Google Drive request failed (${response.status})`;
+      } catch {
+        return `Google Drive request failed (${response.status})`;
+      }
     }
 
     function mergeStates(local, remote) {
@@ -2273,7 +2389,7 @@
         sessions: mergeByUpdatedAt(local.sessions, remote.sessions),
         sets: mergeByUpdatedAt(local.sets, remote.sets),
         profile: remote.profile || local.profile,
-        settings: { ...local.settings, sync: local.settings.sync }
+        settings: { ...local.settings, drive: local.settings.drive }
       });
     }
 
@@ -2558,9 +2674,10 @@
         render();
         return;
       }
-      if (event.target.closest("#syncNowBtn")) return syncGist("sync").catch((error) => showToast(error.message));
-      if (event.target.closest("#pullGistBtn")) return syncGist("pull").catch((error) => showToast(error.message));
-      if (event.target.closest("#pushGistBtn")) return syncGist("push").catch((error) => showToast(error.message));
+      if (event.target.closest("#driveConnectBtn")) return connectGoogleDrive().catch((error) => showToast(error.message));
+      if (event.target.closest("#driveSyncBtn")) return syncDrive("sync").catch((error) => showToast(error.message));
+      if (event.target.closest("#drivePullBtn")) return syncDrive("pull").catch((error) => showToast(error.message));
+      if (event.target.closest("#drivePushBtn")) return syncDrive("push").catch((error) => showToast(error.message));
     });
 
     document.addEventListener("input", (event) => {
@@ -2590,6 +2707,10 @@
         state.profile[event.target.dataset.profileField] = event.target.value;
         saveState();
         if (state.view === "progress") renderProgressView();
+        return;
+      }
+      if (event.target.id === "googleClientId" || event.target.id === "driveFileName") {
+        saveDriveSettingsFromInputs();
         return;
       }
       if (event.target.id === "exerciseSearch") state.exerciseQuery = event.target.value;
@@ -2693,7 +2814,7 @@
     });
 
     window.addEventListener("online", () => {
-      if (state.settings.sync.gistId && state.settings.sync.token) syncGist("sync").catch(() => {});
+      if (state.settings.drive?.clientId && googleAccessToken) syncDrive("sync").catch(() => {});
     });
 
     function downloadText(text, name, type) {

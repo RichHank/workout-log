@@ -1,7 +1,7 @@
 {
   "name": "Workout Log",
   "short_name": "Workout",
-  "description": "A phone-first workout logger with offline storage, rest timer, CSV/JSON export, and Gist sync fallback.",
+  "description": "A phone-first workout logger with offline storage, rest timer, CSV/JSON export, and Google Drive sync.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
