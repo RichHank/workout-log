@@ -1329,12 +1329,17 @@
       }
       return h("article", { class: "session-strip panel" },
         h("div", { class: "session-strip-main" },
-          h("span", { class: "session-label" }, "Session"),
+          h("span", { class: "session-label" }, session.paused_at ? "Session Paused" : "Session"),
           h("span", { class: "session-time" }, formatDuration(elapsed)),
           h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
           session?.notes && h("span", { class: "pill green" }, "notes")
         ),
-        h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
+        h("div", { class: "session-controls" },
+          session.paused_at ?
+            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { resumeSession(draft); showToast("Workout resumed!"); }) }, "Resume") :
+            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { pauseSession(draft); showToast("Workout paused."); }) }, "Pause"),
+          h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
+        )
       );
     }
 
@@ -1822,14 +1827,29 @@
     function activeSession(state) {
       let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
       if (!session) {
-        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO(), paused_total_ms: 0, manual_duration_ms: null, notes: "" };
+        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO(), paused_total_ms: 0, paused_at: null, manual_duration_ms: null, notes: "" };
         state.sessions.push(session);
       }
       return session;
     }
 
-    function sessionForActiveDate(state) {
-      return state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
+    function pauseSession(state) {
+      const session = activeSession(state);
+      if (!session.paused_at) {
+        session.paused_at = nowISO();
+        session.updated_at = nowISO();
+      }
+    }
+
+    function resumeSession(state) {
+      const session = activeSession(state);
+      if (session.paused_at) {
+        const pausedStart = new Date(session.paused_at).getTime();
+        const now = Date.now();
+        session.paused_total_ms = (session.paused_total_ms || 0) + (now - pausedStart);
+        session.paused_at = null;
+        session.updated_at = nowISO();
+      }
     }
 
     function sessionElapsedMs(session, clock = Date.now()) {
@@ -1837,7 +1857,12 @@
       if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
       const started = new Date(session.started_at || session.created_at || nowISO()).getTime();
       const paused = Number(session.paused_total_ms || 0);
-      return Math.max(0, clock - started - paused);
+      let elapsed = clock - started - paused;
+      if (session.paused_at) {
+        const pausedStart = new Date(session.paused_at).getTime();
+        elapsed = pausedStart - started - paused;
+      }
+      return Math.max(0, elapsed);
     }
 
     function adjustSessionDuration(updateState, deltaMs) {
