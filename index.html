@@ -1916,6 +1916,10 @@
       });
     }
 
+    function sessionForActiveDate(state) {
+      return state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
+    }
+
     function createNewPlan(updateState, showToast) {
       updateState((draft) => {
         const plan = createProgramFromTemplate(`K3V Plan ${draft.programs.length + 1}`, "Upper/Lower", 4, draft.exercises);
