@@ -5,51 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0f1115">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Workout Log">
+  <meta name="apple-mobile-web-app-title" content="K3VSYNC">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon-192.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <title>Workout Log</title>
+  <script src="https://unpkg.com/preact@10.26.9/dist/preact.umd.js"></script>
+  <script src="https://unpkg.com/preact@10.26.9/hooks/dist/hooks.umd.js"></script>
+  <title>K3VSYNC</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0f1115;
-      --panel: #171a20;
-      --panel-2: #222732;
-      --panel-3: #101319;
-      --text: #f4f7fb;
-      --muted: #a1acb8;
-      --line: #2c3340;
-      --line-strong: #3b4654;
+      --bg: #0e1116;
+      --panel: #171c24;
+      --panel-2: #202836;
+      --panel-3: #10141b;
+      --text: #f5f8fc;
+      --muted: #9ca9b8;
+      --line: #2c3544;
+      --line-strong: #3d4b5d;
       --accent: #8fb7ff;
-      --accent-2: #6ee7b7;
-      --accent-3: #ffd08a;
+      --green: #74e6ad;
+      --gold: #ffd08a;
       --danger: #ff8a93;
       --shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
       --radius: 8px;
       --tap: 46px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(180deg, #111318 0%, #0f1115 100%);
+      background:
+        radial-gradient(circle at top left, rgba(143, 183, 255, 0.13), transparent 34rem),
+        linear-gradient(180deg, #121620 0%, var(--bg) 58%);
       color: var(--text);
     }
 
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
+    button, input, textarea, select { font: inherit; }
 
     button {
       border: 0;
@@ -57,25 +55,17 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    input,
-    textarea,
-    select {
+    button:disabled { cursor: not-allowed; opacity: 0.48; }
+
+    input, textarea, select {
       width: 100%;
       min-height: var(--tap);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: #111318;
+      background: #111722;
       color: var(--text);
       outline: none;
       padding: 10px 12px;
-      transition: border-color 160ms ease, box-shadow 160ms ease;
-    }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(143, 183, 255, 0.16);
     }
 
     textarea {
@@ -83,35 +73,28 @@
       min-height: 86px;
     }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(143, 183, 255, 0.16);
     }
 
-    .shell {
-      width: min(100%, 980px);
-      margin: 0 auto;
+    .app-shell {
+      width: min(100%, 1040px);
       min-height: 100vh;
-      padding: env(safe-area-inset-top) 14px calc(92px + env(safe-area-inset-bottom));
+      margin: 0 auto;
+      padding: env(safe-area-inset-top) 14px calc(108px + env(safe-area-inset-bottom));
     }
 
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       padding: 12px 0 10px;
-      background: rgba(15, 17, 21, 0.92);
+      background: rgba(14, 17, 22, 0.92);
       backdrop-filter: blur(16px);
     }
 
@@ -129,73 +112,64 @@
       place-items: center;
       flex: 0 0 auto;
       border-radius: var(--radius);
-      background: var(--text);
-      color: #111318;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      color: #08111f;
+      font-weight: 950;
+      letter-spacing: 0;
       box-shadow: var(--shadow);
     }
 
+    h1, h2, h3, p { margin-top: 0; }
+
     .brand h1 {
       margin: 0;
-      font-size: 1.05rem;
-      line-height: 1.08;
+      font-size: 1.06rem;
+      line-height: 1.05;
       letter-spacing: 0;
     }
 
     .brand p {
       margin: 3px 0 0;
       color: var(--muted);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       line-height: 1.2;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 8px;
+    .sync-chip {
+      min-height: 34px;
+      display: inline-flex;
       align-items: center;
-    }
-
-    .icon-btn,
-    .mini-btn {
-      width: var(--tap);
-      height: var(--tap);
-      display: inline-grid;
-      place-items: center;
-      border-radius: var(--radius);
-      background: var(--panel);
-      color: var(--text);
+      gap: 7px;
+      padding: 0 10px;
+      border-radius: 999px;
       border: 1px solid var(--line);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+      background: rgba(23, 28, 36, 0.86);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+      white-space: nowrap;
     }
 
-    .mini-btn {
-      width: 40px;
-      height: 40px;
+    .sync-chip[data-state="syncing"] {
+      color: var(--green);
+      border-color: rgba(116, 230, 173, 0.42);
     }
 
-    .mini-btn.primary {
-      background: var(--text);
-      color: #111318;
-      border-color: var(--text);
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 0 0 rgba(116, 230, 173, 0.45);
     }
 
-    .mini-btn.danger {
-      color: var(--danger);
-      background: transparent;
-      border-color: rgba(255, 138, 147, 0.42);
+    .sync-chip[data-state="syncing"] .sync-dot {
+      animation: pulse 1.1s infinite;
     }
 
-    .icon-btn:active,
-    .mini-btn:active,
-    .primary-btn:active,
-    .ghost-btn:active,
-    .segmented button:active {
-      transform: translateY(1px);
-    }
-
-    svg {
-      width: 19px;
-      height: 19px;
-      stroke-width: 2;
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 8px rgba(116, 230, 173, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(116, 230, 173, 0); }
     }
 
     .toolbar {
@@ -206,7 +180,7 @@
 
     .segmented {
       display: grid;
-      grid-template-columns: repeat(6, minmax(82px, 1fr));
+      grid-template-columns: repeat(5, minmax(82px, 1fr));
       gap: 4px;
       padding: 4px;
       overflow-x: auto;
@@ -215,199 +189,174 @@
       border: 1px solid var(--line);
     }
 
-    .segmented button {
+    .segmented button, .day-strip button {
       min-height: 40px;
       border-radius: 6px;
       background: transparent;
       color: var(--muted);
-      font-size: 0.86rem;
-      font-weight: 800;
-      white-space: nowrap;
+      font-weight: 850;
     }
 
-    .segmented button[aria-selected="true"] {
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    .segmented button[aria-selected="true"], .day-strip button[aria-current="true"] {
+      background: var(--text);
+      color: #0d121a;
     }
 
     .date-row {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 8px;
-      align-items: center;
     }
 
     .day-strip {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(104px, 1fr);
       gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }
 
     .day-strip button {
-      min-height: 58px;
-      padding: 7px 5px;
-      border-radius: var(--radius);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      display: grid;
-      gap: 2px;
-      justify-items: center;
-    }
-
-    .day-strip button strong {
-      color: inherit;
-      font-size: 0.84rem;
-    }
-
-    .day-strip button span {
-      font-size: 0.7rem;
-      line-height: 1.1;
-    }
-
-    .day-strip button[aria-current="true"] {
-      background: var(--text);
-      color: #111318;
-      border-color: var(--text);
-      box-shadow: var(--shadow);
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin: 0 0 12px;
-    }
-
-    .metric,
-    .panel {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--panel);
-      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
-    }
-
-    .metric {
-      min-height: 68px;
-      padding: 10px;
       display: grid;
       align-content: center;
       gap: 2px;
+      min-height: 54px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      background: var(--panel);
     }
 
-    .metric b {
-      font-size: 1.24rem;
-      line-height: 1;
+    .day-strip span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: inherit;
+      font-size: 0.72rem;
+      opacity: 0.8;
+      white-space: nowrap;
     }
 
-    .metric span,
-    .muted {
-      color: var(--muted);
-      font-size: 0.76rem;
-      line-height: 1.25;
-    }
-
-    .voice-panel {
-      padding: 12px;
-      margin: 0 0 12px;
-    }
-
-    .voice-grid {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 8px;
-      align-items: start;
-    }
-
-    .voice-grid textarea {
-      min-height: 46px;
-      height: 46px;
-      max-height: 120px;
-      padding-top: 11px;
-    }
-
-    .primary-btn,
-    .ghost-btn {
+    .primary-btn, .ghost-btn, .mini-btn {
       min-height: var(--tap);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       border-radius: var(--radius);
-      padding: 0 13px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .primary-btn {
+      padding: 0 14px;
       background: var(--accent);
       color: #08111f;
       box-shadow: 0 12px 26px rgba(143, 183, 255, 0.18);
     }
 
     .ghost-btn {
+      padding: 0 13px;
       background: var(--panel);
       color: var(--text);
       border: 1px solid var(--line);
     }
 
-    .primary-btn:disabled,
-    .ghost-btn:disabled {
-      opacity: 0.48;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .ghost-btn.danger {
+    .ghost-btn.danger, .mini-btn.danger {
       color: var(--danger);
       border-color: rgba(255, 138, 147, 0.42);
     }
 
-    .status-line,
-    .row-between {
+    .mini-btn {
+      width: 42px;
+      height: 42px;
+      min-height: 42px;
+      flex: 0 0 auto;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 0;
+    }
+
+    .mini-btn.primary {
+      background: var(--text);
+      color: #111722;
+      border-color: var(--text);
+    }
+
+    .panel {
+      background: rgba(23, 28, 36, 0.94);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .section-title {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: end;
+      gap: 10px;
+      margin: 16px 0 9px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.15;
+    }
+
+    .muted, .section-title span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+
+    .actions, .form-grid, .row-actions {
+      display: grid;
       gap: 8px;
     }
 
-    .status-line {
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      min-height: 19px;
+    .actions {
+      grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+      margin-bottom: 12px;
     }
 
-    .list,
+    .form-grid {
+      grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
     .stack {
       display: grid;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .exercise,
-    .day-card {
+    .exercise-card, .day-card, .chart-card, .drive-card {
       overflow: hidden;
     }
 
-    .exercise-head,
     .card-head {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px;
       align-items: start;
       padding: 13px 12px 10px;
       border-bottom: 1px solid var(--line);
     }
 
-    .exercise-title h2,
-    .card-head h2,
-    .section-title h2 {
+    .card-head h2 {
       margin: 0;
       font-size: 1rem;
       line-height: 1.18;
     }
 
-    .target,
     .chip-row {
       margin-top: 6px;
       display: flex;
@@ -425,185 +374,91 @@
       border-radius: 999px;
       padding: 0 8px;
       font-size: 0.72rem;
-      font-weight: 800;
+      font-weight: 900;
       line-height: 1;
-      white-space: nowrap;
       background: #253142;
       color: #c7d7ea;
+      white-space: nowrap;
     }
 
-    .pill.press,
-    .pill.compound {
-      background: #153150;
-      color: #b8d9ff;
-    }
+    .pill.green { background: #123427; color: #bdf3d0; }
+    .pill.gold { background: #3a2913; color: #ffd79a; }
 
-    .pill.pull,
-    .pill.isolation {
-      background: #153323;
-      color: #bdf3d0;
-    }
-
-    .pill.logged,
-    .pill.hinge {
-      background: #3a2913;
-      color: #ffd79a;
-    }
-
-    .set-form,
-    .form-grid {
+    .set-form {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 70px 70px minmax(76px, 1fr) auto;
+      grid-template-columns: minmax(112px, 1fr) 70px 70px minmax(96px, 1fr) auto;
       gap: 7px;
       padding: 10px 12px;
       align-items: end;
       border-bottom: 1px solid var(--line);
     }
 
-    .form-grid {
-      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
-      border-bottom: 0;
-      padding: 0;
+    .weight-field {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 6px;
     }
 
-    .field label {
-      display: block;
-      color: var(--muted);
-      font-size: 0.68rem;
-      line-height: 1;
-      margin: 0 0 5px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .field input,
-    .field select {
-      min-height: 42px;
-      padding: 8px 10px;
-    }
-
-    .sets {
+    .set-list, .exercise-list, .plan-blocks {
       display: grid;
     }
 
-    .set-row,
-    .block-row,
-    .exercise-row {
+    .set-row, .exercise-row, .block-row {
       display: grid;
-      grid-template-columns: 36px 1fr auto;
+      grid-template-columns: 36px minmax(0, 1fr) auto;
       gap: 8px;
       align-items: center;
-      min-height: 48px;
+      min-height: 52px;
       padding: 8px 12px;
       border-bottom: 1px solid var(--line);
       font-size: 0.9rem;
     }
 
-    .block-row,
-    .exercise-row {
-      grid-template-columns: 1fr auto;
+    .exercise-row, .block-row {
+      grid-template-columns: minmax(0, 1fr) auto;
     }
 
-    .set-row:last-child,
-    .block-row:last-child,
-    .exercise-row:last-child {
+    .set-row:last-child, .exercise-row:last-child, .block-row:last-child {
       border-bottom: 0;
     }
 
     .set-num {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       display: grid;
       place-items: center;
-      border-radius: 7px;
+      border-radius: 999px;
       background: var(--panel-2);
       color: var(--muted);
-      font-weight: 900;
-      font-size: 0.76rem;
+      font-weight: 950;
     }
 
-    .set-main,
     .row-main {
       min-width: 0;
-      display: grid;
-      gap: 2px;
     }
 
-    .set-main b,
     .row-main b {
-      font-size: 0.92rem;
-      line-height: 1.15;
-    }
-
-    .set-main span,
-    .row-main span {
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .row-main span {
+      display: block;
+      margin-top: 2px;
       color: var(--muted);
       font-size: 0.76rem;
-      line-height: 1.15;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .empty {
-      min-height: 86px;
-      display: grid;
-      place-items: center;
-      padding: 18px;
+      padding: 16px 12px;
       color: var(--muted);
       text-align: center;
-      font-size: 0.88rem;
-      line-height: 1.35;
-    }
-
-    .section-title {
-      margin: 16px 0 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .actions,
-    .export-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 8px;
-      margin: 0 0 12px;
-    }
-
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    table {
-      width: 100%;
-      min-width: 620px;
-      border-collapse: collapse;
-      font-size: 0.86rem;
-    }
-
-    th,
-    td {
-      text-align: left;
-      padding: 10px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      background: var(--panel-3);
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
+      font-size: 0.84rem;
     }
 
     .chart-grid {
@@ -616,99 +471,98 @@
       padding: 12px;
     }
 
-    .chart-card canvas {
-      width: 100%;
-      height: 160px;
-      display: block;
-      margin-top: 8px;
-    }
-
-    .note-panel {
-      padding: 12px;
-      margin: 0 0 12px;
-    }
-
-    .note-panel textarea {
-      margin-top: 8px;
-      min-height: 92px;
-    }
-
-    .session-actions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    .chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 8px;
-      margin-top: 10px;
+      margin-bottom: 8px;
     }
 
-    .standards-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .standard-card {
-      padding: 12px;
+    .trend-svg {
+      width: 100%;
+      height: 190px;
+      display: block;
+      overflow: visible;
     }
 
     .standard-bar {
       position: relative;
-      height: 18px;
+      height: 10px;
       margin: 12px 0 8px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #253142 0 20%, #153150 20% 40%, #153323 40% 60%, #3a2913 60% 80%, #4b1d2b 80% 100%);
-      border: 1px solid var(--line);
-      overflow: hidden;
+      background: linear-gradient(90deg, #435065, #8fb7ff, #74e6ad, #ffd08a);
     }
 
     .standard-marker {
       position: absolute;
-      top: -6px;
+      top: -5px;
       width: 4px;
-      height: 30px;
+      height: 20px;
       border-radius: 999px;
       background: var(--text);
-      box-shadow: 0 0 0 2px #111318;
+      box-shadow: 0 0 0 2px #111722;
     }
 
-    .standard-levels {
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      background: rgba(14, 17, 22, 0.94);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-inner {
+      width: min(100%, 1040px);
+      margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
-      color: var(--muted);
-      font-size: 0.68rem;
-      line-height: 1.15;
-      text-align: center;
+      gap: 5px;
     }
 
-    .modal {
+    .bottom-nav button {
+      min-height: 48px;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .bottom-nav button[aria-selected="true"] {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .modal-backdrop {
       position: fixed;
       inset: 0;
-      z-index: 40;
-      display: none;
-      align-items: end;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.58);
-      padding: 14px;
-    }
-
-    .modal.show {
-      display: flex;
+      z-index: 50;
+      display: grid;
+      place-items: end center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.52);
     }
 
     .modal-panel {
-      width: min(100%, 620px);
+      width: min(100%, 560px);
       max-height: min(88vh, 760px);
       overflow: auto;
+      background: var(--panel);
       border: 1px solid var(--line-strong);
       border-radius: var(--radius);
-      background: var(--panel);
       box-shadow: var(--shadow);
       padding: 14px;
     }
 
     .modal-head {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -718,191 +572,55 @@
       font-size: 1rem;
     }
 
-    .rest-bar {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: calc(72px + env(safe-area-inset-bottom));
-      z-index: 25;
-      display: none;
-      padding: 8px max(14px, env(safe-area-inset-left)) 0 max(14px, env(safe-area-inset-right));
-    }
-
-    .rest-bar.show {
-      display: block;
-    }
-
-    .rest-inner {
-      width: min(100%, 980px);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr repeat(4, auto);
-      gap: 7px;
-      align-items: center;
-      border: 1px solid var(--line-strong);
-      border-radius: var(--radius);
-      background: #111318;
-      box-shadow: var(--shadow);
-      padding: 8px;
-    }
-
-    .rest-time {
-      font-weight: 900;
-      color: var(--accent-2);
-    }
-
-    .bottom-nav {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 20;
-      padding: 8px max(14px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
-      background: rgba(15, 17, 21, 0.92);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--line);
-    }
-
-    .bottom-nav-inner {
-      width: min(100%, 980px);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 6px;
-    }
-
-    .bottom-nav button {
-      min-height: 52px;
-      border-radius: var(--radius);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      display: grid;
-      justify-items: center;
-      align-content: center;
-      gap: 4px;
-      font-size: 0.68rem;
-      font-weight: 800;
-    }
-
-    .bottom-nav button[aria-selected="true"] {
-      color: #111318;
-      background: var(--text);
-      border-color: var(--text);
-    }
-
     .toast {
       position: fixed;
-      left: 50%;
-      bottom: calc(132px + env(safe-area-inset-bottom));
-      z-index: 50;
-      transform: translateX(-50%) translateY(18px);
+      left: 14px;
+      right: 14px;
+      bottom: calc(78px + env(safe-area-inset-bottom));
+      z-index: 60;
       width: min(calc(100% - 28px), 520px);
-      padding: 12px 14px;
+      margin: 0 auto;
+      padding: 12px 13px;
       border-radius: var(--radius);
       background: var(--text);
-      color: #111318;
+      color: #10141b;
+      font-weight: 850;
       box-shadow: var(--shadow);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 180ms ease, transform 180ms ease;
-      font-size: 0.9rem;
-      line-height: 1.25;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    .toast button {
-      margin-left: 8px;
-      color: #111318;
-      font-weight: 900;
-      text-decoration: underline;
-      background: transparent;
-    }
-
-    [draggable="true"] {
-      cursor: grab;
-    }
-
-    @media (min-width: 720px) {
-      .shell {
-        padding-left: 22px;
-        padding-right: 22px;
-      }
-
-      .toolbar {
-        grid-template-columns: 1.5fr 1fr;
-        align-items: start;
-      }
-
-      .day-strip {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (max-width: 520px) {
+    @media (max-width: 760px) {
+      .segmented { display: none; }
+      .sync-chip span:last-child { display: none; }
       .set-form {
-        grid-template-columns: 1fr 58px 58px auto;
+        grid-template-columns: 1fr 70px 70px auto;
       }
-
-      .set-form .notes-field {
+      .notes-field {
         grid-column: 1 / -1;
       }
-
-      .bottom-nav-inner {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .rest-inner {
-        grid-template-columns: 1fr repeat(2, auto);
+      .actions {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M6 8v8M18 8v8M3.5 10.5v3M20.5 10.5v3M6 12h12" stroke="currentColor" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>
-          <h1>Workout Log</h1>
-          <p id="headline">Ready</p>
-        </div>
-      </div>
-      <div class="top-actions">
-        <button class="ghost-btn" id="editPlanBtn" type="button">Edit Plan</button>
-      </div>
-    </header>
-
-    <div class="toolbar">
-      <div class="segmented" role="tablist" aria-label="Views" id="topTabs"></div>
-      <div class="date-row">
-        <label class="sr-only" for="workoutDate">Workout date</label>
-        <input id="workoutDate" type="date">
-        <button class="ghost-btn" id="todayBtn" type="button">Today</button>
-      </div>
-      <div class="day-strip" id="dayStrip" aria-label="Workout day"></div>
-    </div>
-
-    <main id="app"></main>
-  </div>
-
-  <div class="rest-bar" id="restBar"></div>
-  <nav class="bottom-nav" aria-label="Primary">
-    <div class="bottom-nav-inner" id="bottomTabs"></div>
-  </nav>
-  <div class="modal" id="modal"></div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
+  <div id="root"></div>
   <script>
+    const { h, render } = preact;
+    const { useEffect, useMemo, useRef, useState } = preactHooks;
+
     const STORAGE_KEY = "workout-log-v2";
     const LEGACY_STORAGE_KEY = "workout-log-v1";
     const DB_NAME = "workout-log-db";
@@ -910,45 +628,17 @@
     const DB_STORE = "keyval";
     const DRIVE_STATE_FILE = "workout-log-state.json";
     const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
-    // Public Web OAuth client ID for the hosted app. Safe to commit after creating it in Google Cloud.
     const GOOGLE_OAUTH_CLIENT_ID = "565625887082-vfb55neduq0bj9trrcgonntckj44mt4d.apps.googleusercontent.com";
-    const DRIVE_AUTO_SYNC_DELAY = 1800;
-
-    const views = [
-      ["log", "Log", "plus"],
-      ["progress", "Stats", "chart"],
-      ["plan", "Plan", "calendar"],
-      ["exercises", "Exercises", "dumbbell"],
-      ["export", "Export", "download"],
-      ["sync", "Drive", "cloud"]
-    ];
-
-    const icons = {
-      plus: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-linecap="round"/></svg>',
-      mic: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="currentColor"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M9 21h6" stroke="currentColor" stroke-linecap="round"/></svg>',
-      stop: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h8v8H8z" stroke="currentColor" stroke-linejoin="round"/></svg>',
-      trash: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7l1-3h4l1 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      download: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 4v10M8 10l4 4 4-4M5 20h14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      upload: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 20V10M8 14l4-4 4 4M5 20h14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      copy: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h11v11H8zM5 16H4V4h12v1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      chart: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 19h16M6 15l4-4 3 3 5-7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      dumbbell: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 8v8M18 8v8M3.5 10.5v3M20.5 10.5v3M6 12h12" stroke="currentColor" stroke-linecap="round"/></svg>',
-      swap: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 7h10l-3-3M17 17H7l3 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      calendar: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 3v3M17 3v3M4 8h16M5 5h14v15H5z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      cloud: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 18h10a4 4 0 0 0 .8-7.9A6 6 0 0 0 6.4 8.2 4.8 4.8 0 0 0 7 18Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      refresh: '<svg viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 0 1-13.6 5.7M4 12A8 8 0 0 1 17.6 6.3M18 3v4h-4M6 21v-4h4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      play: '<svg viewBox="0 0 24 24" fill="none"><path d="m9 6 10 6-10 6z" stroke="currentColor" stroke-linejoin="round"/></svg>',
-      pause: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14M16 5v14" stroke="currentColor" stroke-linecap="round"/></svg>',
-      edit: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5 14.5 5.5 4 16v4ZM13 7l4 4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-      duplicate: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h11v11H8zM5 16H4V4h12v1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-    };
+    const DRIVE_AUTO_SYNC_DELAY = 2600;
+    const BAR_WEIGHT = 45;
+    const PLATES = [45, 35, 25, 10, 5, 2.5];
 
     const muscles = ["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quads", "Hamstrings", "Glutes", "Calves", "Core", "Cardio"];
     const patterns = ["squat", "hinge", "press", "pull", "carry", "lunge", "core", "cardio"];
     const dayTypes = ["Strength", "Cardio", "Mobility", "Rest", "Custom"];
     const standardLevels = ["untrained", "novice", "intermediate", "advanced", "elite"];
-    const ageBrackets = ["18-39", "40-49", "50-59", "60-69"];
     const bodyweightBrackets = [120, 150, 180, 210, 240, 270];
+    const ageBrackets = ["18-39", "40-49", "50-59", "60-69"];
     const strengthStandardModels = {
       "bench-press": { lift: "Bench Press", aliases: ["bench-press"], male: [0.65, 0.92, 1.23, 1.58, 1.95], female: [0.38, 0.55, 0.75, 0.95, 1.15] },
       squat: { lift: "Squat", aliases: ["front-squat", "leg-press"], male: [0.85, 1.2, 1.55, 1.95, 2.45], female: [0.55, 0.8, 1.05, 1.35, 1.65] },
@@ -957,7 +647,23 @@
       "barbell-row": { lift: "Barbell Row", aliases: ["seated-cable-row", "wide-cable-row"], male: [0.62, 0.88, 1.15, 1.45, 1.75], female: [0.42, 0.6, 0.82, 1.02, 1.22] },
       "pull-up": { lift: "Pull-up", aliases: ["lat-pulldown-close", "lat-pulldown-wide"], male: [0.45, 0.65, 0.9, 1.12, 1.35], female: [0.28, 0.42, 0.58, 0.74, 0.9] }
     };
-    const strengthStandards = buildStrengthStandards();
+
+    function ex(id, name, primary, secondary, pattern, rest, sets, reps, aliases = []) {
+      return {
+        id,
+        name,
+        primary_muscle: primary,
+        secondary_muscles: secondary,
+        movement_pattern: pattern,
+        default_rest_seconds: rest,
+        default_sets: sets,
+        default_rep_range: reps,
+        demo_video_url: "",
+        notes: "",
+        aliases,
+        updated_at: new Date(0).toISOString()
+      };
+    }
 
     const defaultExercises = [
       ex("bench-press", "Bench Press", "Chest", ["Triceps", "Shoulders"], "press", 180, 3, "4-6", ["bench", "barbell bench"]),
@@ -983,48 +689,8 @@
       ex("hip-thrust", "Hip Thrust", "Glutes", ["Hamstrings"], "hinge", 150, 2, "10-12", ["hip thrusts"])
     ];
 
-    let state = createDefaultState();
-    let recognition = null;
-    let listening = false;
-    let restInterval = null;
-    let uiClock = null;
-    let chartStart = 0;
-    let dragData = null;
-    let googleAccessToken = "";
-    let googleTokenClient = null;
-    let driveAutoSyncTimer = null;
-    let driveSyncInFlight = false;
-    let driveSyncDirty = false;
-    let suppressDriveAutoSync = false;
-
-    function ex(id, name, primary, secondary, pattern, rest, sets, reps, aliases = []) {
-      return {
-        id,
-        name,
-        primary_muscle: primary,
-        secondary_muscles: secondary,
-        movement_pattern: pattern,
-        default_rest_seconds: rest,
-        default_sets: sets,
-        default_rep_range: reps,
-        demo_video_url: "",
-        notes: "",
-        aliases,
-        updated_at: new Date(0).toISOString()
-      };
-    }
-
     function defaultDriveSettings() {
-      return {
-        provider: "google-drive",
-        clientId: "",
-        fileName: DRIVE_STATE_FILE,
-        fileId: "",
-        connectedAt: "",
-        lastSyncAt: "",
-        lastStatus: "",
-        autoSync: true
-      };
+      return { provider: "google-drive", clientId: "", fileName: DRIVE_STATE_FILE, fileId: "", connectedAt: "", lastSyncAt: "", lastStatus: "", autoSync: true };
     }
 
     function createDefaultState() {
@@ -1044,8 +710,6 @@
         drafts: {},
         profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
         settings: { muted: false, drive: defaultDriveSettings() },
-        command: "",
-        rest: null,
         csvPreview: null
       };
     }
@@ -1068,18 +732,11 @@
           ["Full A", ["front-squat", "bench-press", "seated-cable-row", "leg-curl"]],
           ["Full B", ["deadlift", "overhead-press", "lat-pulldown-wide", "leg-extension"]],
           ["Full C", ["leg-press", "incline-db-press", "wide-cable-row", "standing-calf-raise"]]
-        ],
-        "Bro Split": [
-          ["Chest", ["bench-press", "incline-db-press"]],
-          ["Back", ["deadlift", "lat-pulldown-wide", "seated-cable-row"]],
-          ["Shoulders", ["overhead-press", "lateral-raise"]],
-          ["Arms", ["barbell-curl", "hammer-curl", "tricep-pushdown"]],
-          ["Legs", ["front-squat", "leg-press", "romanian-deadlift"]]
         ]
       };
-      const source = split === "Custom" ? [] : templates[split] || templates["Upper/Lower"];
+      const source = templates[split] || templates["Upper/Lower"];
       const days = Array.from({ length: daysPerWeek }, (_, index) => {
-        const template = source[index % Math.max(source.length, 1)] || [`Day ${index + 1}`, []];
+        const template = source[index % source.length] || [`Day ${index + 1}`, []];
         return {
           id: cryptoId(),
           label: template[0],
@@ -1088,1101 +745,886 @@
           blocks: template[1].filter((id) => map[id]).map((id, blockIndex) => blockFromExercise(map[id], blockIndex))
         };
       });
-      return { id: cryptoId(), name, split, days, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+      return { id: cryptoId(), name, split, days, created_at: nowISO(), updated_at: nowISO() };
     }
 
     function blockFromExercise(exercise, order = 0) {
-      return {
-        id: cryptoId(),
-        exercise_id: exercise.id,
-        sets: exercise.default_sets || 3,
-        rep_range: exercise.default_rep_range || "8-12",
-        rest_seconds: exercise.default_rest_seconds || 120,
-        order,
-        updated_at: new Date().toISOString()
-      };
+      return { id: cryptoId(), exercise_id: exercise.id, sets: exercise.default_sets || 3, rep_range: exercise.default_rep_range || "8-12", rest_seconds: exercise.default_rest_seconds || 120, order, updated_at: nowISO() };
     }
 
-    async function loadState() {
-      const saved = await readStoredState();
-      return normalizeState(saved);
-    }
-
-    async function readStoredState() {
-      try {
-        const saved = await idbGet(STORAGE_KEY);
-        if (saved) return saved;
-      } catch {
-        // Fall back below.
-      }
-
-      for (const key of [STORAGE_KEY, LEGACY_STORAGE_KEY]) {
+    const K3V_Storage = {
+      async load() {
+        const saved = await this.readStoredState();
+        return normalizeState(saved);
+      },
+      async readStoredState() {
         try {
-          const saved = JSON.parse(localStorage.getItem(key));
+          const saved = await this.idbGet(STORAGE_KEY);
           if (saved) return saved;
-        } catch {
-          // Try the next key.
+        } catch {}
+        for (const key of [STORAGE_KEY, LEGACY_STORAGE_KEY]) {
+          try {
+            const saved = JSON.parse(localStorage.getItem(key));
+            if (saved) return saved;
+          } catch {}
         }
+        return null;
+      },
+      save(state) {
+        const snapshot = JSON.parse(JSON.stringify({ ...state, csvPreview: null }));
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot)); } catch {}
+        this.idbSet(STORAGE_KEY, snapshot).catch(() => {});
+      },
+      openDB() {
+        return new Promise((resolve, reject) => {
+          if (!("indexedDB" in window)) return reject(new Error("IndexedDB unavailable"));
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          request.onupgradeneeded = () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      },
+      async idbGet(key) {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readonly");
+          const request = tx.objectStore(DB_STORE).get(key);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+          tx.oncomplete = () => db.close();
+        });
+      },
+      async idbSet(key, value) {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(DB_STORE, "readwrite");
+          tx.objectStore(DB_STORE).put(value, key);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => reject(tx.error);
+        });
       }
-      return null;
-    }
+    };
 
-    function normalizeState(saved) {
-      const fallback = createDefaultState();
-      if (!saved || typeof saved !== "object") return fallback;
-      if (saved.schema_version === 2) {
-        const merged = { ...fallback, ...saved };
-        merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
-        merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
-        merged.sessions = saved.sessions || [];
-        merged.sets = saved.sets || [];
-        merged.settings = { ...fallback.settings, ...(saved.settings || {}), drive: { ...defaultDriveSettings(), ...(saved.settings?.drive || {}) } };
-        merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
-        if (!merged.activeProgramId || !getProgram(merged.activeProgramId, merged)) merged.activeProgramId = merged.programs[0]?.id;
-        if (!merged.activeDayId || !getDay(merged.activeDayId, merged)) merged.activeDayId = merged.programs[0]?.days[0]?.id;
-        return merged;
+    const K3V_SyncEngine = (() => {
+      let googleAccessToken = "";
+      let googleTokenClient = null;
+      let syncTimer = null;
+      let inFlight = false;
+      let dirty = false;
+
+      function clientId(state) {
+        return GOOGLE_OAUTH_CLIENT_ID || cleanValue(state.settings?.drive?.clientId || "");
       }
-      return migrateLegacyState(saved, fallback);
-    }
 
-    function migrateLegacyState(saved, fallback) {
-      const sets = (saved.logs || []).map((log) => ({
-        id: log.id || cryptoId(),
-        session_id: `${log.date}-${log.workoutId || "legacy"}`,
-        date: log.date || todayISO(),
-        exercise_id: log.exerciseId || slug(log.exerciseName || "Exercise"),
-        exercise: log.exerciseName || "Exercise",
-        set_number: Number(log.setNumber || 1),
-        reps: Number(log.reps || 0),
-        weight_lb: parseWeight(log.weight),
-        rpe: log.rir ? String(10 - Number(log.rir)) : "",
-        notes: log.notes || "",
-        created_at: log.createdAt || new Date().toISOString(),
-        updated_at: log.createdAt || new Date().toISOString()
-      }));
-      const sessions = [...new Map(sets.map((set) => [set.session_id, {
-        id: set.session_id,
-        date: set.date,
-        program_id: fallback.activeProgramId,
-        day_id: fallback.activeDayId,
-        started_at: set.created_at,
-        updated_at: set.updated_at
-      }])).values()];
-      return { ...fallback, view: saved.view || "log", activeDate: saved.activeDate || todayISO(), sets, sessions, drafts: saved.drafts || {}, command: saved.command || "" };
-    }
-
-    function saveState() {
-      const snapshot = JSON.parse(JSON.stringify({ ...state, command: "" }));
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-      } catch {
-        // IndexedDB remains the primary cache.
+      function canSync(state) {
+        return Boolean(clientId(state)) && Boolean(googleAccessToken) && state.settings?.drive?.autoSync !== false && navigator.onLine !== false;
       }
-      idbSet(STORAGE_KEY, snapshot).catch(() => {});
-      if (!suppressDriveAutoSync) scheduleDriveAutoSync("local change");
-    }
 
-    function openAppDB() {
-      return new Promise((resolve, reject) => {
-        if (!("indexedDB" in window)) {
-          reject(new Error("IndexedDB unavailable"));
+      function schedule(state, callbacks, delay = DRIVE_AUTO_SYNC_DELAY) {
+        if (!canSync(state)) return;
+        dirty = true;
+        window.clearTimeout(syncTimer);
+        syncTimer = window.setTimeout(() => run(state, callbacks, { silent: true }), delay);
+      }
+
+      async function connect(state, callbacks) {
+        await ensureGoogleDriveToken(state, true);
+        const next = cloneState(state);
+        next.settings.drive.connectedAt = nowISO();
+        next.settings.drive.autoSync = true;
+        next.settings.drive.lastStatus = "Google Drive connected. K3VSYNC is syncing now.";
+        callbacks.onState(next, { localOnly: true });
+        return run(next, callbacks, { silent: false });
+      }
+
+      async function run(state, callbacks, options = {}) {
+        if (inFlight) {
+          dirty = true;
+          return state;
+        }
+        inFlight = true;
+        dirty = false;
+        window.clearTimeout(syncTimer);
+        callbacks.onStatus({ state: "syncing", label: "Syncing..." });
+        let working = cloneState(state);
+        try {
+          await ensureGoogleDriveToken(working, false);
+          const remote = await pullDriveState(working);
+          if (remote) working = deepUnionMerge(working, remote);
+          await pushDriveState(working);
+          working.settings.drive.lastSyncAt = nowISO();
+          working.settings.drive.lastStatus = "K3VSYNC deep-union sync complete.";
+          callbacks.onState(working, { localOnly: true });
+          callbacks.onStatus({ state: "synced", label: "Synced" });
+          if (!options.silent) callbacks.onToast("Google Drive synced.");
+        } catch (error) {
+          working.settings.drive.lastStatus = `Google Drive sync failed: ${error.message}`;
+          callbacks.onState(working, { localOnly: true });
+          callbacks.onStatus({ state: "error", label: "Sync issue" });
+          if (!options.silent) callbacks.onToast(error.message);
+          throw error;
+        } finally {
+          inFlight = false;
+          if (dirty) {
+            dirty = false;
+            schedule(working, callbacks, 400);
+          }
+        }
+        return working;
+      }
+
+      function ensureGoogleDriveToken(state, forcePrompt = false) {
+        return new Promise((resolve, reject) => {
+          const id = clientId(state);
+          if (!id) return reject(new Error("Google OAuth client is missing."));
+          if (googleAccessToken && !forcePrompt) return resolve(googleAccessToken);
+          if (!window.google?.accounts?.oauth2) return reject(new Error("Google Identity Services is still loading."));
+          googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: id,
+            scope: GOOGLE_DRIVE_SCOPE,
+            callback: (response) => {
+              if (response.error) return reject(new Error(response.error_description || response.error));
+              googleAccessToken = response.access_token;
+              resolve(googleAccessToken);
+            }
+          });
+          googleTokenClient.requestAccessToken({ prompt: forcePrompt ? "consent" : "" });
+        });
+      }
+
+      async function pullDriveState(state) {
+        const file = await findDriveStateFile(state);
+        if (!file) return null;
+        const response = await googleDriveRequest(state, `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`);
+        const parsed = JSON.parse(await response.text());
+        const remote = normalizeState(parsed.state || parsed);
+        remote.settings.drive.fileId = file.id;
+        return remote;
+      }
+
+      async function pushDriveState(state) {
+        const file = await findDriveStateFile(state);
+        const content = backupPayload(state);
+        if (file) {
+          await googleDriveRequest(state, `https://www.googleapis.com/upload/drive/v3/files/${file.id}?uploadType=media&fields=id,name,modifiedTime`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: content
+          });
+          state.settings.drive.fileId = file.id;
           return;
         }
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = () => {
-          const db = request.result;
-          if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
-        };
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    async function idbGet(key) {
-      const db = await openAppDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(DB_STORE, "readonly");
-        const request = tx.objectStore(DB_STORE).get(key);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-        tx.oncomplete = () => db.close();
-      });
-    }
-
-    async function idbSet(key, value) {
-      const db = await openAppDB();
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(DB_STORE, "readwrite");
-        tx.objectStore(DB_STORE).put(value, key);
-        tx.oncomplete = () => {
-          db.close();
-          resolve();
-        };
-        tx.onerror = () => {
-          db.close();
-          reject(tx.error);
-        };
-      });
-    }
-
-    function getProgram(id = state.activeProgramId, root = state) {
-      return root.programs.find((program) => program.id === id) || root.programs[0];
-    }
-
-    function getDay(id = state.activeDayId, root = state) {
-      return getProgram(root.activeProgramId, root)?.days.find((day) => day.id === id) || getProgram(root.activeProgramId, root)?.days[0];
-    }
-
-    function getExercise(id) {
-      return state.exercises.find((item) => item.id === id);
-    }
-
-    function todayISO() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
-      return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
-    }
-
-    function activeSession() {
-      const day = getDay();
-      let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === day?.id);
-      if (!session) {
-        session = {
-          id: cryptoId(),
-          date: state.activeDate,
-          program_id: state.activeProgramId,
-          day_id: day?.id,
-          started_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          notes: "",
-          timer_started_at: Date.now(),
-          timer_paused_at: null,
-          paused_total_ms: 0,
-          finished_at: null
-        };
-        state.sessions.push(session);
+        const created = await createDriveStateFile(state, content);
+        state.settings.drive.fileId = created.id;
       }
-      return ensureSessionFields(session);
+
+      async function findDriveStateFile(state) {
+        const fileName = state.settings.drive?.fileName || DRIVE_STATE_FILE;
+        const q = encodeURIComponent(`name='${fileName.replace(/'/g, "\\'")}'`);
+        const response = await googleDriveRequest(state, `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&pageSize=1&fields=files(id,name,modifiedTime)`);
+        const data = await response.json();
+        return data.files?.[0] || null;
+      }
+
+      async function createDriveStateFile(state, content) {
+        const boundary = `k3vsync-${Date.now()}`;
+        const metadata = { name: state.settings.drive?.fileName || DRIVE_STATE_FILE, parents: ["appDataFolder"], mimeType: "application/json" };
+        const body = [
+          `--${boundary}`,
+          "Content-Type: application/json; charset=UTF-8",
+          "",
+          JSON.stringify(metadata),
+          `--${boundary}`,
+          "Content-Type: application/json",
+          "",
+          content,
+          `--${boundary}--`
+        ].join("\r\n");
+        const response = await googleDriveRequest(state, "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime", {
+          method: "POST",
+          headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
+          body
+        });
+        return response.json();
+      }
+
+      async function googleDriveRequest(state, url, options = {}) {
+        const token = await ensureGoogleDriveToken(state, false);
+        const response = await fetch(url, {
+          ...options,
+          headers: { ...(options.headers || {}), Authorization: `Bearer ${token}` }
+        });
+        if (response.status === 401) {
+          googleAccessToken = "";
+          throw new Error("Google session expired. Sign in again.");
+        }
+        if (!response.ok) throw new Error(await googleErrorMessage(response));
+        return response;
+      }
+
+      async function googleErrorMessage(response) {
+        try {
+          const data = await response.json();
+          return data.error?.message || `Google Drive request failed (${response.status})`;
+        } catch {
+          return `Google Drive request failed (${response.status})`;
+        }
+      }
+
+      function deepUnionMerge(local, remote) {
+        const merged = normalizeState({
+          ...local,
+          exercises: mergeRecords(local.exercises, remote.exercises),
+          sessions: mergeRecords(local.sessions, remote.sessions),
+          sets: mergeRecords(local.sets, remote.sets),
+          programs: mergePrograms(local.programs, remote.programs),
+          profile: mergeProfile(local.profile, remote.profile),
+          settings: { ...local.settings, drive: local.settings.drive }
+        });
+        if (remote.settings?.drive?.fileId) merged.settings.drive.fileId = remote.settings.drive.fileId;
+        return merged;
+      }
+
+      function mergeRecords(localItems = [], remoteItems = []) {
+        const map = new Map();
+        [...localItems, ...remoteItems].forEach((item) => {
+          if (!item?.id) return;
+          const previous = map.get(item.id);
+          if (!previous || newer(item, previous)) map.set(item.id, { ...previous, ...item });
+        });
+        return [...map.values()];
+      }
+
+      function mergePrograms(localPrograms = [], remotePrograms = []) {
+        const map = new Map();
+        [...localPrograms, ...remotePrograms].forEach((program) => {
+          if (!program?.id) return;
+          const previous = map.get(program.id);
+          if (!previous) {
+            map.set(program.id, cloneState(program));
+            return;
+          }
+          const base = newer(program, previous) ? { ...previous, ...program } : { ...program, ...previous };
+          base.days = mergeDays(previous.days || [], program.days || []);
+          map.set(program.id, base);
+        });
+        return [...map.values()];
+      }
+
+      function mergeDays(localDays = [], remoteDays = []) {
+        const map = new Map();
+        [...localDays, ...remoteDays].forEach((day) => {
+          if (!day?.id) return;
+          const previous = map.get(day.id);
+          if (!previous) {
+            map.set(day.id, cloneState(day));
+            return;
+          }
+          const base = newer(day, previous) ? { ...previous, ...day } : { ...day, ...previous };
+          base.blocks = mergeRecords(previous.blocks || [], day.blocks || []).sort(byOrder);
+          map.set(day.id, base);
+        });
+        return [...map.values()].sort(byOrder);
+      }
+
+      function newer(a, b) {
+        return String(a.updated_at || a.created_at || "") >= String(b.updated_at || b.created_at || "");
+      }
+
+      function mergeProfile(local = {}, remote = {}) {
+        return { ...remote, ...local, updated_at: local.updated_at || remote.updated_at || nowISO() };
+      }
+
+      return { schedule, connect, run, deepUnionMerge, isConnected: () => Boolean(googleAccessToken) };
+    })();
+
+    const K3V_UI_Components = {
+      Trendline({ exercise, sets }) {
+        const points = trendPoints(sets);
+        if (!points.length) return h("div", { class: "empty" }, "Log sets to build a PR trendline.");
+        const width = 520;
+        const height = 190;
+        const pad = 24;
+        const minY = Math.min(...points.map((p) => p.e1rm)) * 0.94;
+        const maxY = Math.max(...points.map((p) => p.e1rm)) * 1.04 || 1;
+        const minX = Math.min(...points.map((p) => p.time));
+        const maxX = Math.max(...points.map((p) => p.time));
+        const x = (p) => maxX === minX ? width / 2 : pad + ((p.time - minX) / (maxX - minX)) * (width - pad * 2);
+        const y = (p) => height - pad - ((p.e1rm - minY) / Math.max(1, maxY - minY)) * (height - pad * 2);
+        const d = points.map((p, index) => `${index ? "L" : "M"}${x(p).toFixed(1)} ${y(p).toFixed(1)}`).join(" ");
+        let best = 0;
+        const prPoints = points.filter((p) => {
+          if (p.e1rm > best) {
+            best = p.e1rm;
+            return true;
+          }
+          return false;
+        });
+        return h("svg", { class: "trend-svg", viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${exercise.name} PR trendline` },
+          h("path", { d: `M${pad} ${height - pad}H${width - pad}M${pad} ${pad}V${height - pad}`, fill: "none", stroke: "#3d4b5d", "stroke-width": "1" }),
+          h("path", { d, fill: "none", stroke: "#8fb7ff", "stroke-width": "3", "stroke-linecap": "round", "stroke-linejoin": "round" }),
+          points.map((p) => h("circle", { key: `${p.date}-${p.e1rm}`, cx: x(p), cy: y(p), r: 3, fill: "#f5f8fc" })),
+          prPoints.map((p) => h("g", { key: `pr-${p.date}-${p.e1rm}` },
+            h("circle", { cx: x(p), cy: y(p), r: 6, fill: "#74e6ad", stroke: "#0e1116", "stroke-width": "2" }),
+            h("text", { x: Math.min(width - 76, x(p) + 8), y: Math.max(14, y(p) - 8), fill: "#74e6ad", "font-size": "11", "font-weight": "800" }, `PR ${Math.round(p.e1rm)}`)
+          )),
+          h("text", { x: pad, y: 14, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(maxY)} lb`),
+          h("text", { x: pad, y: height - 5, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(minY)} lb`)
+        );
+      },
+      PlateModal({ weight, onClose }) {
+        const target = Number(weight) || BAR_WEIGHT;
+        const result = calculatePlates(target);
+        return h(Modal, { title: "Plate Calculator", onClose },
+          h("div", { class: "stack" },
+            h("p", { class: "muted" }, `Target: ${formatWeight(target)} on a 45 lb bar.`),
+            h("div", { class: "panel", style: "padding:12px" },
+              h("h3", null, result.loadable ? `${result.perSide} lb per side` : "Below bar weight"),
+              h("p", { class: "muted" }, result.loadable ? `Each side: ${result.plates.length ? result.plates.join(" + ") : "no plates"}` : "Use the empty bar or a lighter implement.")
+            ),
+            h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
+          )
+        );
+      }
+    };
+
+    function K3V_App() {
+      const [state, setState] = useState(null);
+      const [syncStatus, setSyncStatus] = useState({ state: "idle", label: "Local" });
+      const [toast, setToast] = useState("");
+      const [modal, setModal] = useState(null);
+      const [clock, setClock] = useState(Date.now());
+      const stateRef = useRef(null);
+      const fileJsonRef = useRef(null);
+      const fileCsvRef = useRef(null);
+
+      useEffect(() => {
+        K3V_Storage.load().then((loaded) => {
+          stateRef.current = loaded;
+          setState(loaded);
+        });
+        registerServiceWorker();
+      }, []);
+
+      useEffect(() => {
+        const id = window.setInterval(() => setClock(Date.now()), 1000);
+        return () => window.clearInterval(id);
+      }, []);
+
+      useEffect(() => {
+        const online = () => stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 250);
+        const visible = () => !document.hidden && stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 300);
+        const pageHide = () => stateRef.current && K3V_SyncEngine.run(stateRef.current, callbacks(), { silent: true }).catch(() => {});
+        window.addEventListener("online", online);
+        document.addEventListener("visibilitychange", visible);
+        window.addEventListener("pagehide", pageHide);
+        return () => {
+          window.removeEventListener("online", online);
+          document.removeEventListener("visibilitychange", visible);
+          window.removeEventListener("pagehide", pageHide);
+        };
+      }, []);
+
+      function callbacks() {
+        return {
+          onState: applyRemoteState,
+          onStatus: setSyncStatus,
+          onToast: showToast
+        };
+      }
+
+      function showToast(message) {
+        setToast(message);
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(() => setToast(""), 2600);
+      }
+
+      function applyRemoteState(next, options = {}) {
+        const normalized = normalizeState(next);
+        stateRef.current = normalized;
+        setState(normalized);
+        K3V_Storage.save(normalized);
+        if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks());
+      }
+
+      function updateState(mutator, options = {}) {
+        setState((previous) => {
+          const base = cloneState(previous || createDefaultState());
+          const next = mutator(base) || base;
+          const normalized = normalizeState(next);
+          stateRef.current = normalized;
+          K3V_Storage.save(normalized);
+          if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks(), options.syncDelay || DRIVE_AUTO_SYNC_DELAY);
+          return normalized;
+        });
+      }
+
+      if (!state) return h("main", { class: "app-shell" }, h("div", { class: "empty panel" }, "Loading K3VSYNC..."));
+
+      const program = getProgram(state);
+      const day = getDay(state);
+      const activeSets = setsForDate(state, state.activeDate);
+      const views = [
+        ["log", "Log"],
+        ["progress", "Stats"],
+        ["plan", "Plan"],
+        ["exercises", "Exercises"],
+        ["sync", "Drive"]
+      ];
+
+      return h("div", null,
+        h("main", { class: "app-shell" },
+          h("header", { class: "topbar" },
+            h("div", { class: "brand" },
+              h("div", { class: "brand-mark" }, "K3V"),
+              h("div", null,
+                h("h1", null, "K3VSYNC"),
+                h("p", null, `${day?.label || "Workout"} / ${activeSets.length} sets / ${formatNumber(activeSets.reduce((sum, set) => sum + volume(set), 0))} lb`)
+              )
+            ),
+            h("div", { class: "sync-chip", "data-state": syncStatus.state },
+              h("i", { class: "sync-dot" }),
+              h("span", null, syncStatus.label)
+            )
+          ),
+          h("section", { class: "toolbar" },
+            h("nav", { class: "segmented", "aria-label": "Primary" },
+              views.map(([id, label]) => h("button", { key: id, type: "button", "aria-selected": state.view === id, onClick: () => updateState((draft) => { draft.view = id; }, { localOnly: true }) }, label))
+            ),
+            h("div", { class: "date-row" },
+              h("input", { type: "date", value: state.activeDate, onInput: (event) => updateState((draft) => { draft.activeDate = event.currentTarget.value || todayISO(); }, { localOnly: true }) }),
+              h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { draft.activeDate = todayISO(); }, { localOnly: true }) }, "Today")
+            ),
+            h("div", { class: "day-strip", "aria-label": "Workout day" },
+              (program?.days || []).sort(byOrder).map((item, index) => h("button", { key: item.id, type: "button", "aria-current": item.id === state.activeDayId, onClick: () => updateState((draft) => { draft.activeDayId = item.id; }, { localOnly: true }) },
+                h("strong", null, shortDayLabel(index, item.label)),
+                h("span", null, item.label)
+              ))
+            )
+          ),
+          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "progress" && h(ProgressView, { state, updateState }),
+          state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "sync" && h(DriveView, { state, updateState, showToast, syncStatus, connect: () => K3V_SyncEngine.connect(stateRef.current, callbacks()).catch(() => {}), syncNow: () => K3V_SyncEngine.run(stateRef.current, callbacks()).catch(() => {}), fileJsonRef, fileCsvRef })
+        ),
+        h("nav", { class: "bottom-nav", "aria-label": "Primary" },
+          h("div", { class: "bottom-nav-inner" }, views.map(([id, label]) => h("button", { key: id, type: "button", "aria-selected": state.view === id, onClick: () => updateState((draft) => { draft.view = id; }, { localOnly: true }) }, label)))
+        ),
+        h("input", { ref: fileJsonRef, class: "sr-only", type: "file", accept: "application/json,.json", onChange: (event) => importJSONFile(event, updateState, showToast) }),
+        h("input", { ref: fileCsvRef, class: "sr-only", type: "file", accept: ".csv,text/csv", onChange: (event) => importCSVFile(event, updateState, showToast) }),
+        modal,
+        toast && h("div", { class: "toast", role: "status" }, toast)
+      );
     }
 
-    function ensureSessionFields(session) {
-      session.notes ||= "";
-      session.timer_started_at ||= new Date(session.started_at || Date.now()).getTime();
-      session.paused_total_ms ||= 0;
-      if (session.timer_paused_at === undefined) session.timer_paused_at = null;
-      if (session.finished_at === undefined) session.finished_at = null;
-      return session;
+    function LogView({ state, updateState, showToast, openModal }) {
+      const day = getDay(state);
+      const blocks = (day?.blocks || []).slice().sort(byOrder);
+      return h("section", { class: "stack" },
+        blocks.length ? blocks.map((block) => h(ExerciseBlock, { key: block.id, state, block, updateState, showToast, openModal })) : h("div", { class: "empty panel" }, "No exercises on this day yet. Add blocks from Plan.")
+      );
     }
 
-    function activeSets() {
-      const day = getDay();
-      const sessionIds = state.sessions.filter((item) => item.date === state.activeDate && item.day_id === day?.id).map((item) => item.id);
-      return state.sets.filter((set) => sessionIds.includes(set.session_id)).sort(sortRecords);
-    }
-
-    function setsForExercise(exerciseId, sessionId = null) {
-      return state.sets.filter((set) => set.exercise_id === exerciseId && (!sessionId || set.session_id === sessionId)).sort(sortRecords);
-    }
-
-    function weekStartISO(dateISO) {
-      const date = new Date(`${dateISO}T12:00:00`);
-      const day = date.getDay();
-      date.setDate(date.getDate() + (day === 0 ? -6 : 1 - day));
-      return date.toISOString().slice(0, 10);
-    }
-
-    function weekSets() {
-      const start = new Date(`${weekStartISO(state.activeDate)}T00:00:00`);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 7);
-      return state.sets.filter((set) => {
-        const date = new Date(`${set.date}T12:00:00`);
-        return date >= start && date < end;
-      }).sort(sortRecords);
-    }
-
-    function render() {
-      renderIcons();
-      renderTabs();
-      renderToolbar();
-      renderHeadline();
-      renderRestBar();
-      document.querySelectorAll("[data-view]").forEach((button) => {
-        button.setAttribute("aria-selected", String(button.dataset.view === state.view));
-      });
-      if (state.view === "log") renderLogView();
-      if (state.view === "progress") renderProgressView();
-      if (state.view === "plan") renderPlanView();
-      if (state.view === "exercises") renderExercisesView();
-      if (state.view === "export") renderExportView();
-      if (state.view === "sync") renderSyncView();
-      document.getElementById("editPlanBtn").textContent = state.editPlan ? "Done" : "Edit Plan";
-      saveState();
-    }
-
-    function renderIcons(root = document) {
-      root.querySelectorAll("[data-icon]").forEach((node) => {
-        node.innerHTML = icons[node.dataset.icon] || "";
-      });
-    }
-
-    function renderTabs() {
-      const markup = views.map(([id, label, icon]) => `
-        <button type="button" data-view="${id}" aria-selected="${state.view === id}">
-          <span data-icon="${icon}"></span>
-          <span>${label}</span>
-        </button>
-      `).join("");
-      document.getElementById("topTabs").innerHTML = markup;
-      document.getElementById("bottomTabs").innerHTML = markup;
-      renderIcons();
-    }
-
-    function renderToolbar() {
-      document.getElementById("workoutDate").value = state.activeDate;
-      const program = getProgram();
-      document.getElementById("dayStrip").innerHTML = program.days.sort(byOrder).map((day, index) => `
-        <button type="button" data-day="${day.id}" aria-current="${day.id === state.activeDayId}">
-          <strong>${shortDayLabel(index, day.label)}</strong>
-          <span>${escapeHtml(day.label)}</span>
-        </button>
-      `).join("");
-    }
-
-    function renderHeadline() {
-      const day = getDay();
-      const sets = activeSets();
-      const totalVolume = sets.reduce((total, set) => total + volume(set), 0);
-      document.getElementById("headline").textContent = `${day?.label || "Plan"} / ${sets.length} sets / ${formatNumber(totalVolume)} lb`;
-    }
-
-    function renderLogView() {
-      const day = getDay();
-      const session = activeSession();
-      const blocks = day?.blocks?.sort(byOrder) || [];
-      const sets = activeSets();
-      const target = blocks.reduce((sum, block) => sum + Number(block.sets || 0), 0);
-      document.getElementById("app").innerHTML = `
-        <section class="metric-grid">
-          <div class="metric"><b>${sets.length}</b><span>Sets logged</span></div>
-          <div class="metric"><b data-session-timer="${session.id}">${formatDuration(sessionElapsedMs(session))}</b><span>Session time</span></div>
-          <div class="metric"><b>${formatNumber(sets.reduce((sum, set) => sum + volume(set), 0))}</b><span>Est. volume</span></div>
-        </section>
-        <section class="note-panel panel">
-          <div class="row-between">
-            <div>
-              <b>Day Notes</b>
-              <div class="muted">${target} target sets / ${session.finished_at ? "finished" : session.timer_paused_at ? "paused" : "running"}</div>
-            </div>
-            <div class="session-actions">
-              <button class="ghost-btn" type="button" id="sessionToggleBtn">${session.timer_paused_at ? "Resume" : "Pause"}</button>
-              <button class="ghost-btn" type="button" id="sessionFinishBtn">${session.finished_at ? "Reopen" : "Finish"}</button>
-            </div>
-          </div>
-          <div class="form-grid" style="margin-top:10px">
-            <div class="field">
-              <label for="sessionTimeInput">Session time</label>
-              <input id="sessionTimeInput" inputmode="text" value="${formatDuration(sessionElapsedMs(session))}" placeholder="75m or 1:15:00">
-            </div>
-            <button class="ghost-btn" type="button" data-session-adjust="-300000">-5m</button>
-            <button class="primary-btn" type="button" id="sessionSetTimeBtn">Set Time</button>
-            <button class="ghost-btn" type="button" data-session-adjust="300000">+5m</button>
-          </div>
-          <label class="sr-only" for="sessionNotes">Workout notes</label>
-          <textarea id="sessionNotes" data-session-notes="${session.id}" placeholder="How did this workout feel? Energy, soreness, aches, pump, sleep, anything worth remembering.">${escapeHtml(session.notes || "")}</textarea>
-        </section>
-        <section class="voice-panel panel">
-          <div class="voice-grid">
-            <button class="icon-btn" id="voiceBtn" type="button" aria-label="${listening ? "Stop voice entry" : "Start voice entry"}"><span data-icon="${listening ? "stop" : "mic"}"></span></button>
-            <label class="sr-only" for="commandInput">Voice or typed command</label>
-            <textarea id="commandInput" placeholder="bench press 185 for 6 rpe 8">${escapeHtml(state.command)}</textarea>
-            <button class="primary-btn" id="parseBtn" type="button">Add</button>
-          </div>
-          <div class="status-line">
-            <span>${voiceStatusText()}</span>
-            <span>${escapeHtml(day?.type || "Strength")} / ${escapeHtml(getProgram()?.name || "Plan")}</span>
-          </div>
-        </section>
-        <section class="list">
-          ${day?.type === "Rest" ? '<div class="empty panel">Rest day.</div>' : blocks.map((block) => renderBlock(block, session.id)).join("")}
-          <button class="ghost-btn" type="button" data-add-exercise-day="${day?.id}">+ Add exercise</button>
-        </section>
-      `;
-      renderIcons();
-    }
-
-    function renderBlock(block, sessionId) {
-      const exercise = getExercise(block.exercise_id);
-      const logs = setsForExercise(block.exercise_id, sessionId);
+    function ExerciseBlock({ state, block, updateState, showToast, openModal }) {
+      const exercise = getExercise(state, block.exercise_id);
       const draft = state.drafts[block.id] || {};
-      const timing = exerciseTiming(logs, activeSession());
-      if (!exercise) return "";
-      return `
-        <article class="exercise panel">
-          <div class="exercise-head">
-            <div class="exercise-title">
-              <h2>${escapeHtml(exercise.name)}</h2>
-              <div class="target">
-                <span>${block.sets} sets</span>
-                <span>${escapeHtml(block.rep_range)} reps</span>
-                <span>${formatTimer(block.rest_seconds)} rest</span>
-                <span data-exercise-time="${sessionId}|${exercise.id}">${timing.label}</span>
-                <span class="pill ${exercise.movement_pattern}">${escapeHtml(exercise.primary_muscle)}</span>
-                <span class="pill logged">${logs.length}/${block.sets}</span>
-              </div>
-            </div>
-            <div class="row-between">
-              <button class="mini-btn" type="button" data-swap-block="${block.id}" aria-label="Swap exercise"><span data-icon="swap"></span></button>
-            </div>
-          </div>
-          <div class="set-form" data-block-form="${block.id}">
-            <div class="field">
-              <label>Weight</label>
-              <input data-draft="${block.id}" data-field="weight_lb" inputmode="decimal" placeholder="lb" value="${escapeHtml(draft.weight_lb || "")}">
-            </div>
-            <div class="field">
-              <label>Reps</label>
-              <input data-draft="${block.id}" data-field="reps" inputmode="numeric" placeholder="0" value="${escapeHtml(draft.reps || "")}">
-            </div>
-            <div class="field">
-              <label>RPE</label>
-              <input data-draft="${block.id}" data-field="rpe" inputmode="decimal" placeholder="-" value="${escapeHtml(draft.rpe || "")}">
-            </div>
-            <div class="field notes-field">
-              <label>Notes</label>
-              <input data-draft="${block.id}" data-field="notes" placeholder="optional" value="${escapeHtml(draft.notes || "")}">
-            </div>
-            <button class="mini-btn primary" type="button" data-add-set="${block.id}" aria-label="Add set"><span data-icon="plus"></span></button>
-          </div>
-          <div class="sets">
-            ${logs.length ? logs.map(renderSetRow).join("") : '<div class="empty">No sets logged yet.</div>'}
-          </div>
-        </article>
-      `;
+      const logs = state.sets.filter((set) => set.date === state.activeDate && set.exercise_id === block.exercise_id).sort(sortRecords);
+      if (!exercise) return null;
+      const updateDraft = (field, value) => updateState((next) => {
+        next.drafts[block.id] ||= {};
+        next.drafts[block.id][field] = value;
+      });
+      return h("article", { class: "exercise-card panel" },
+        h("div", { class: "card-head" },
+          h("div", null,
+            h("h2", null, exercise.name),
+            h("div", { class: "chip-row" },
+              h("span", { class: "pill" }, exercise.primary_muscle),
+              h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatTimer(block.rest_seconds)} rest`)
+            )
+          ),
+          h("button", { class: "ghost-btn", type: "button", onClick: () => addWarmups(state, block, updateState, showToast) }, "Warmup")
+        ),
+        h("div", { class: "set-form" },
+          h("div", { class: "field" },
+            h("label", null, "Weight"),
+            h("div", { class: "weight-field" },
+              h("input", { inputMode: "decimal", placeholder: "lb", value: draft.weight_lb || "", onInput: (event) => updateDraft("weight_lb", event.currentTarget.value) }),
+              h("button", { class: "mini-btn", type: "button", title: "Plate calculator", onClick: () => openModal(h(K3V_UI_Components.PlateModal, { weight: draft.weight_lb || lastWeightForExercise(state, exercise.id) || BAR_WEIGHT, onClose: () => openModal(null) })) }, "🏋️")
+            )
+          ),
+          h("div", { class: "field" }, h("label", null, "Reps"), h("input", { inputMode: "numeric", placeholder: "0", value: draft.reps || "", onInput: (event) => updateDraft("reps", event.currentTarget.value) })),
+          h("div", { class: "field" }, h("label", null, "RPE"), h("input", { inputMode: "decimal", placeholder: "7.5", value: draft.rpe || "", onInput: (event) => updateDraft("rpe", event.currentTarget.value) })),
+          h("div", { class: "field notes-field" }, h("label", null, "Notes"), h("input", { placeholder: "optional", value: draft.notes || "", onInput: (event) => updateDraft("notes", event.currentTarget.value) })),
+          h("button", { class: "mini-btn primary", type: "button", "aria-label": "Add set", onClick: () => addSet(state, block, updateState, showToast) }, "+")
+        ),
+        h("div", { class: "set-list" },
+          logs.length ? logs.map((set) => h(SetRow, { key: set.id, set, updateState })) : h("div", { class: "empty" }, "No sets logged yet.")
+        )
+      );
     }
 
-    function renderSetRow(set) {
-      return `
-        <div class="set-row">
-          <div class="set-num">${set.set_number}</div>
-          <div class="set-main">
-            <b>${formatWeight(set.weight_lb)} x ${escapeHtml(set.reps)}</b>
-            <span>${set.rpe ? `RPE ${escapeHtml(set.rpe)} / ` : ""}${escapeHtml(set.notes || "logged")}</span>
-          </div>
-          <button class="mini-btn danger" type="button" data-delete-set="${set.id}" aria-label="Delete set"><span data-icon="trash"></span></button>
-        </div>
-      `;
+    function SetRow({ set, updateState }) {
+      return h("div", { class: "set-row" },
+        h("div", { class: "set-num" }, set.set_number),
+        h("div", { class: "row-main" },
+          h("b", null, `${formatWeight(set.weight_lb)} x ${set.reps}`),
+          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}`)
+        ),
+        h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
+          draft.sets = draft.sets.filter((item) => item.id !== set.id);
+          renumberSets(draft, set.session_id, set.exercise_id);
+        }) }, "Del")
+      );
     }
 
-    function renderProgressView() {
-      const ranked = mostLoggedExercises().slice(0, 5);
+    function ProgressView({ state, updateState }) {
       const selected = state.progressExerciseId || "";
-      const options = state.exercises.slice().sort(byName).map((exercise) => `<option value="${exercise.id}" ${exercise.id === selected ? "selected" : ""}>${escapeHtml(exercise.name)}</option>`).join("");
+      const ranked = mostLoggedExercises(state).slice(0, 5);
+      const exercises = selected ? [getExercise(state, selected)].filter(Boolean) : ranked;
       const profile = state.profile || {};
-      document.getElementById("app").innerHTML = `
-        <div class="section-title">
-          <h2>PR Trendline</h2>
-          <span>e1RM = weight * (1 + reps / 30)</span>
-        </div>
-        <div class="actions">
-          <select id="progressExercise"><option value="">Top 5 most logged</option>${options}</select>
-        </div>
-        <section class="chart-grid">
-          ${(selected ? [getExercise(selected)].filter(Boolean) : ranked).map((exercise) => `
-            <article class="chart-card panel">
-              <div class="row-between"><b>${escapeHtml(exercise.name)}</b><span class="muted">${setsForExercise(exercise.id).length} sets</span></div>
-              <canvas data-pr-chart="${exercise.id}" width="520" height="220"></canvas>
-            </article>
-          `).join("") || '<div class="empty panel">Log sets to see PR trendlines.</div>'}
-        </section>
-        <div class="section-title">
-          <h2>Strength Standards</h2>
-          <span>Bodyweight, age, and sex adjusted bands</span>
-        </div>
-        <section class="panel" style="padding:12px; margin-bottom:12px">
-          <div class="form-grid">
-            <div class="field"><label>Sex</label><select data-profile-field="sex"><option value="male" ${profile.sex === "male" ? "selected" : ""}>Male</option><option value="female" ${profile.sex === "female" ? "selected" : ""}>Female</option></select></div>
-            <div class="field"><label>Bodyweight lb</label><input data-profile-field="bodyweight_lb" inputmode="decimal" value="${escapeHtml(profile.bodyweight_lb || "")}" placeholder="180"></div>
-            <div class="field"><label>Age</label><input data-profile-field="age" inputmode="numeric" value="${escapeHtml(profile.age || "")}" placeholder="32"></div>
-            <div class="field"><label>Height</label><input data-profile-field="height" value="${escapeHtml(profile.height || "")}" placeholder="optional"></div>
-          </div>
-          <p class="muted">These are benchmark bands for context, not coaching advice. Your current number uses the best logged estimated 1RM for matching lifts.</p>
-        </section>
-        <section class="standards-list">
-          ${renderStandardsList()}
-        </section>
-      `;
-      chartStart = performance.now();
-      requestAnimationFrame(drawCharts);
+      return h("section", null,
+        h("div", { class: "section-title" }, h("h2", null, "SVG PR Trendlines"), h("span", null, "Epley e1RM")),
+        h("div", { class: "actions" },
+          h("select", { value: selected, onChange: (event) => updateState((draft) => { draft.progressExerciseId = event.currentTarget.value; }, { localOnly: true }) },
+            h("option", { value: "" }, "Top 5 most logged"),
+            state.exercises.slice().sort(byName).map((exercise) => h("option", { key: exercise.id, value: exercise.id }, exercise.name))
+          )
+        ),
+        h("div", { class: "chart-grid" },
+          exercises.length ? exercises.map((exercise) => h("article", { key: exercise.id, class: "chart-card panel" },
+            h("div", { class: "chart-head" }, h("b", null, exercise.name), h("span", { class: "muted" }, `${setsForExercise(state, exercise.id).length} sets`)),
+            h(K3V_UI_Components.Trendline, { exercise, sets: setsForExercise(state, exercise.id) })
+          )) : h("div", { class: "empty panel" }, "Log sets to see trendlines.")
+        ),
+        h("div", { class: "section-title" }, h("h2", null, "Strength Standards"), h("span", null, "Context bands")),
+        h("section", { class: "panel", style: "padding:12px; margin-bottom:12px" },
+          h("div", { class: "form-grid" },
+            h(FieldSelect, { label: "Sex", value: profile.sex || "male", options: ["male", "female"], onChange: (value) => updateState((draft) => { draft.profile.sex = value; }) }),
+            h(FieldInput, { label: "Bodyweight lb", value: profile.bodyweight_lb || "", inputMode: "decimal", placeholder: "180", onInput: (value) => updateState((draft) => { draft.profile.bodyweight_lb = value; }) }),
+            h(FieldInput, { label: "Age", value: profile.age || "", inputMode: "numeric", placeholder: "32", onInput: (value) => updateState((draft) => { draft.profile.age = value; }) }),
+            h(FieldInput, { label: "Height", value: profile.height || "", placeholder: "optional", onInput: (value) => updateState((draft) => { draft.profile.height = value; }) })
+          )
+        ),
+        h("section", { class: "stack" }, renderStandards(state))
+      );
     }
 
-    function renderPlanView() {
-      const program = getProgram();
-      document.getElementById("app").innerHTML = `
-        <section class="actions">
-          <button class="primary-btn" type="button" id="newPlanBtn">New Plan</button>
-          <select id="programSelect">${state.programs.map((item) => `<option value="${item.id}" ${item.id === state.activeProgramId ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}</select>
-        </section>
-        <section class="stack">
-          ${program.days.sort(byOrder).map((day) => renderDayCard(day)).join("")}
-        </section>
-      `;
-      renderIcons();
+    function PlanView({ state, updateState, showToast, openModal }) {
+      const program = getProgram(state);
+      return h("section", null,
+        h("div", { class: "actions" },
+          h("button", { class: "primary-btn", type: "button", onClick: () => createNewPlan(updateState, showToast) }, "New Plan"),
+          h("select", { value: state.activeProgramId, onChange: (event) => updateState((draft) => { draft.activeProgramId = event.currentTarget.value; draft.activeDayId = getProgram(draft)?.days[0]?.id; }) },
+            state.programs.map((item) => h("option", { key: item.id, value: item.id }, item.name))
+          )
+        ),
+        h("section", { class: "stack" },
+          (program?.days || []).slice().sort(byOrder).map((day) => h("article", { key: day.id, class: "day-card panel" },
+            h("div", { class: "card-head" },
+              h("div", null, h("h2", null, day.label), h("div", { class: "chip-row" }, h("span", { class: "pill gold" }, day.type), h("span", null, `${day.blocks.length} blocks`))),
+              h("select", { value: day.type, onChange: (event) => updateState((draft) => {
+                const found = getDayById(draft, day.id);
+                found.type = event.currentTarget.value;
+                found.updated_at = nowISO();
+                if (found.type === "Rest") found.blocks = [];
+              }) }, dayTypes.map((type) => h("option", { key: type, value: type }, type)))
+            ),
+            h("div", { class: "plan-blocks" },
+              day.blocks.slice().sort(byOrder).map((block) => h(PlanBlockRow, { key: block.id, state, day, block, updateState })),
+              h("button", { class: "ghost-btn", style: "margin:10px 12px", type: "button", onClick: () => openModal(h(AddBlockModal, { state, dayId: day.id, updateState, onClose: () => openModal(null) })) }, "+ Add exercise")
+            )
+          ))
+        )
+      );
     }
 
-    function renderDayCard(day) {
-      const editable = state.editPlan;
-      return `
-        <article class="day-card panel" data-day-card="${day.id}" draggable="${editable}">
-          <div class="card-head">
-            <div>
-              <h2>${escapeHtml(day.label)}</h2>
-              <div class="chip-row"><span class="pill">${escapeHtml(day.type)}</span><span>${day.blocks.length} blocks</span></div>
-            </div>
-            ${editable ? `<select data-day-type="${day.id}">${dayTypes.map((type) => `<option ${type === day.type ? "selected" : ""}>${type}</option>`).join("")}</select>` : ""}
-          </div>
-          <div class="sets">
-            ${day.blocks.sort(byOrder).map((block) => renderPlanBlock(day, block)).join("") || '<div class="empty">No blocks.</div>'}
-            ${editable ? `<button class="ghost-btn" type="button" data-add-exercise-day="${day.id}">+ Add exercise</button>` : ""}
-          </div>
-        </article>
-      `;
+    function PlanBlockRow({ state, day, block, updateState }) {
+      const exercise = getExercise(state, block.exercise_id);
+      if (!exercise) return null;
+      return h("div", { class: "block-row" },
+        h("div", { class: "row-main" }, h("b", null, exercise.name), h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatTimer(block.rest_seconds)} rest`)),
+        h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
+          const found = getDayById(draft, day.id);
+          found.blocks = found.blocks.filter((item) => item.id !== block.id);
+          found.updated_at = nowISO();
+        }) }, "Del")
+      );
     }
 
-    function renderPlanBlock(day, block) {
-      const exercise = getExercise(block.exercise_id);
-      if (!exercise) return "";
-      return `
-        <div class="block-row" data-block-row="${block.id}" data-day-id="${day.id}" draggable="${state.editPlan}">
-          <div class="row-main">
-            <b>${escapeHtml(exercise.name)}</b>
-            <span>${block.sets} sets / ${escapeHtml(block.rep_range)} reps / ${formatTimer(block.rest_seconds)} rest</span>
-          </div>
-          <div class="row-between">
-            <button class="mini-btn" type="button" data-edit-block="${block.id}" aria-label="Edit block"><span data-icon="edit"></span></button>
-            <button class="mini-btn" type="button" data-swap-block="${block.id}" aria-label="Swap block"><span data-icon="swap"></span></button>
-          </div>
-        </div>
-      `;
+    function AddBlockModal({ state, dayId, updateState, onClose }) {
+      const [query, setQuery] = useState("");
+      const filtered = state.exercises.filter((exercise) => normalizeText(exercise.name).includes(normalizeText(query))).slice(0, 30);
+      return h(Modal, { title: "Add Exercise", onClose },
+        h("div", { class: "stack" },
+          h("input", { value: query, placeholder: "Search exercises", onInput: (event) => setQuery(event.currentTarget.value) }),
+          h("div", { class: "panel" }, filtered.map((exercise) => h("button", { key: exercise.id, class: "ghost-btn", style: "width:100%; justify-content:flex-start; border-radius:0", type: "button", onClick: () => {
+            updateState((draft) => {
+              const day = getDayById(draft, dayId);
+              day.blocks.push(blockFromExercise(exercise, day.blocks.length));
+              day.updated_at = nowISO();
+            });
+            onClose();
+          } }, exercise.name))),
+          !filtered.length && h("button", { class: "primary-btn", type: "button", onClick: () => {
+            const name = cleanValue(query) || "New Exercise";
+            updateState((draft) => {
+              const exercise = createExercise({ name });
+              draft.exercises.push(exercise);
+              const day = getDayById(draft, dayId);
+              day.blocks.push(blockFromExercise(exercise, day.blocks.length));
+            });
+            onClose();
+          } }, "Create new exercise")
+        )
+      );
     }
 
-    function renderExercisesView() {
+    function ExercisesView({ state, updateState, showToast, openModal }) {
       const query = state.exerciseQuery || "";
       const muscle = state.exerciseMuscle || "";
       const pattern = state.exercisePattern || "";
-      const filtered = filterExercises(query, muscle, pattern);
-      document.getElementById("app").innerHTML = `
-        <section class="actions">
-          <button class="primary-btn" type="button" id="newExerciseBtn">New Exercise</button>
-          <input id="exerciseSearch" placeholder="Search exercises" value="${escapeHtml(query)}">
-          <select id="exerciseMuscle"><option value="">All muscles</option>${muscles.map((item) => `<option ${item === muscle ? "selected" : ""}>${item}</option>`).join("")}</select>
-          <select id="exercisePattern"><option value="">All patterns</option>${patterns.map((item) => `<option ${item === pattern ? "selected" : ""}>${item}</option>`).join("")}</select>
-        </section>
-        <section class="panel">
-          ${filtered.map(renderExerciseEditorRow).join("") || '<div class="empty">No exercises found.</div>'}
-        </section>
-      `;
-      renderIcons();
+      const filtered = state.exercises.filter((exercise) =>
+        (!query || normalizeText(exercise.name).includes(normalizeText(query))) &&
+        (!muscle || exercise.primary_muscle === muscle) &&
+        (!pattern || exercise.movement_pattern === pattern)
+      ).sort(byName);
+      return h("section", null,
+        h("div", { class: "actions" },
+          h("button", { class: "primary-btn", type: "button", onClick: () => openModal(h(ExerciseFormModal, { onClose: () => openModal(null), updateState })) }, "New Exercise"),
+          h("input", { placeholder: "Search exercises", value: query, onInput: (event) => updateState((draft) => { draft.exerciseQuery = event.currentTarget.value; }, { localOnly: true }) }),
+          h("select", { value: muscle, onChange: (event) => updateState((draft) => { draft.exerciseMuscle = event.currentTarget.value; }, { localOnly: true }) }, h("option", { value: "" }, "All muscles"), muscles.map((item) => h("option", { key: item, value: item }, item))),
+          h("select", { value: pattern, onChange: (event) => updateState((draft) => { draft.exercisePattern = event.currentTarget.value; }, { localOnly: true }) }, h("option", { value: "" }, "All patterns"), patterns.map((item) => h("option", { key: item, value: item }, item)))
+        ),
+        h("section", { class: "panel exercise-list" },
+          filtered.length ? filtered.map((exercise) => h("div", { key: exercise.id, class: "exercise-row" },
+            h("div", { class: "row-main" }, h("b", null, exercise.name), h("span", null, `${exercise.primary_muscle} / ${exercise.movement_pattern} / ${exercise.default_sets} x ${exercise.default_rep_range} / ${formatTimer(exercise.default_rest_seconds)}`)),
+            h("div", { class: "row-actions", style: "grid-auto-flow:column" },
+              h("button", { class: "mini-btn", type: "button", onClick: () => openModal(h(ExerciseFormModal, { exercise, updateState, onClose: () => openModal(null) })) }, "Edit"),
+              h("button", { class: "mini-btn danger", type: "button", onClick: () => deleteExercise(exercise.id, updateState, showToast) }, "Del")
+            )
+          )) : h("div", { class: "empty" }, "No exercises found.")
+        )
+      );
     }
 
-    function renderExerciseEditorRow(exercise) {
-      return `
-        <div class="exercise-row">
-          <div class="row-main">
-            <b>${escapeHtml(exercise.name)}</b>
-            <span>${escapeHtml(exercise.primary_muscle)} / ${escapeHtml(exercise.movement_pattern)} / ${exercise.default_sets} x ${escapeHtml(exercise.default_rep_range)} / ${formatTimer(exercise.default_rest_seconds)}</span>
-          </div>
-          <div class="row-between">
-            <button class="mini-btn" type="button" data-duplicate-exercise="${exercise.id}" aria-label="Duplicate exercise"><span data-icon="duplicate"></span></button>
-            <button class="mini-btn" type="button" data-edit-exercise="${exercise.id}" aria-label="Edit exercise"><span data-icon="edit"></span></button>
-            <button class="mini-btn danger" type="button" data-delete-exercise="${exercise.id}" aria-label="Delete exercise"><span data-icon="trash"></span></button>
-          </div>
-        </div>
-      `;
+    function ExerciseFormModal({ exercise, updateState, onClose }) {
+      const [form, setForm] = useState(exercise || createExercise({ name: "" }));
+      const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+      return h(Modal, { title: exercise ? "Edit Exercise" : "New Exercise", onClose },
+        h("div", { class: "stack" },
+          h("div", { class: "form-grid" },
+            h(FieldInput, { label: "Name", value: form.name, onInput: (value) => set("name", value) }),
+            h(FieldSelect, { label: "Primary muscle", value: form.primary_muscle, options: muscles, onChange: (value) => set("primary_muscle", value) }),
+            h(FieldSelect, { label: "Pattern", value: form.movement_pattern, options: patterns, onChange: (value) => set("movement_pattern", value) }),
+            h(FieldInput, { label: "Default rest", value: form.default_rest_seconds, inputMode: "numeric", onInput: (value) => set("default_rest_seconds", value) }),
+            h(FieldInput, { label: "Sets", value: form.default_sets, inputMode: "numeric", onInput: (value) => set("default_sets", value) }),
+            h(FieldInput, { label: "Rep range", value: form.default_rep_range, onInput: (value) => set("default_rep_range", value) })
+          ),
+          h("textarea", { value: form.notes || "", placeholder: "Notes", onInput: (event) => set("notes", event.currentTarget.value) }),
+          h("button", { class: "primary-btn", type: "button", onClick: () => {
+            if (!cleanValue(form.name)) return;
+            updateState((draft) => {
+              const payload = { ...form, default_rest_seconds: Number(form.default_rest_seconds) || 120, default_sets: Number(form.default_sets) || 3, updated_at: nowISO() };
+              const index = draft.exercises.findIndex((item) => item.id === payload.id);
+              if (index >= 0) draft.exercises[index] = payload;
+              else draft.exercises.push(payload);
+            });
+            onClose();
+          } }, "Save Exercise")
+        )
+      );
     }
 
-    function renderExportView() {
-      const csv = toCSV(state.sets);
-      document.getElementById("app").innerHTML = `
-        <section class="export-actions">
-          <button class="primary-btn" type="button" id="downloadCsvBtn"><span data-icon="download"></span>CSV</button>
-          <button class="ghost-btn" type="button" id="importCsvBtn"><span data-icon="upload"></span>Import CSV</button>
-          <button class="ghost-btn" type="button" id="copyCsvBtn"><span data-icon="copy"></span>Copy CSV</button>
-          <button class="ghost-btn" type="button" id="downloadJsonBtn"><span data-icon="download"></span>JSON</button>
-          <button class="ghost-btn" type="button" id="importJsonBtn"><span data-icon="upload"></span>Import JSON</button>
-        </section>
-        <input class="sr-only" id="csvFile" type="file" accept=".csv,text/csv">
-        <input class="sr-only" id="jsonFile" type="file" accept="application/json,.json">
-        <label class="sr-only" for="csvPreview">CSV preview</label>
-        <textarea id="csvPreview" readonly>${escapeHtml(csv)}</textarea>
-        ${state.csvPreview ? renderCsvPreview() : ""}
-      `;
-      renderIcons();
+    function DriveView({ state, updateState, connect, syncNow, fileJsonRef, fileCsvRef }) {
+      const drive = state.settings.drive || defaultDriveSettings();
+      const connected = K3V_SyncEngine.isConnected();
+      return h("section", { class: "stack" },
+        h("article", { class: "drive-card panel", style: "padding:12px" },
+          h("div", { class: "section-title", style: "margin-top:0" }, h("h2", null, "Google Drive Sync"), h("span", null, connected ? "Connected" : "Ready")),
+          h("p", { class: "muted" }, "K3VSYNC stores one JSON file in this user's hidden Google Drive app-data folder. Deep-union sync keeps local-only and remote-only records instead of deleting them."),
+          h("div", { class: "form-grid" },
+            h(FieldSelect, { label: "Auto sync", value: drive.autoSync === false ? "off" : "on", options: ["on", "off"], onChange: (value) => updateState((draft) => { draft.settings.drive.autoSync = value !== "off"; }) }),
+            h(FieldInput, { label: "Drive file", value: drive.fileName || DRIVE_STATE_FILE, onInput: (value) => updateState((draft) => { draft.settings.drive.fileName = value || DRIVE_STATE_FILE; }) })
+          ),
+          h("div", { class: "actions", style: "margin-top:12px" },
+            h("button", { class: "primary-btn", type: "button", onClick: connect }, connected ? "Reconnect Google" : "Sign in with Google"),
+            h("button", { class: "ghost-btn", type: "button", disabled: !connected, onClick: syncNow }, "Sync now")
+          ),
+          h("p", { class: "muted" }, drive.lastStatus || "Sign in to start cross-device sync."),
+          h("p", { class: "muted" }, drive.lastSyncAt ? `Last sync: ${formatDateTime(drive.lastSyncAt)}` : "Not synced yet.")
+        ),
+        h("article", { class: "drive-card panel", style: "padding:12px" },
+          h("div", { class: "section-title", style: "margin-top:0" }, h("h2", null, "Backup Tools"), h("span", null, "No Export tab")),
+          h("div", { class: "actions" },
+            h("button", { class: "ghost-btn", type: "button", onClick: () => downloadText(toCSV(state.sets), `k3vsync-sets-${todayISO()}.csv`, "text/csv") }, "CSV"),
+            h("button", { class: "ghost-btn", type: "button", onClick: () => fileCsvRef.current?.click() }, "Import CSV"),
+            h("button", { class: "ghost-btn", type: "button", onClick: () => downloadText(backupPayload(state), `k3vsync-backup-${todayISO()}.json`, "application/json") }, "JSON"),
+            h("button", { class: "ghost-btn", type: "button", onClick: () => fileJsonRef.current?.click() }, "Import JSON")
+          ),
+          state.csvPreview && h(CsvPreview, { preview: state.csvPreview, updateState })
+        )
+      );
     }
 
-    function renderCsvPreview() {
-      const preview = state.csvPreview;
-      return `
-        <div class="section-title"><h2>Import Preview</h2><span>${preview.added} added / ${preview.changed} changed / ${preview.unchanged} unchanged / ${preview.errored} errors</span></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Status</th><th>Row</th><th>Exercise</th><th>Set</th><th>Message</th></tr></thead>
-            <tbody>${preview.rows.map((row) => `<tr><td>${row.status}</td><td>${row.row}</td><td>${escapeHtml(row.record?.exercise || "")}</td><td>${row.record?.set_number || ""}</td><td>${escapeHtml(row.message || "")}</td></tr>`).join("")}</tbody>
-          </table>
-        </div>
-        <div class="actions">
-          <button class="primary-btn" type="button" id="commitCsvBtn" ${preview.errored ? "disabled" : ""}>Commit Import</button>
-          <button class="ghost-btn" type="button" id="cancelCsvBtn">Cancel</button>
-        </div>
-      `;
+    function CsvPreview({ preview, updateState }) {
+      return h("div", { class: "stack" },
+        h("p", { class: "muted" }, `${preview.added} added / ${preview.changed} changed / ${preview.unchanged} unchanged / ${preview.errored} errors`),
+        h("button", { class: "primary-btn", type: "button", disabled: preview.errored > 0, onClick: () => commitCSVImport(updateState) }, "Commit Import")
+      );
     }
 
-    function renderSyncView() {
-      const drive = ensureDriveSettings();
-      const configured = Boolean(configuredGoogleClientId());
-      const ready = Boolean(googleDriveClientId());
-      const connected = Boolean(googleAccessToken);
-      const autoSync = drive.autoSync !== false;
-      document.getElementById("app").innerHTML = `
-        <section class="panel" style="padding:12px">
-          <div class="section-title" style="margin-top:0">
-            <h2>Google Drive</h2>
-            <span>${connected ? "Connected" : ready ? "Ready to sign in" : "App setup needed"}</span>
-          </div>
-          <p class="muted">Sign in with Google, approve app-specific Drive access, and this tracker will keep one hidden JSON backup in that Google account. After sign-in, changes auto-sync between phone, browser, and desktop when the app is online.</p>
-          ${configured ? "" : `
-            <div class="empty" style="margin:10px 0;text-align:left">
-              <b>Owner setup</b><br>
-              Add the public Web OAuth Client ID once. After it is built into the hosted app, users will only see the Google sign-in prompt.
-            </div>
-            <div class="form-grid">
-              <div class="field"><label>Google OAuth Client ID</label><input id="googleClientId" value="${escapeHtml(drive.clientId || "")}" placeholder="paste web client id"></div>
-            </div>
-          `}
-          <div class="form-grid" style="margin-top:12px">
-            <div class="field">
-              <label>Sync mode</label>
-              <select id="driveAutoSync">
-                <option value="on" ${autoSync ? "selected" : ""}>Auto sync on</option>
-                <option value="off" ${autoSync ? "" : "selected"}>Auto sync off</option>
-              </select>
-            </div>
-            <div class="field"><label>Drive file</label><input id="driveFileName" value="${escapeHtml(drive.fileName || DRIVE_STATE_FILE)}"></div>
-          </div>
-          <div class="actions" style="margin-top:12px">
-            <button class="primary-btn" type="button" id="driveConnectBtn" ${ready ? "" : "disabled"}><span data-icon="cloud"></span>${connected ? "Reconnect Google" : "Sign in with Google"}</button>
-            <button class="ghost-btn" type="button" id="driveSyncNowBtn" ${connected ? "" : "disabled"}><span data-icon="refresh"></span>Sync now</button>
-          </div>
-          <p class="muted">${escapeHtml(driveStatusText(drive, ready, connected, autoSync))}</p>
-          <p class="muted">${drive.lastSyncAt ? `Last sync: ${escapeHtml(formatDateTime(drive.lastSyncAt))}` : "Not synced yet."}</p>
-        </section>
-      `;
-      renderIcons();
+    function FieldInput({ label, value, onInput, inputMode, placeholder }) {
+      return h("div", { class: "field" }, h("label", null, label), h("input", { value: value ?? "", inputMode, placeholder, onInput: (event) => onInput(event.currentTarget.value) }));
     }
 
-    function addSet(blockId) {
-      const day = getDay();
-      const block = day?.blocks.find((item) => item.id === blockId);
-      const exercise = getExercise(block?.exercise_id);
-      const draft = state.drafts[blockId] || {};
-      if (!block || !exercise) return false;
+    function FieldSelect({ label, value, options, onChange }) {
+      return h("div", { class: "field" }, h("label", null, label), h("select", { value, onChange: (event) => onChange(event.currentTarget.value) }, options.map((option) => h("option", { key: option, value: option }, option))));
+    }
+
+    function Modal({ title, onClose, children }) {
+      return h("div", { class: "modal-backdrop", onClick: (event) => event.target === event.currentTarget && onClose() },
+        h("div", { class: "modal-panel" },
+          h("div", { class: "modal-head" }, h("h2", null, title), h("button", { class: "mini-btn", type: "button", onClick: onClose }, "X")),
+          children
+        )
+      );
+    }
+
+    function addSet(state, block, updateState, showToast) {
+      const draft = state.drafts[block.id] || {};
       const reps = Number(draft.reps);
       const weight = parseWeight(draft.weight_lb);
-      if (!Number.isFinite(reps) || reps <= 0 || !Number.isFinite(weight)) return false;
-      const session = activeSession();
-      const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === exercise.id);
-      const now = new Date().toISOString();
-      if (session.finished_at) session.finished_at = null;
-      if (session.timer_paused_at) {
-        session.paused_total_ms += Date.now() - session.timer_paused_at;
-        session.timer_paused_at = null;
+      if (!Number.isFinite(reps) || reps <= 0 || !Number.isFinite(weight)) {
+        showToast("Weight and reps are needed.");
+        return;
       }
+      updateState((next) => {
+        appendSet(next, block, weight, reps, draft.rpe || "", draft.notes || "");
+        next.drafts[block.id] = { weight_lb: String(weight), reps: "", rpe: draft.rpe || "", notes: "" };
+      });
+      showToast(`${getExercise(state, block.exercise_id)?.name || "Set"}: ${weight} x ${reps}`);
+    }
+
+    function addWarmups(state, block, updateState, showToast) {
+      const draft = state.drafts[block.id] || {};
+      const target = parseWeight(draft.weight_lb) || lastWeightForExercise(state, block.exercise_id) || BAR_WEIGHT;
+      const warmups = [[0.5, 5], [0.7, 3], [0.85, 1]].map(([percent, reps]) => [roundToPlate(target * percent), reps, `${Math.round(percent * 100)}% warm-up`]);
+      updateState((next) => {
+        warmups.forEach(([weight, reps, notes]) => appendSet(next, block, weight, reps, "", notes));
+      });
+      showToast("Warm-up sets added.");
+    }
+
+    function appendSet(state, block, weight, reps, rpe = "", notes = "") {
+      const exercise = getExercise(state, block.exercise_id);
+      const session = activeSession(state);
+      const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === block.exercise_id);
+      const now = nowISO();
       state.sets.push({
         id: cryptoId(),
         session_id: session.id,
         date: state.activeDate,
-        exercise_id: exercise.id,
-        exercise: exercise.name,
+        exercise_id: block.exercise_id,
+        exercise: exercise?.name || "Exercise",
         set_number: existing.length + 1,
         reps,
         weight_lb: weight,
-        rpe: cleanValue(draft.rpe),
-        notes: cleanValue(draft.notes),
+        rpe,
+        notes,
         created_at: now,
         updated_at: now
       });
       session.updated_at = now;
-      state.drafts[blockId] = { weight_lb: String(weight), reps: "", rpe: draft.rpe || "", notes: "" };
-      startRestTimer(block.rest_seconds || exercise.default_rest_seconds || 120);
-      render();
-      showToast(`${exercise.name}: ${weight} x ${reps}`);
-      return true;
     }
 
-    function deleteSet(id) {
-      if (!window.confirm("Delete this set from this browser?")) return;
-      const deleted = state.sets.find((set) => set.id === id);
-      state.sets = state.sets.filter((set) => set.id !== id);
-      renumberSets(deleted);
-      render();
-    }
-
-    function renumberSets(deleted) {
-      if (!deleted) return;
-      state.sets
-        .filter((set) => set.session_id === deleted.session_id && set.exercise_id === deleted.exercise_id)
-        .sort(sortRecords)
-        .forEach((set, index) => {
-          set.set_number = index + 1;
-          set.updated_at = new Date().toISOString();
-        });
-    }
-
-    function parseCommand(text) {
-      const raw = cleanValue(text);
-      if (!raw) return { ok: false, message: "No command text." };
-      const match = findExercise(raw);
-      if (!match) return { ok: false, message: "No matching exercise." };
-      const day = getDay();
-      let block = day.blocks.find((item) => item.exercise_id === match.exercise.id);
-      if (!block) {
-        block = blockFromExercise(match.exercise, day.blocks.length);
-        day.blocks.push(block);
+    function activeSession(state) {
+      let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
+      if (!session) {
+        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO() };
+        state.sessions.push(session);
       }
-      const sets = extractSets(raw, match.alias);
-      if (!sets.length) return { ok: false, message: "No weight and reps found." };
-      sets.forEach((item) => {
-        state.drafts[block.id] = { weight_lb: item.weight_lb, reps: item.reps, rpe: item.rpe || "", notes: item.notes || "" };
-        addSet(block.id);
+      return session;
+    }
+
+    function renumberSets(state, sessionId, exerciseId) {
+      state.sets.filter((set) => set.session_id === sessionId && set.exercise_id === exerciseId).sort(sortRecords).forEach((set, index) => {
+        set.set_number = index + 1;
+        set.updated_at = nowISO();
       });
-      state.command = "";
-      return { ok: true, message: `${sets.length} set${sets.length === 1 ? "" : "s"} added.` };
     }
 
-    function findExercise(text) {
-      const normalized = normalizeText(text);
-      const matches = [];
-      state.exercises.forEach((exercise) => {
-        [exercise.name, ...(exercise.aliases || [])].map(normalizeText).forEach((alias) => {
-          if (normalized.includes(alias)) matches.push({ exercise, alias, score: alias.length });
-        });
+    function createNewPlan(updateState, showToast) {
+      updateState((draft) => {
+        const plan = createProgramFromTemplate(`K3V Plan ${draft.programs.length + 1}`, "Upper/Lower", 4, draft.exercises);
+        draft.programs.push(plan);
+        draft.activeProgramId = plan.id;
+        draft.activeDayId = plan.days[0]?.id;
       });
-      matches.sort((a, b) => b.score - a.score);
-      return matches[0] || null;
+      showToast("New plan created.");
     }
 
-    function extractSets(text, alias) {
-      let body = normalizeText(text)
-        .replace(alias, " ")
-        .replace(/\b(add|set|sets|logged|log|did|pounds|pound|lbs|lb|reps|rep)\b/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-      const rpeMatch = body.match(/\b(?:rpe|r p e)\s*(\d+(?:\.\d+)?)\b/);
-      const rpe = rpeMatch ? rpeMatch[1] : "";
-      if (rpeMatch) body = body.replace(rpeMatch[0], " ");
-      const notesMatch = body.match(/\bnote\s+(.+)$/);
-      const notes = notesMatch ? notesMatch[1].trim() : "";
-      if (notesMatch) body = body.replace(notesMatch[0], " ");
-      const sets = [];
-      const pairPattern = /(\d+(?:\.\d+)?)\s*(?:x|by|for|with)\s*(\d{1,3})/g;
-      let match;
-      while ((match = pairPattern.exec(body))) sets.push({ weight_lb: match[1], reps: match[2], rpe, notes });
-      if (sets.length) return sets;
-      const numbers = body.match(/\d+(?:\.\d+)?/g) || [];
-      for (let index = 0; index < numbers.length - 1; index += 2) sets.push({ weight_lb: numbers[index], reps: numbers[index + 1], rpe, notes });
-      return sets;
-    }
-
-    function startVoice() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        showToast("Voice entry is not available in this browser.");
-        return;
-      }
-      if (listening && recognition) {
-        recognition.stop();
-        return;
-      }
-      recognition = new SpeechRecognition();
-      recognition.lang = "en-US";
-      recognition.interimResults = true;
-      recognition.continuous = false;
-      listening = true;
-      render();
-      recognition.onresult = (event) => {
-        let transcript = "";
-        for (let index = event.resultIndex; index < event.results.length; index += 1) transcript += event.results[index][0].transcript;
-        state.command = transcript.trim();
-        const input = document.getElementById("commandInput");
-        if (input) input.value = state.command;
-        const latest = event.results[event.results.length - 1];
-        if (latest?.isFinal) showToast(parseCommand(state.command).message);
-      };
-      recognition.onerror = (event) => {
-        listening = false;
-        render();
-        showToast(event.error === "not-allowed" ? "Microphone permission was blocked." : `Voice error: ${event.error}`);
-      };
-      recognition.onend = () => {
-        listening = false;
-        render();
-      };
-      try {
-        recognition.start();
-      } catch {
-        listening = false;
-        render();
-      }
-    }
-
-    function voiceStatusText() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) return "Voice unavailable in this browser.";
-      return listening ? "Listening" : "Voice ready";
-    }
-
-    function startRestTimer(seconds) {
-      const now = Date.now();
-      state.rest = { duration: seconds, remaining: seconds, startedAt: now, pausedAt: null, totalPaused: 0, running: true, done: false };
-      tickRest();
-      if (restInterval) clearInterval(restInterval);
-      restInterval = setInterval(tickRest, 250);
-    }
-
-    function tickRest() {
-      if (!state.rest) return;
-      if (state.rest.running) {
-        const elapsed = Math.floor((Date.now() - state.rest.startedAt - state.rest.totalPaused) / 1000);
-        state.rest.remaining = Math.max(0, state.rest.duration - elapsed);
-      }
-      if (state.rest.remaining <= 0 && !state.rest.done) {
-        state.rest.done = true;
-        notifyRestDone();
-      }
-      renderRestBar();
-    }
-
-    function renderRestBar() {
-      const bar = document.getElementById("restBar");
-      if (!bar || !state.rest) {
-        if (bar) bar.classList.remove("show");
-        return;
-      }
-      bar.classList.add("show");
-      bar.innerHTML = `
-        <div class="rest-inner">
-          <div><b>Rest</b> <span class="rest-time">${formatTimer(state.rest.remaining)}</span></div>
-          <button class="mini-btn" type="button" data-rest-adjust="-15">-15</button>
-          <button class="mini-btn primary" type="button" data-rest-toggle><span data-icon="${state.rest.running ? "pause" : "play"}"></span></button>
-          <button class="mini-btn" type="button" data-rest-adjust="15">+15</button>
-          <button class="ghost-btn" type="button" data-rest-skip>Skip</button>
-        </div>
-      `;
-      renderIcons(bar);
-    }
-
-    function sessionElapsedMs(session) {
-      ensureSessionFields(session);
-      const start = Number(session.timer_started_at);
-      const end = session.finished_at ? new Date(session.finished_at).getTime() : (session.timer_paused_at || Date.now());
-      return Math.max(0, end - start - Number(session.paused_total_ms || 0));
-    }
-
-    function toggleSessionTimer() {
-      const session = activeSession();
-      const now = Date.now();
-      if (session.finished_at) session.finished_at = null;
-      if (session.timer_paused_at) {
-        session.paused_total_ms += now - session.timer_paused_at;
-        session.timer_paused_at = null;
-      } else {
-        session.timer_paused_at = now;
-      }
-      session.updated_at = new Date().toISOString();
-      render();
-    }
-
-    function finishSession() {
-      const session = activeSession();
-      if (session.finished_at) {
-        session.finished_at = null;
-        if (!session.timer_paused_at) session.timer_started_at = Date.now() - sessionElapsedMs(session);
-      } else {
-        session.finished_at = new Date().toISOString();
-        session.timer_paused_at = null;
-      }
-      session.updated_at = new Date().toISOString();
-      render();
-    }
-
-    function setSessionDuration(ms) {
-      const session = activeSession();
-      const desired = Math.max(0, Number(ms || 0));
-      const end = session.finished_at ? new Date(session.finished_at).getTime() : (session.timer_paused_at || Date.now());
-      session.timer_started_at = end - Number(session.paused_total_ms || 0) - desired;
-      session.updated_at = new Date().toISOString();
-      render();
-    }
-
-    function setSessionDurationFromInput() {
-      const input = document.getElementById("sessionTimeInput");
-      const ms = parseDurationInput(input?.value);
-      if (!Number.isFinite(ms)) {
-        showToast("Use time like 75m, 1:15, or 1:15:00.");
-        return;
-      }
-      setSessionDuration(ms);
-      showToast("Session time updated.");
-    }
-
-    function adjustSessionDuration(deltaMs) {
-      const session = activeSession();
-      setSessionDuration(sessionElapsedMs(session) + Number(deltaMs || 0));
-    }
-
-    function exerciseTiming(logs, session) {
-      if (!logs.length) return { elapsedMs: 0, avgRestMs: 0, label: "not started" };
-      const times = logs.map((set) => new Date(set.created_at || set.updated_at).getTime()).filter(Number.isFinite).sort((a, b) => a - b);
-      const first = times[0];
-      const last = times.length > 1 ? times[times.length - 1] : (session.finished_at ? new Date(session.finished_at).getTime() : Date.now());
-      const gaps = times.slice(1).map((time, index) => time - times[index]).filter((gap) => gap > 0);
-      const avgRestMs = gaps.length ? gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length : 0;
+    function createExercise(overrides = {}) {
       return {
-        elapsedMs: Math.max(0, last - first),
-        avgRestMs,
-        label: `${formatDuration(Math.max(0, last - first))} work${avgRestMs ? ` / ${formatDuration(avgRestMs)} avg rest` : ""}`
+        id: cryptoId(),
+        name: overrides.name || "New Exercise",
+        primary_muscle: overrides.primary_muscle || "Chest",
+        secondary_muscles: overrides.secondary_muscles || [],
+        movement_pattern: overrides.movement_pattern || "press",
+        default_rest_seconds: Number(overrides.default_rest_seconds) || 120,
+        default_sets: Number(overrides.default_sets) || 3,
+        default_rep_range: overrides.default_rep_range || "8-12",
+        demo_video_url: overrides.demo_video_url || "",
+        notes: overrides.notes || "",
+        aliases: overrides.aliases || [],
+        updated_at: nowISO()
       };
     }
 
-    function updateLiveTimers() {
-      document.querySelectorAll("[data-session-timer]").forEach((node) => {
-        const session = state.sessions.find((item) => item.id === node.dataset.sessionTimer);
-        if (session) node.textContent = formatDuration(sessionElapsedMs(session));
-      });
-      document.querySelectorAll("[data-exercise-time]").forEach((node) => {
-        const [sessionId, exerciseId] = node.dataset.exerciseTime.split("|");
-        const session = state.sessions.find((item) => item.id === sessionId);
-        if (!session) return;
-        node.textContent = exerciseTiming(setsForExercise(exerciseId, sessionId), session).label;
-      });
-    }
-
-    function notifyRestDone() {
-      if (!state.settings.muted) {
-        if (navigator.vibrate) navigator.vibrate(300);
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = ctx.createOscillator();
-          const gain = ctx.createGain();
-          oscillator.frequency.value = 660;
-          gain.gain.value = 0.045;
-          oscillator.connect(gain).connect(ctx.destination);
-          oscillator.start();
-          setTimeout(() => {
-            oscillator.stop();
-            ctx.close();
-          }, 180);
-        } catch {
-          // Audio is optional.
+    function deleteExercise(id, updateState, showToast) {
+      updateState((draft) => {
+        const isUsed = draft.programs.some((program) => program.days.some((day) => day.blocks.some((block) => block.exercise_id === id)));
+        if (isUsed) {
+          showToast("Exercise is used in a plan. Remove the block first.");
+          return draft;
         }
+        draft.exercises = draft.exercises.filter((exercise) => exercise.id !== id);
+      });
+    }
+
+    function backupPayload(state) {
+      return JSON.stringify({ app: "K3VSYNC", version: 3, exported_at: nowISO(), state: { ...state, csvPreview: null } }, null, 2);
+    }
+
+    async function importJSONFile(event, updateState, showToast) {
+      const file = event.currentTarget.files?.[0];
+      event.currentTarget.value = "";
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        updateState(() => normalizeState(parsed.state || parsed));
+        showToast("JSON import complete.");
+      } catch {
+        showToast("JSON import failed.");
       }
-      showToast("Rest done.");
     }
 
-    function adjustRest(seconds) {
-      if (!state.rest) return;
-      state.rest.duration = Math.max(0, state.rest.duration + seconds);
-      state.rest.remaining = Math.max(0, state.rest.remaining + seconds);
-      state.rest.startedAt = Date.now();
-      state.rest.totalPaused = 0;
-      state.rest.done = false;
-      renderRestBar();
-      saveState();
-    }
-
-    function toggleRest() {
-      if (!state.rest) return;
-      if (state.rest.running) {
-        state.rest.running = false;
-        state.rest.pausedAt = Date.now();
-      } else {
-        state.rest.running = true;
-        state.rest.totalPaused += Date.now() - (state.rest.pausedAt || Date.now());
-        state.rest.pausedAt = null;
+    async function importCSVFile(event, updateState, showToast) {
+      const file = event.currentTarget.files?.[0];
+      event.currentTarget.value = "";
+      if (!file) return;
+      try {
+        const text = await file.text();
+        updateState((draft) => {
+          draft.csvPreview = previewCSV(draft, text);
+        }, { localOnly: true });
+      } catch (error) {
+        showToast(error.message);
       }
-      renderRestBar();
-      saveState();
-    }
-
-    function skipRest() {
-      state.rest = null;
-      if (restInterval) clearInterval(restInterval);
-      restInterval = null;
-      renderRestBar();
-      saveState();
-    }
-
-    function openExercisePicker(dayId, replaceBlockId = null) {
-      state.picker = { dayId, replaceBlockId, query: "", muscle: "", pattern: "" };
-      renderPickerModal();
-    }
-
-    function renderPickerModal() {
-      const picker = state.picker;
-      if (!picker) return;
-      const currentBlock = findBlock(picker.replaceBlockId);
-      const currentExercise = getExercise(currentBlock?.block.exercise_id);
-      const pattern = picker.pattern || (currentExercise?.movement_pattern || "");
-      const muscle = picker.muscle || (currentExercise?.primary_muscle || "");
-      const list = filterExercises(picker.query, muscle, pattern);
-      showModal(`
-        <div class="modal-head">
-          <h2>${picker.replaceBlockId ? "Swap Exercise" : "Add Exercise"}</h2>
-          <button class="mini-btn" type="button" data-close-modal>x</button>
-        </div>
-        <div class="form-grid">
-          <div class="field"><label>Search</label><input id="pickerQuery" value="${escapeHtml(picker.query)}" placeholder="exercise name"></div>
-          <div class="field"><label>Muscle</label><select id="pickerMuscle"><option value="">All</option>${muscles.map((item) => `<option ${item === muscle ? "selected" : ""}>${item}</option>`).join("")}</select></div>
-          <div class="field"><label>Pattern</label><select id="pickerPattern"><option value="">All</option>${patterns.map((item) => `<option ${item === pattern ? "selected" : ""}>${item}</option>`).join("")}</select></div>
-        </div>
-        <div class="stack" style="margin-top:12px">
-          ${list.map((exercise) => `<button class="ghost-btn" type="button" data-pick-exercise="${exercise.id}">${escapeHtml(exercise.name)} / ${escapeHtml(exercise.primary_muscle)}</button>`).join("") || '<button class="primary-btn" type="button" id="createFromPickerBtn">Create new exercise</button>'}
-        </div>
-      `);
-    }
-
-    function pickExercise(exerciseId) {
-      const picker = state.picker;
-      const exercise = getExercise(exerciseId);
-      const day = getProgram().days.find((item) => item.id === picker.dayId);
-      if (!picker || !exercise || !day) return;
-      if (picker.replaceBlockId) {
-        const found = findBlock(picker.replaceBlockId);
-        if (!found) return;
-        const previous = { ...found.block };
-        found.block.exercise_id = exercise.id;
-        found.block.sets = exercise.default_sets;
-        found.block.rep_range = exercise.default_rep_range;
-        found.block.rest_seconds = exercise.default_rest_seconds;
-        found.block.updated_at = new Date().toISOString();
-        showToast(`${exercise.name} swapped in.`, () => {
-          Object.assign(found.block, previous);
-          render();
-        });
-      } else {
-        day.blocks.push(blockFromExercise(exercise, day.blocks.length));
-        day.type = day.type === "Rest" ? "Strength" : day.type;
-      }
-      state.picker = null;
-      closeModal();
-      render();
-    }
-
-    function openExerciseForm(id = null, duplicate = false) {
-      const existing = id ? getExercise(id) : null;
-      const item = duplicate && existing ? { ...existing, id: "", name: `${existing.name} Copy` } : (existing || ex("", "", "Chest", [], "press", 120, 3, "8-12"));
-      showModal(`
-        <div class="modal-head"><h2>${existing && !duplicate ? "Edit Exercise" : "New Exercise"}</h2><button class="mini-btn" type="button" data-close-modal>x</button></div>
-        <div class="form-grid">
-          <input type="hidden" id="exerciseId" value="${escapeHtml(item.id)}">
-          <div class="field"><label>Name</label><input id="exerciseName" value="${escapeHtml(item.name)}"></div>
-          <div class="field"><label>Primary muscle</label><select id="exercisePrimary">${muscles.map((m) => `<option ${m === item.primary_muscle ? "selected" : ""}>${m}</option>`).join("")}</select></div>
-          <div class="field"><label>Secondary muscles</label><input id="exerciseSecondary" value="${escapeHtml((item.secondary_muscles || []).join(", "))}"></div>
-          <div class="field"><label>Pattern</label><select id="exercisePatternEdit">${patterns.map((p) => `<option ${p === item.movement_pattern ? "selected" : ""}>${p}</option>`).join("")}</select></div>
-          <div class="field"><label>Rest seconds</label><input id="exerciseRest" inputmode="numeric" value="${escapeHtml(item.default_rest_seconds)}"></div>
-          <div class="field"><label>Default sets</label><input id="exerciseSets" inputmode="numeric" value="${escapeHtml(item.default_sets)}"></div>
-          <div class="field"><label>Rep range</label><input id="exerciseReps" value="${escapeHtml(item.default_rep_range)}"></div>
-          <div class="field"><label>Demo URL</label><input id="exerciseDemo" value="${escapeHtml(item.demo_video_url || "")}"></div>
-          <div class="field"><label>Aliases</label><input id="exerciseAliases" value="${escapeHtml((item.aliases || []).join(", "))}"></div>
-          <div class="field"><label>Notes</label><input id="exerciseNotes" value="${escapeHtml(item.notes || "")}"></div>
-        </div>
-        <div class="actions" style="margin-top:12px"><button class="primary-btn" id="saveExerciseBtn" type="button">Save</button></div>
-      `);
-    }
-
-    function saveExerciseForm() {
-      const id = document.getElementById("exerciseId").value || slug(document.getElementById("exerciseName").value);
-      const exercise = {
-        id,
-        name: cleanValue(document.getElementById("exerciseName").value),
-        primary_muscle: document.getElementById("exercisePrimary").value,
-        secondary_muscles: splitList(document.getElementById("exerciseSecondary").value),
-        movement_pattern: document.getElementById("exercisePatternEdit").value,
-        default_rest_seconds: Number(document.getElementById("exerciseRest").value) || 120,
-        default_sets: Number(document.getElementById("exerciseSets").value) || 3,
-        default_rep_range: cleanValue(document.getElementById("exerciseReps").value) || "8-12",
-        demo_video_url: cleanValue(document.getElementById("exerciseDemo").value),
-        aliases: splitList(document.getElementById("exerciseAliases").value),
-        notes: cleanValue(document.getElementById("exerciseNotes").value),
-        updated_at: new Date().toISOString()
-      };
-      if (!exercise.name) {
-        showToast("Exercise name is required.");
-        return;
-      }
-      const index = state.exercises.findIndex((item) => item.id === id);
-      if (index >= 0) state.exercises[index] = exercise;
-      else state.exercises.push(exercise);
-      closeModal();
-      render();
-    }
-
-    function deleteExercise(id) {
-      const exercise = getExercise(id);
-      if (!exercise || !window.confirm(`Delete ${exercise.name}? Blocks using it will be removed.`)) return;
-      state.exercises = state.exercises.filter((item) => item.id !== id);
-      state.programs.forEach((program) => program.days.forEach((day) => {
-        day.blocks = day.blocks.filter((block) => block.exercise_id !== id);
-      }));
-      render();
-    }
-
-    function openBlockEditor(blockId) {
-      const found = findBlock(blockId);
-      if (!found) return;
-      const exercise = getExercise(found.block.exercise_id);
-      showModal(`
-        <div class="modal-head"><h2>${escapeHtml(exercise?.name || "Block")}</h2><button class="mini-btn" type="button" data-close-modal>x</button></div>
-        <input type="hidden" id="blockId" value="${blockId}">
-        <div class="form-grid">
-          <div class="field"><label>Sets</label><input id="blockSets" inputmode="numeric" value="${escapeHtml(found.block.sets)}"></div>
-          <div class="field"><label>Rep range</label><input id="blockReps" value="${escapeHtml(found.block.rep_range)}"></div>
-          <div class="field"><label>Rest seconds</label><input id="blockRest" inputmode="numeric" value="${escapeHtml(found.block.rest_seconds)}"></div>
-        </div>
-        <div class="actions" style="margin-top:12px"><button class="primary-btn" id="saveBlockBtn" type="button">Save</button></div>
-      `);
-    }
-
-    function saveBlockEditor() {
-      const found = findBlock(document.getElementById("blockId").value);
-      if (!found) return;
-      found.block.sets = Number(document.getElementById("blockSets").value) || 3;
-      found.block.rep_range = cleanValue(document.getElementById("blockReps").value) || "8-12";
-      found.block.rest_seconds = Number(document.getElementById("blockRest").value) || 120;
-      found.block.updated_at = new Date().toISOString();
-      closeModal();
-      render();
-    }
-
-    function openNewPlanWizard() {
-      showModal(`
-        <div class="modal-head"><h2>New Plan</h2><button class="mini-btn" type="button" data-close-modal>x</button></div>
-        <div class="form-grid">
-          <div class="field"><label>Name</label><input id="newPlanName" value="New Plan"></div>
-          <div class="field"><label>Days per week</label><select id="newPlanDays">${[3,4,5,6,7].map((n) => `<option ${n === 4 ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-          <div class="field"><label>Split</label><select id="newPlanSplit">${["Upper/Lower", "Push/Pull/Legs", "Full Body", "Bro Split", "Custom"].map((item) => `<option>${item}</option>`).join("")}</select></div>
-        </div>
-        <div class="actions" style="margin-top:12px"><button class="primary-btn" id="createPlanBtn" type="button">Create</button></div>
-      `);
-    }
-
-    function createPlanFromWizard() {
-      const plan = createProgramFromTemplate(cleanValue(document.getElementById("newPlanName").value) || "New Plan", document.getElementById("newPlanSplit").value, Number(document.getElementById("newPlanDays").value), state.exercises);
-      state.programs.push(plan);
-      state.activeProgramId = plan.id;
-      state.activeDayId = plan.days[0]?.id;
-      closeModal();
-      render();
     }
 
     function toCSV(sets) {
@@ -2195,6 +1637,24 @@
       return String(value ?? "").replace(/[\r\n,]/g, " ").trim();
     }
 
+    function previewCSV(state, text) {
+      const rows = parseCSV(text).map((item) => {
+        if (item.errors.length) return { row: item.row, record: item.record, status: "errored", message: item.errors.join("; ") };
+        const exercise = ensureExerciseByName(state, item.record.exercise);
+        const id = csvRecordId(item.record);
+        const existing = state.sets.find((set) => csvRecordId(set) === id);
+        const status = existing ? "changed" : "added";
+        return { row: item.row, record: { ...item.record, exercise_id: exercise.id }, status, message: "" };
+      });
+      return {
+        rows,
+        added: rows.filter((row) => row.status === "added").length,
+        changed: rows.filter((row) => row.status === "changed").length,
+        unchanged: rows.filter((row) => row.status === "unchanged").length,
+        errored: rows.filter((row) => row.status === "errored").length
+      };
+    }
+
     function parseCSV(text) {
       const lines = text.split(/\r?\n/).filter((line) => line.trim());
       const headers = lines.shift()?.split(",").map((item) => item.trim()) || [];
@@ -2203,346 +1663,99 @@
       return lines.map((line, index) => {
         const cells = line.split(",");
         const record = Object.fromEntries(expected.map((key, keyIndex) => [key, (cells[keyIndex] || "").trim()]));
-        return validateCSVRecord(record, index + 2);
+        const errors = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) errors.push("bad ISO date");
+        if (!record.exercise) errors.push("missing exercise");
+        if (!Number(record.set_number)) errors.push("bad set_number");
+        if (!Number(record.reps)) errors.push("bad reps");
+        if (!Number(record.weight_lb)) errors.push("bad weight_lb");
+        return { row: index + 2, record: { ...record, set_number: Number(record.set_number), reps: Number(record.reps), weight_lb: Number(record.weight_lb) }, errors };
       });
     }
 
-    function validateCSVRecord(record, row) {
-      const errors = [];
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) errors.push("bad ISO date");
-      if (!record.exercise) errors.push("missing exercise");
-      if (!Number(record.set_number)) errors.push("bad set_number");
-      if (!Number(record.reps)) errors.push("bad reps");
-      if (!Number(record.weight_lb)) errors.push("bad weight_lb");
-      return { row, record: { ...record, set_number: Number(record.set_number), reps: Number(record.reps), weight_lb: Number(record.weight_lb) }, errors };
-    }
-
-    function previewCSV(text) {
-      const rows = parseCSV(text).map((item) => {
-        if (item.errors.length) return { row: item.row, record: item.record, status: "errored", message: item.errors.join("; ") };
-        const exercise = ensureExerciseByName(item.record.exercise);
-        const id = csvRecordId(item.record);
-        const existing = state.sets.find((set) => csvRecordId(set) === id);
-        const status = existing ? (existing.reps === item.record.reps && existing.weight_lb === item.record.weight_lb && String(existing.rpe || "") === String(item.record.rpe || "") && String(existing.notes || "") === String(item.record.notes || "") ? "unchanged" : "changed") : "added";
-        return { row: item.row, record: { ...item.record, exercise_id: exercise.id }, status, message: "" };
+    function commitCSVImport(updateState) {
+      updateState((state) => {
+        if (!state.csvPreview || state.csvPreview.errored) return;
+        state.csvPreview.rows.filter((row) => row.status !== "unchanged" && row.status !== "errored").forEach((row) => {
+          const record = row.record;
+          const session = getOrCreateImportedSession(state, record.date);
+          const id = csvRecordId(record);
+          const existing = state.sets.findIndex((set) => csvRecordId(set) === id);
+          const payload = {
+            id: existing >= 0 ? state.sets[existing].id : cryptoId(),
+            session_id: session.id,
+            date: record.date,
+            exercise_id: record.exercise_id,
+            exercise: record.exercise,
+            set_number: Number(record.set_number),
+            reps: Number(record.reps),
+            weight_lb: Number(record.weight_lb),
+            rpe: record.rpe,
+            notes: record.notes,
+            created_at: existing >= 0 ? state.sets[existing].created_at : nowISO(),
+            updated_at: nowISO()
+          };
+          if (existing >= 0) state.sets[existing] = payload;
+          else state.sets.push(payload);
+        });
+        state.csvPreview = null;
       });
-      state.csvPreview = {
-        rows,
-        added: rows.filter((row) => row.status === "added").length,
-        changed: rows.filter((row) => row.status === "changed").length,
-        unchanged: rows.filter((row) => row.status === "unchanged").length,
-        errored: rows.filter((row) => row.status === "errored").length
-      };
-      render();
     }
 
-    function commitCSVImport() {
-      if (!state.csvPreview || state.csvPreview.errored) return;
-      state.csvPreview.rows.filter((row) => row.status !== "unchanged").forEach((row) => {
-        const record = row.record;
-        const session = getOrCreateImportedSession(record.date);
-        const id = csvRecordId(record);
-        const existing = state.sets.findIndex((set) => csvRecordId(set) === id);
-        const payload = {
-          id: existing >= 0 ? state.sets[existing].id : cryptoId(),
-          session_id: session.id,
-          date: record.date,
-          exercise_id: record.exercise_id,
-          exercise: record.exercise,
-          set_number: Number(record.set_number),
-          reps: Number(record.reps),
-          weight_lb: Number(record.weight_lb),
-          rpe: record.rpe,
-          notes: record.notes,
-          created_at: existing >= 0 ? state.sets[existing].created_at : new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        if (existing >= 0) state.sets[existing] = payload;
-        else state.sets.push(payload);
-      });
-      state.csvPreview = null;
-      render();
-      showToast("CSV import committed.");
+    function ensureExerciseByName(state, name) {
+      const existing = state.exercises.find((exercise) => normalizeText(exercise.name) === normalizeText(name));
+      if (existing) return existing;
+      const exercise = createExercise({ name });
+      state.exercises.push(exercise);
+      return exercise;
     }
 
-    function getOrCreateImportedSession(date) {
+    function getOrCreateImportedSession(state, date) {
       let session = state.sessions.find((item) => item.date === date && item.day_id === state.activeDayId);
       if (!session) {
-        session = { id: cryptoId(), date, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+        session = { id: cryptoId(), date, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO() };
         state.sessions.push(session);
       }
       return session;
     }
 
-    function backupPayload() {
-      return JSON.stringify({ app: "Workout Log", version: 2, exported_at: new Date().toISOString(), state: { ...state, command: "", csvPreview: null } }, null, 2);
-    }
-
-    async function importJSON(file) {
-      const parsed = JSON.parse(await file.text());
-      state = normalizeState(parsed.state || parsed);
-      render();
-      showToast("JSON import complete.");
-    }
-
-    function configuredGoogleClientId() {
-      return cleanValue(GOOGLE_OAUTH_CLIENT_ID);
-    }
-
-    function googleDriveClientId() {
-      return configuredGoogleClientId() || cleanValue(state.settings.drive?.clientId || "");
-    }
-
-    function ensureDriveSettings() {
-      state.settings ||= {};
-      state.settings.drive = { ...defaultDriveSettings(), ...(state.settings.drive || {}) };
-      if (configuredGoogleClientId()) state.settings.drive.clientId = "";
-      if (state.settings.drive.autoSync === undefined) state.settings.drive.autoSync = true;
-      if (!state.settings.drive.fileName) state.settings.drive.fileName = DRIVE_STATE_FILE;
-      return state.settings.drive;
-    }
-
-    function driveStatusText(drive, ready, connected, autoSync) {
-      if (drive.lastStatus) return drive.lastStatus;
-      if (!ready) return "App setup needed: add the public Web OAuth Client ID once, then publish the app.";
-      if (!connected) return "Tap Sign in with Google to grant Drive app data access.";
-      return autoSync ? "Auto sync is on for this browser session." : "Auto sync is off. Use Sync now when needed.";
-    }
-
-    function formatDateTime(value) {
-      try {
-        return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-      } catch {
-        return value;
+    function normalizeState(saved) {
+      const fallback = createDefaultState();
+      if (!saved || typeof saved !== "object") return fallback;
+      if (saved.schema_version === 2 || saved.schema_version === 3) {
+        const merged = { ...fallback, ...saved, schema_version: 3 };
+        merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
+        merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
+        merged.sessions = saved.sessions || [];
+        merged.sets = saved.sets || [];
+        merged.drafts = saved.drafts || {};
+        merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
+        merged.settings = { ...fallback.settings, ...(saved.settings || {}), drive: { ...defaultDriveSettings(), ...(saved.settings?.drive || {}) } };
+        merged.view = ["log", "progress", "plan", "exercises", "sync"].includes(saved.view) ? saved.view : "log";
+        if (!merged.activeProgramId || !getProgram(merged)) merged.activeProgramId = merged.programs[0]?.id;
+        if (!merged.activeDayId || !getDay(merged)) merged.activeDayId = getProgram(merged)?.days[0]?.id;
+        return merged;
       }
+      return fallback;
     }
 
-    function saveDriveSettingsFromInputs(options = {}) {
-      const drive = ensureDriveSettings();
-      const configuredClientId = configuredGoogleClientId();
-      const clientInput = document.getElementById("googleClientId");
-      const fileInput = document.getElementById("driveFileName");
-      const autoSyncInput = document.getElementById("driveAutoSync");
-      if (!configuredClientId && clientInput) drive.clientId = cleanValue(clientInput.value || drive.clientId);
-      if (configuredClientId) drive.clientId = "";
-      if (fileInput) drive.fileName = cleanValue(fileInput.value || drive.fileName || DRIVE_STATE_FILE);
-      if (autoSyncInput) drive.autoSync = autoSyncInput.value !== "off";
-      if (options.persist !== false) saveState();
-      return drive;
-    }
-
-    function canDriveAutoSync() {
-      const drive = ensureDriveSettings();
-      return drive.autoSync !== false && Boolean(googleDriveClientId()) && Boolean(googleAccessToken) && navigator.onLine !== false;
-    }
-
-    function scheduleDriveAutoSync(reason = "local change", delay = DRIVE_AUTO_SYNC_DELAY) {
-      if (!canDriveAutoSync()) return;
-      driveSyncDirty = true;
-      window.clearTimeout(driveAutoSyncTimer);
-      driveAutoSyncTimer = window.setTimeout(() => runDriveAutoSync(reason), delay);
-    }
-
-    async function runDriveAutoSync(reason = "local change") {
-      if (!canDriveAutoSync()) return;
-      if (driveSyncInFlight) {
-        driveSyncDirty = true;
-        return;
-      }
-      driveSyncDirty = false;
-      try {
-        await syncDrive("sync", { silent: true, reason });
-      } catch {
-        // The Drive screen shows the latest failure status; background sync stays quiet.
-      }
-    }
-
-    async function connectGoogleDrive() {
-      saveDriveSettingsFromInputs();
-      await ensureGoogleDriveToken(true);
-      const drive = ensureDriveSettings();
-      drive.connectedAt = new Date().toISOString();
-      drive.autoSync = true;
-      drive.lastStatus = "Google Drive connected. Syncing this device now.";
-      await syncDrive("sync", { silent: true });
-      ensureDriveSettings().lastStatus = "Google Drive connected. Auto sync is on.";
-      suppressDriveAutoSync = true;
-      render();
-      suppressDriveAutoSync = false;
-      showToast("Google Drive connected and synced.");
-    }
-
-    async function syncDrive(mode = "sync", options = {}) {
-      if (driveSyncInFlight) {
-        driveSyncDirty = true;
-        if (!options.silent) showToast("Sync already running.");
-        return;
-      }
-      driveSyncInFlight = true;
-      window.clearTimeout(driveAutoSyncTimer);
-      try {
-        suppressDriveAutoSync = true;
-        saveDriveSettingsFromInputs({ persist: false });
-        suppressDriveAutoSync = false;
-        await ensureGoogleDriveToken(false);
-        if (mode === "pull" || mode === "sync") await pullDriveState();
-        if (mode === "push" || mode === "sync") await pushDriveState();
-        const drive = ensureDriveSettings();
-        const verb = mode === "sync" ? "Synced" : mode === "pull" ? "Pulled" : "Pushed";
-        drive.lastSyncAt = new Date().toISOString();
-        drive.lastStatus = `${verb} with Google Drive. Auto sync ${drive.autoSync === false ? "is off" : "is on"}.`;
-        suppressDriveAutoSync = true;
-        render();
-        suppressDriveAutoSync = false;
-        if (!options.silent) showToast(drive.lastStatus);
-      } catch (error) {
-        const drive = ensureDriveSettings();
-        drive.lastStatus = `Google Drive sync failed: ${error.message}`;
-        suppressDriveAutoSync = true;
-        saveState();
-        if (state.view === "sync") renderSyncView();
-        suppressDriveAutoSync = false;
-        if (!options.silent) showToast(error.message);
-        throw error;
-      } finally {
-        suppressDriveAutoSync = false;
-        driveSyncInFlight = false;
-        if (driveSyncDirty) {
-          driveSyncDirty = false;
-          scheduleDriveAutoSync("queued change");
-        }
-      }
-    }
-
-    function ensureGoogleDriveToken(forcePrompt = false) {
-      return new Promise((resolve, reject) => {
-        const clientId = googleDriveClientId();
-        if (!clientId) {
-          reject(new Error("Google Drive sign-in is not configured yet. Add the Web OAuth Client ID once."));
-          return;
-        }
-        if (googleAccessToken && !forcePrompt) {
-          resolve(googleAccessToken);
-          return;
-        }
-        if (!window.google?.accounts?.oauth2) {
-          reject(new Error("Google Identity Services is still loading. Try again in a few seconds."));
-          return;
-        }
-        googleTokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: GOOGLE_DRIVE_SCOPE,
-          callback: (response) => {
-            if (response.error) {
-              reject(new Error(response.error_description || response.error));
-              return;
-            }
-            googleAccessToken = response.access_token;
-            resolve(googleAccessToken);
-          }
-        });
-        googleTokenClient.requestAccessToken({ prompt: forcePrompt ? "consent" : "" });
-      });
-    }
-
-    async function pullDriveState() {
-      const file = await findDriveStateFile();
-      if (!file) {
-        state.settings.drive.lastStatus = "No Drive backup found yet. Push from the device with the latest data first.";
-        return;
-      }
-      const response = await googleDriveRequest(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`);
-      const text = await response.text();
-      const parsed = JSON.parse(text);
-      state = mergeStates(state, normalizeState(parsed.state || parsed));
-      state.settings.drive.fileId = file.id;
-    }
-
-    async function pushDriveState() {
-      const file = await findDriveStateFile();
-      const content = backupPayload();
-      if (file) {
-        await googleDriveRequest(`https://www.googleapis.com/upload/drive/v3/files/${file.id}?uploadType=media&fields=id,name,modifiedTime`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: content
-        });
-        state.settings.drive.fileId = file.id;
-        return;
-      }
-      const created = await createDriveStateFile(content);
-      state.settings.drive.fileId = created.id;
-    }
-
-    async function findDriveStateFile() {
-      const fileName = state.settings.drive?.fileName || DRIVE_STATE_FILE;
-      const q = encodeURIComponent(`name='${fileName.replace(/'/g, "\\'")}'`);
-      const response = await googleDriveRequest(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&pageSize=1&fields=files(id,name,modifiedTime)`);
-      const data = await response.json();
-      return data.files?.[0] || null;
-    }
-
-    async function createDriveStateFile(content) {
-      const boundary = `workout-log-${Date.now()}`;
-      const metadata = {
-        name: state.settings.drive?.fileName || DRIVE_STATE_FILE,
-        parents: ["appDataFolder"],
-        mimeType: "application/json"
-      };
-      const body = [
-        `--${boundary}`,
-        "Content-Type: application/json; charset=UTF-8",
-        "",
-        JSON.stringify(metadata),
-        `--${boundary}`,
-        "Content-Type: application/json",
-        "",
-        content,
-        `--${boundary}--`
-      ].join("\r\n");
-      const response = await googleDriveRequest("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime", {
-        method: "POST",
-        headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
-        body
-      });
-      return response.json();
-    }
-
-    async function googleDriveRequest(url, options = {}) {
-      const token = await ensureGoogleDriveToken(false);
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          ...(options.headers || {}),
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (response.status === 401) {
-        googleAccessToken = "";
-        throw new Error("Google session expired. Tap Sign in with Google again.");
-      }
-      if (!response.ok) throw new Error(await googleErrorMessage(response));
-      return response;
-    }
-
-    async function googleErrorMessage(response) {
-      try {
-        const data = await response.json();
-        return data.error?.message || `Google Drive request failed (${response.status})`;
-      } catch {
-        return `Google Drive request failed (${response.status})`;
-      }
-    }
-
-    function mergeStates(local, remote) {
-      return normalizeState({
-        ...local,
-        exercises: mergeByUpdatedAt(local.exercises, remote.exercises),
-        programs: mergeByUpdatedAt(local.programs, remote.programs),
-        sessions: mergeByUpdatedAt(local.sessions, remote.sessions),
-        sets: mergeByUpdatedAt(local.sets, remote.sets),
-        profile: remote.profile || local.profile,
-        settings: { ...local.settings, drive: local.settings.drive }
+    function renderStandards(state) {
+      const sex = state.profile.sex || "male";
+      const bodyweight = Number(state.profile.bodyweight_lb) || 180;
+      const age = Number(state.profile.age) || 30;
+      const bracket = nearest(bodyweightBrackets, bodyweight);
+      const ageBracket = ageToBracket(age);
+      return Object.entries(strengthStandardModels).map(([liftId, model]) => {
+        const standards = buildStrengthStandards().filter((row) => row.lift_id === liftId && row.sex === sex && row.bodyweight_bracket_lb === bracket && row.age_bracket === ageBracket);
+        const best = bestE1RMForModel(state, model);
+        const elite = standards.find((row) => row.level === "elite")?.one_rm_lb || 1;
+        const position = Math.min(100, Math.max(0, best ? (best / elite) * 100 : 0));
+        const level = best ? currentStandardLevel(best, standards) : "no data";
+        return h("article", { key: liftId, class: "panel", style: "padding:12px" },
+          h("div", { class: "chart-head" }, h("b", null, model.lift), h("span", { class: "muted" }, best ? `${Math.round(best)} lb / ${level}` : "no data")),
+          h("div", { class: "standard-bar" }, h("span", { class: "standard-marker", style: `left:calc(${position}% - 2px)` })),
+          h("p", { class: "muted" }, `${sex} / ${bracket} lb / age ${ageBracket}`)
+        );
       });
     }
 
@@ -2567,59 +1780,139 @@
       );
     }
 
-    function renderStandardsList() {
-      const sex = state.profile.sex || "male";
-      const bodyweight = Number(state.profile.bodyweight_lb) || 180;
-      const age = Number(state.profile.age) || 30;
-      const bracket = nearest(bodyweightBrackets, bodyweight);
-      const ageBracket = ageToBracket(age);
-      return Object.entries(strengthStandardModels).map(([liftId, model]) => {
-        const standards = strengthStandards.filter((row) =>
-          row.lift_id === liftId &&
-          row.sex === sex &&
-          row.bodyweight_bracket_lb === bracket &&
-          row.age_bracket === ageBracket
-        );
-        const best = bestE1RMForModel(model);
-        const elite = standards.find((row) => row.level === "elite")?.one_rm_lb || 1;
-        const position = Math.min(100, Math.max(0, best ? (best / elite) * 100 : 0));
-        const level = best ? currentStandardLevel(best, standards) : "no data";
-        return `
-          <article class="standard-card panel">
-            <div class="row-between">
-              <div>
-                <b>${escapeHtml(model.lift)}</b>
-                <div class="muted">${sex} / ${bracket} lb / age ${ageBracket}</div>
-              </div>
-              <div class="row-main" style="text-align:right">
-                <b>${best ? `${Math.round(best)} lb` : "--"}</b>
-                <span>${escapeHtml(level)}</span>
-              </div>
-            </div>
-            <div class="standard-bar" aria-label="${escapeHtml(model.lift)} standards">
-              <span class="standard-marker" style="left: calc(${position}% - 2px)"></span>
-            </div>
-            <div class="standard-levels">
-              ${standards.map((row) => `<span>${row.level}<br>${row.one_rm_lb}</span>`).join("")}
-            </div>
-          </article>
-        `;
-      }).join("");
-    }
-
-    function bestE1RMForModel(model) {
+    function bestE1RMForModel(state, model) {
       const ids = new Set(model.aliases);
-      return state.sets
-        .filter((set) => ids.has(set.exercise_id) || model.aliases.some((alias) => normalizeText(set.exercise).includes(normalizeText(alias))))
-        .reduce((best, set) => Math.max(best, Number(set.weight_lb || 0) * (1 + Number(set.reps || 0) / 30)), 0);
+      return Math.max(0, ...state.sets.filter((set) => ids.has(set.exercise_id) || model.aliases.some((alias) => normalizeText(set.exercise).includes(normalizeText(alias)))).map(e1rm));
     }
 
-    function currentStandardLevel(best, standards) {
-      let level = "below untrained";
-      standards.forEach((row) => {
-        if (best >= row.one_rm_lb) level = row.level;
+    function currentStandardLevel(value, standards) {
+      return standards.filter((row) => value >= row.one_rm_lb).slice(-1)[0]?.level || "below untrained";
+    }
+
+    function trendPoints(sets) {
+      const byDate = new Map();
+      sets.forEach((set) => {
+        const value = e1rm(set);
+        const previous = byDate.get(set.date);
+        if (!previous || value > previous.e1rm) byDate.set(set.date, { date: set.date, time: new Date(`${set.date}T12:00:00`).getTime(), e1rm: value });
       });
-      return level;
+      return [...byDate.values()].sort((a, b) => a.time - b.time);
+    }
+
+    function calculatePlates(weight) {
+      const remaining = (Number(weight) - BAR_WEIGHT) / 2;
+      if (!Number.isFinite(remaining) || remaining < 0) return { loadable: false, perSide: 0, plates: [] };
+      let left = remaining;
+      const plates = [];
+      PLATES.forEach((plate) => {
+        while (left + 0.001 >= plate) {
+          plates.push(plate);
+          left -= plate;
+        }
+      });
+      return { loadable: true, perSide: remaining, plates, leftover: left };
+    }
+
+    function getProgram(state) {
+      return state.programs.find((program) => program.id === state.activeProgramId) || state.programs[0];
+    }
+
+    function getDay(state) {
+      const program = getProgram(state);
+      return program?.days.find((day) => day.id === state.activeDayId) || program?.days[0];
+    }
+
+    function getDayById(state, dayId) {
+      return state.programs.flatMap((program) => program.days).find((day) => day.id === dayId);
+    }
+
+    function getExercise(state, id) {
+      return state.exercises.find((exercise) => exercise.id === id);
+    }
+
+    function setsForDate(state, date) {
+      return state.sets.filter((set) => set.date === date).sort(sortRecords);
+    }
+
+    function setsForExercise(state, exerciseId) {
+      return state.sets.filter((set) => set.exercise_id === exerciseId).sort(sortRecords);
+    }
+
+    function mostLoggedExercises(state) {
+      return state.exercises.map((exercise) => ({ exercise, count: setsForExercise(state, exercise.id).length })).filter((item) => item.count).sort((a, b) => b.count - a.count).map((item) => item.exercise);
+    }
+
+    function lastWeightForExercise(state, exerciseId) {
+      return setsForExercise(state, exerciseId).slice(-1)[0]?.weight_lb || "";
+    }
+
+    function volume(set) {
+      return Number(set.weight_lb || 0) * Number(set.reps || 0);
+    }
+
+    function e1rm(set) {
+      return Number(set.weight_lb || 0) * (1 + Number(set.reps || 0) / 30);
+    }
+
+    function csvRecordId(record) {
+      return [record.date, normalizeText(record.exercise), record.set_number].join("|");
+    }
+
+    function mergeById(base, incoming) {
+      return [...new Map([...base, ...incoming].map((item) => [item.id, item])).values()];
+    }
+
+    function cloneState(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function parseWeight(value) {
+      const cleaned = String(value ?? "").replace(/[^0-9.]/g, "");
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+
+    function roundToPlate(value) {
+      return Math.max(BAR_WEIGHT, Math.round(value / 5) * 5);
+    }
+
+    function formatWeight(value) {
+      const number = Number(value);
+      return Number.isInteger(number) ? `${number}` : `${number.toFixed(1)}`;
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat().format(Math.round(value || 0));
+    }
+
+    function formatTimer(seconds) {
+      const mins = Math.floor(Number(seconds || 0) / 60);
+      const secs = Math.floor(Number(seconds || 0) % 60);
+      return `${mins}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function formatDateTime(value) {
+      try {
+        return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+      } catch {
+        return value;
+      }
+    }
+
+    function sortRecords(a, b) {
+      return String(a.date || "").localeCompare(String(b.date || "")) || Number(a.set_number || 0) - Number(b.set_number || 0) || String(a.created_at || "").localeCompare(String(b.created_at || ""));
+    }
+
+    function byOrder(a, b) {
+      return Number(a.order || 0) - Number(b.order || 0);
+    }
+
+    function byName(a, b) {
+      return a.name.localeCompare(b.name);
+    }
+
+    function shortDayLabel(index, label) {
+      return ["M", "T", "W", "T", "F", "S", "S"][index] || label.slice(0, 1);
     }
 
     function ageToBracket(age) {
@@ -2630,357 +1923,29 @@
     }
 
     function nearest(values, target) {
-      return values.reduce((best, value) => Math.abs(value - target) < Math.abs(best - target) ? value : best, values[0]);
+      return values.slice().sort((a, b) => Math.abs(a - target) - Math.abs(b - target))[0];
     }
 
-    function drawCharts() {
-      document.querySelectorAll("[data-pr-chart]").forEach((canvas) => drawPRChart(canvas, canvas.dataset.prChart));
-      const elapsed = performance.now() - chartStart;
-      if (elapsed > 200) console.info(`PR charts rendered in ${Math.round(elapsed)}ms`);
+    function normalizeText(value) {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
     }
 
-    function drawPRChart(canvas, exerciseId) {
-      const ctx = canvas.getContext("2d");
-      const points = topSetsByDate(exerciseId);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "#2c3340";
-      ctx.lineWidth = 1;
-      for (let y = 24; y < canvas.height - 20; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(34, y);
-        ctx.lineTo(canvas.width - 12, y);
-        ctx.stroke();
-      }
-      if (!points.length) {
-        ctx.fillStyle = "#a1acb8";
-        ctx.fillText("No top sets yet", 34, 80);
-        return;
-      }
-      const minTime = Math.min(...points.map((point) => point.time));
-      const maxTime = Math.max(...points.map((point) => point.time));
-      const minY = Math.min(...points.map((point) => point.e1rm)) * 0.95;
-      const maxY = Math.max(...points.map((point) => point.e1rm)) * 1.05;
-      let best = 0;
-      ctx.beginPath();
-      points.forEach((point, index) => {
-        const x = scale(point.time, minTime, maxTime, 38, canvas.width - 18);
-        const y = scale(point.e1rm, minY, maxY, canvas.height - 24, 18);
-        if (index === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = "#8fb7ff";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      points.forEach((point) => {
-        const x = scale(point.time, minTime, maxTime, 38, canvas.width - 18);
-        const y = scale(point.e1rm, minY, maxY, canvas.height - 24, 18);
-        const pr = point.e1rm > best;
-        best = Math.max(best, point.e1rm);
-        ctx.fillStyle = pr ? "#6ee7b7" : "#f4f7fb";
-        ctx.beginPath();
-        ctx.arc(x, y, pr ? 5 : 3, 0, Math.PI * 2);
-        ctx.fill();
-        if (pr) {
-          ctx.fillStyle = "#6ee7b7";
-          ctx.font = "12px system-ui";
-          ctx.fillText(`${Math.round(point.e1rm)}`, x + 6, y - 6);
-        }
-      });
+    function cleanValue(value) {
+      return String(value ?? "").trim();
     }
 
-    function topSetsByDate(exerciseId) {
-      const groups = new Map();
-      setsForExercise(exerciseId).forEach((set) => {
-        const e1rm = Number(set.weight_lb) * (1 + Number(set.reps) / 30);
-        const previous = groups.get(set.date);
-        if (!previous || e1rm > previous.e1rm) groups.set(set.date, { date: set.date, time: new Date(`${set.date}T12:00:00`).getTime(), e1rm });
-      });
-      return [...groups.values()].sort((a, b) => a.time - b.time);
+    function todayISO() {
+      return new Date().toISOString().slice(0, 10);
     }
 
-    function mostLoggedExercises() {
-      return state.exercises.slice().sort((a, b) => setsForExercise(b.id).length - setsForExercise(a.id).length).filter((exercise) => setsForExercise(exercise.id).length);
+    function nowISO() {
+      return new Date().toISOString();
     }
 
-    function filterExercises(query = "", muscle = "", pattern = "") {
-      const q = normalizeText(query);
-      return state.exercises.filter((exercise) => {
-        const search = normalizeText([exercise.name, exercise.primary_muscle, exercise.movement_pattern, ...(exercise.aliases || [])].join(" "));
-        return (!q || search.includes(q)) && (!muscle || exercise.primary_muscle === muscle || exercise.secondary_muscles.includes(muscle)) && (!pattern || exercise.movement_pattern === pattern);
-      }).sort(byName);
+    function cryptoId() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      return `k3v-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
-
-    function ensureExerciseByName(name) {
-      let exercise = state.exercises.find((item) => normalizeText(item.name) === normalizeText(name));
-      if (!exercise) {
-        exercise = ex(slug(name), name, "Custom", [], "press", 120, 3, "8-12");
-        exercise.updated_at = new Date().toISOString();
-        state.exercises.push(exercise);
-      }
-      return exercise;
-    }
-
-    function showModal(content) {
-      const modal = document.getElementById("modal");
-      modal.innerHTML = `<div class="modal-panel">${content}</div>`;
-      modal.classList.add("show");
-      renderIcons(modal);
-    }
-
-    function closeModal() {
-      const modal = document.getElementById("modal");
-      modal.classList.remove("show");
-      modal.innerHTML = "";
-    }
-
-    function showToast(message, undo = null) {
-      const toast = document.getElementById("toast");
-      toast.innerHTML = `${escapeHtml(message)}${undo ? '<button type="button" id="undoToast">Undo</button>' : ""}`;
-      toast.classList.add("show");
-      if (undo) toast.querySelector("#undoToast").onclick = () => {
-        undo();
-        toast.classList.remove("show");
-      };
-      clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("show"), undo ? 10000 : 2200);
-    }
-
-    document.addEventListener("click", async (event) => {
-      const viewButton = event.target.closest("[data-view]");
-      if (viewButton) {
-        state.view = viewButton.dataset.view;
-        render();
-        return;
-      }
-      const dayButton = event.target.closest("[data-day]");
-      if (dayButton) {
-        state.activeDayId = dayButton.dataset.day;
-        render();
-        return;
-      }
-      if (event.target.closest("#editPlanBtn")) {
-        state.editPlan = !state.editPlan;
-        state.view = "plan";
-        render();
-        return;
-      }
-      if (event.target.closest("#todayBtn")) {
-        state.activeDate = todayISO();
-        render();
-        return;
-      }
-      if (event.target.closest("#sessionToggleBtn")) return toggleSessionTimer();
-      if (event.target.closest("#sessionFinishBtn")) return finishSession();
-      if (event.target.closest("#sessionSetTimeBtn")) return setSessionDurationFromInput();
-      const sessionAdjust = event.target.closest("[data-session-adjust]");
-      if (sessionAdjust) return adjustSessionDuration(Number(sessionAdjust.dataset.sessionAdjust));
-      if (event.target.closest("#voiceBtn")) return startVoice();
-      if (event.target.closest("#parseBtn")) {
-        const result = parseCommand(state.command || document.getElementById("commandInput").value);
-        showToast(result.message);
-        render();
-        return;
-      }
-      const addSetButton = event.target.closest("[data-add-set]");
-      if (addSetButton) {
-        if (!addSet(addSetButton.dataset.addSet)) showToast("Weight and reps are needed.");
-        return;
-      }
-      const deleteSetButton = event.target.closest("[data-delete-set]");
-      if (deleteSetButton) return deleteSet(deleteSetButton.dataset.deleteSet);
-      const addExerciseButton = event.target.closest("[data-add-exercise-day]");
-      if (addExerciseButton) return openExercisePicker(addExerciseButton.dataset.addExerciseDay);
-      const swapButton = event.target.closest("[data-swap-block]");
-      if (swapButton) {
-        const found = findBlock(swapButton.dataset.swapBlock);
-        return openExercisePicker(found?.day.id, swapButton.dataset.swapBlock);
-      }
-      const pickButton = event.target.closest("[data-pick-exercise]");
-      if (pickButton) return pickExercise(pickButton.dataset.pickExercise);
-      if (event.target.closest("#createFromPickerBtn")) return openExerciseForm();
-      if (event.target.closest("[data-close-modal]") || event.target.id === "modal") return closeModal();
-      if (event.target.closest("#newExerciseBtn")) return openExerciseForm();
-      const editExerciseButton = event.target.closest("[data-edit-exercise]");
-      if (editExerciseButton) return openExerciseForm(editExerciseButton.dataset.editExercise);
-      const duplicateExerciseButton = event.target.closest("[data-duplicate-exercise]");
-      if (duplicateExerciseButton) return openExerciseForm(duplicateExerciseButton.dataset.duplicateExercise, true);
-      const deleteExerciseButton = event.target.closest("[data-delete-exercise]");
-      if (deleteExerciseButton) return deleteExercise(deleteExerciseButton.dataset.deleteExercise);
-      if (event.target.closest("#saveExerciseBtn")) return saveExerciseForm();
-      const editBlockButton = event.target.closest("[data-edit-block]");
-      if (editBlockButton) return openBlockEditor(editBlockButton.dataset.editBlock);
-      if (event.target.closest("#saveBlockBtn")) return saveBlockEditor();
-      if (event.target.closest("#newPlanBtn")) return openNewPlanWizard();
-      if (event.target.closest("#createPlanBtn")) return createPlanFromWizard();
-      const restAdjust = event.target.closest("[data-rest-adjust]");
-      if (restAdjust) return adjustRest(Number(restAdjust.dataset.restAdjust));
-      if (event.target.closest("[data-rest-toggle]")) return toggleRest();
-      if (event.target.closest("[data-rest-skip]")) return skipRest();
-      if (event.target.closest("#downloadCsvBtn")) return downloadText(toCSV(state.sets), `workout-log-sets-${todayISO()}.csv`, "text/csv");
-      if (event.target.closest("#copyCsvBtn")) return copyText(toCSV(state.sets));
-      if (event.target.closest("#importCsvBtn")) return document.getElementById("csvFile").click();
-      if (event.target.closest("#downloadJsonBtn")) return downloadText(backupPayload(), `workout-log-backup-${todayISO()}.json`, "application/json");
-      if (event.target.closest("#importJsonBtn")) return document.getElementById("jsonFile").click();
-      if (event.target.closest("#commitCsvBtn")) return commitCSVImport();
-      if (event.target.closest("#cancelCsvBtn")) {
-        state.csvPreview = null;
-        render();
-        return;
-      }
-      if (event.target.closest("#driveConnectBtn")) return connectGoogleDrive().catch((error) => showToast(error.message));
-      if (event.target.closest("#driveSyncNowBtn")) return syncDrive("sync").catch((error) => showToast(error.message));
-    });
-
-    document.addEventListener("input", (event) => {
-      const draftInput = event.target.closest("[data-draft]");
-      if (draftInput) {
-        const id = draftInput.dataset.draft;
-        state.drafts[id] ||= {};
-        state.drafts[id][draftInput.dataset.field] = draftInput.value;
-        saveState();
-        return;
-      }
-      if (event.target.id === "commandInput") {
-        state.command = event.target.value;
-        saveState();
-        return;
-      }
-      if (event.target.dataset.sessionNotes) {
-        const session = state.sessions.find((item) => item.id === event.target.dataset.sessionNotes);
-        if (session) {
-          session.notes = event.target.value;
-          session.updated_at = new Date().toISOString();
-          saveState();
-        }
-        return;
-      }
-      if (event.target.dataset.profileField) {
-        state.profile[event.target.dataset.profileField] = event.target.value;
-        saveState();
-        if (state.view === "progress") renderProgressView();
-        return;
-      }
-      if (event.target.id === "googleClientId" || event.target.id === "driveFileName") {
-        saveDriveSettingsFromInputs();
-        if (event.target.id === "googleClientId") {
-          const connectButton = document.getElementById("driveConnectBtn");
-          if (connectButton) connectButton.disabled = !googleDriveClientId();
-        }
-        return;
-      }
-      if (event.target.id === "exerciseSearch") state.exerciseQuery = event.target.value;
-      if (event.target.id === "exerciseMuscle") state.exerciseMuscle = event.target.value;
-      if (event.target.id === "exercisePattern") state.exercisePattern = event.target.value;
-      if (["exerciseSearch", "exerciseMuscle", "exercisePattern"].includes(event.target.id)) renderExercisesView();
-      if (event.target.id === "pickerQuery") {
-        state.picker.query = event.target.value;
-        renderPickerModal();
-      }
-    });
-
-    document.addEventListener("change", async (event) => {
-      if (event.target.dataset.profileField) {
-        state.profile[event.target.dataset.profileField] = event.target.value;
-        saveState();
-        if (state.view === "progress") renderProgressView();
-        return;
-      }
-      if (event.target.id === "workoutDate") {
-        state.activeDate = event.target.value || todayISO();
-        render();
-      }
-      if (event.target.id === "programSelect") {
-        state.activeProgramId = event.target.value;
-        state.activeDayId = getProgram()?.days[0]?.id;
-        render();
-      }
-      if (event.target.id === "progressExercise") {
-        state.progressExerciseId = event.target.value;
-        render();
-      }
-      if (event.target.dataset.dayType) {
-        const day = getProgram().days.find((item) => item.id === event.target.dataset.dayType);
-        day.type = event.target.value;
-        if (day.type === "Rest" && day.blocks.length && window.confirm("Setting this day to Rest clears its blocks. Continue?")) day.blocks = [];
-        render();
-      }
-      if (event.target.id === "pickerMuscle") {
-        state.picker.muscle = event.target.value;
-        renderPickerModal();
-      }
-      if (event.target.id === "pickerPattern") {
-        state.picker.pattern = event.target.value;
-        renderPickerModal();
-      }
-      if (event.target.id === "driveAutoSync") {
-        saveDriveSettingsFromInputs();
-        if (state.settings.drive.autoSync !== false) scheduleDriveAutoSync("auto sync enabled", 200);
-        renderSyncView();
-        return;
-      }
-      if (event.target.id === "csvFile" && event.target.files?.[0]) {
-        try {
-          previewCSV(await event.target.files[0].text());
-        } catch (error) {
-          showToast(error.message);
-        }
-        event.target.value = "";
-      }
-      if (event.target.id === "jsonFile" && event.target.files?.[0]) {
-        try {
-          await importJSON(event.target.files[0]);
-        } catch {
-          showToast("JSON import failed.");
-        }
-        event.target.value = "";
-      }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter") return;
-      if (event.target.id === "sessionTimeInput") {
-        event.preventDefault();
-        setSessionDurationFromInput();
-        return;
-      }
-      const form = event.target.closest("[data-block-form]");
-      if (!form) return;
-      event.preventDefault();
-      if (!addSet(form.dataset.blockForm)) showToast("Weight and reps are needed.");
-    });
-
-    document.addEventListener("dragstart", (event) => {
-      const dayCard = event.target.closest("[data-day-card]");
-      const blockRow = event.target.closest("[data-block-row]");
-      if (dayCard) dragData = { type: "day", id: dayCard.dataset.dayCard };
-      if (blockRow) dragData = { type: "block", id: blockRow.dataset.blockRow, dayId: blockRow.dataset.dayId };
-    });
-
-    document.addEventListener("dragover", (event) => {
-      if (event.target.closest("[data-day-card], [data-block-row]")) event.preventDefault();
-    });
-
-    document.addEventListener("drop", (event) => {
-      event.preventDefault();
-      if (!dragData) return;
-      const targetDay = event.target.closest("[data-day-card]");
-      const targetBlock = event.target.closest("[data-block-row]");
-      if (dragData.type === "day" && targetDay) reorderItems(getProgram().days, dragData.id, targetDay.dataset.dayCard);
-      if (dragData.type === "block" && targetBlock) {
-        const day = getProgram().days.find((item) => item.id === dragData.dayId);
-        reorderItems(day.blocks, dragData.id, targetBlock.dataset.blockRow);
-      }
-      dragData = null;
-      render();
-    });
-
-    window.addEventListener("online", () => {
-      scheduleDriveAutoSync("back online", 200);
-    });
-
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) scheduleDriveAutoSync("app visible", 300);
-    });
 
     function downloadText(text, name, type) {
       const blob = new Blob([text], { type: `${type};charset=utf-8` });
@@ -2994,186 +1959,13 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
-    async function copyText(text) {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-        showToast("Copied.");
-      }
-    }
-
-    function mergeById(base, incoming) {
-      return [...new Map([...base, ...incoming].map((item) => [item.id, item])).values()];
-    }
-
-    function mergeByUpdatedAt(local = [], remote = []) {
-      const map = new Map();
-      [...local, ...remote].forEach((item) => {
-        const previous = map.get(item.id);
-        if (!previous || String(item.updated_at || "") >= String(previous.updated_at || "")) map.set(item.id, item);
-      });
-      return [...map.values()];
-    }
-
-    function findBlock(blockId) {
-      for (const day of getProgram().days) {
-        const block = day.blocks.find((item) => item.id === blockId);
-        if (block) return { day, block };
-      }
-      return null;
-    }
-
-    function reorderItems(items, sourceId, targetId) {
-      const sourceIndex = items.findIndex((item) => item.id === sourceId);
-      const targetIndex = items.findIndex((item) => item.id === targetId);
-      if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return;
-      const [moved] = items.splice(sourceIndex, 1);
-      items.splice(targetIndex, 0, moved);
-      items.forEach((item, index) => {
-        item.order = index;
-        item.updated_at = new Date().toISOString();
-      });
-    }
-
-    function csvRecordId(record) {
-      return `${record.date}|${normalizeText(record.exercise)}|${record.set_number}`;
-    }
-
-    function normalizeText(text) {
-      return replaceNumberWords(String(text).toLowerCase())
-        .replace(/dumbbells?/g, "db")
-        .replace(/triceps/g, "tricep")
-        .replace(/r\.?p\.?e\.?/g, "rpe")
-        .replace(/times/g, "x")
-        .replace(/[^a-z0-9.\s]/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-    function replaceNumberWords(text) {
-      const numbers = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20 };
-      return text.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/g, (word) => numbers[word]);
-    }
-
-    function slug(text) {
-      return normalizeText(text).replace(/\s+/g, "-") || cryptoId();
-    }
-
-    function splitList(text) {
-      return String(text || "").split(",").map((item) => item.trim()).filter(Boolean);
-    }
-
-    function parseWeight(value) {
-      return Number.parseFloat(String(value).replace(/[^0-9.]/g, ""));
-    }
-
-    function formatWeight(value) {
-      return Number.isFinite(Number(value)) ? `${value} lb` : String(value || "");
-    }
-
-    function volume(set) {
-      return Number(set.weight_lb || 0) * Number(set.reps || 0);
-    }
-
-    function scale(value, min, max, outMin, outMax) {
-      if (min === max) return (outMin + outMax) / 2;
-      return outMin + ((value - min) / (max - min)) * (outMax - outMin);
-    }
-
-    function formatNumber(value) {
-      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
-    }
-
-    function formatTimer(seconds) {
-      const safe = Math.max(0, Number(seconds || 0));
-      const min = Math.floor(safe / 60);
-      const sec = Math.floor(safe % 60);
-      return `${min}:${String(sec).padStart(2, "0")}`;
-    }
-
-    function formatDuration(ms) {
-      const totalSeconds = Math.max(0, Math.floor(Number(ms || 0) / 1000));
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      return `${minutes}:${String(seconds).padStart(2, "0")}`;
-    }
-
-    function parseDurationInput(value) {
-      const text = cleanValue(value).toLowerCase();
-      if (!text) return NaN;
-      if (/^\d+(\.\d+)?$/.test(text)) return Number(text) * 60000;
-      const colon = text.match(/^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/);
-      if (colon) {
-        const first = Number(colon[1]);
-        const second = Number(colon[2]);
-        const third = Number(colon[3] || 0);
-        return colon[3] ? ((first * 3600) + (second * 60) + third) * 1000 : ((first * 60) + second) * 1000;
-      }
-      const hours = text.match(/(\d+(?:\.\d+)?)\s*h/);
-      const minutes = text.match(/(\d+(?:\.\d+)?)\s*m/);
-      const seconds = text.match(/(\d+(?:\.\d+)?)\s*s/);
-      const total =
-        (hours ? Number(hours[1]) * 3600000 : 0) +
-        (minutes ? Number(minutes[1]) * 60000 : 0) +
-        (seconds ? Number(seconds[1]) * 1000 : 0);
-      return total || NaN;
-    }
-
-    function shortDayLabel(index, label) {
-      return label.split(" ")[0].slice(0, 3) || `D${index + 1}`;
-    }
-
-    function cleanValue(value) {
-      return String(value ?? "").trim();
-    }
-
-    function cryptoId() {
-      if (window.crypto?.randomUUID) return crypto.randomUUID();
-      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    }
-
-    function sortRecords(a, b) {
-      return `${a.date || ""}-${a.created_at || ""}`.localeCompare(`${b.date || ""}-${b.created_at || ""}`);
-    }
-
-    function byOrder(a, b) {
-      return Number(a.order || 0) - Number(b.order || 0);
-    }
-
-    function byName(a, b) {
-      return a.name.localeCompare(b.name);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    async function initApp() {
-      try {
-        state = await loadState();
-      } catch {
-        state = createDefaultState();
-      }
-      if (state.rest?.running) {
-        restInterval = setInterval(tickRest, 250);
-      }
-      if (!uiClock) uiClock = setInterval(updateLiveTimers, 1000);
-      render();
-      registerServiceWorker();
-    }
-
     function registerServiceWorker() {
-      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
+      if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
     }
 
-    initApp();
+    render(h(K3V_App), document.getElementById("root"));
   </script>
 </body>
 </html>

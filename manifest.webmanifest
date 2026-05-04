@@ -1,7 +1,7 @@
 {
-  "name": "Workout Log",
-  "short_name": "Workout",
-  "description": "A phone-first workout logger with offline storage, rest timer, CSV/JSON export, and Google Drive sync.",
+  "name": "K3VSYNC",
+  "short_name": "K3VSYNC",
+  "description": "A phone-first StrengthLog tracker with offline storage, SVG PR trendlines, plate tools, and Google Drive deep-union sync.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,14 +10,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.svg",
-      "sizes": "192x192",
+      "src": "icon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.svg",
-      "sizes": "512x512",
+      "src": "icon.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
