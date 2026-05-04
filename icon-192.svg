@@ -1,9 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="38" fill="#0f1115"/>
-  <rect x="35" y="82" width="122" height="28" rx="14" fill="#f4f7fb"/>
-  <rect x="25" y="68" width="22" height="56" rx="11" fill="#6ee7b7"/>
-  <rect x="145" y="68" width="22" height="56" rx="11" fill="#6ee7b7"/>
-  <rect x="12" y="80" width="22" height="32" rx="11" fill="#8fb7ff"/>
-  <rect x="158" y="80" width="22" height="32" rx="11" fill="#8fb7ff"/>
-  <path d="M67 58h58M67 134h58" stroke="#ffd08a" stroke-width="11" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Smiling Hispanic athlete logo">
+  <defs>
+    <linearGradient id="bg" x1="30" y1="8" x2="161" y2="188" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#182131"/>
+      <stop offset="0.6" stop-color="#0f141d"/>
+      <stop offset="1" stop-color="#0a0d12"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="67" y1="128" x2="126" y2="185" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8fb7ff"/>
+      <stop offset="1" stop-color="#6ee7b7"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="39" fill="url(#bg)"/>
+  <circle cx="35" cy="41" r="4" fill="#6ee7b7" opacity="0.72"/>
+  <circle cx="158" cy="47" r="5" fill="#ffd08a" opacity="0.72"/>
+  <path d="M44 139c11-23 29-35 52-35s42 12 52 35l8 25H36l8-25Z" fill="url(#shirt)"/>
+  <path d="M69 134c9 9 18 13 27 13s18-4 27-13l-5 34H74l-5-34Z" fill="#121a24" opacity="0.25"/>
+  <path d="M60 60c2-25 16-42 37-42 23 0 36 16 37 42l-7 2c-9-10-18-15-29-15s-22 5-31 15l-7-2Z" fill="#241510"/>
+  <path d="M58 68c0-22 17-39 38-39s38 17 38 39v21c0 25-16 42-38 42s-38-17-38-42V68Z" fill="#b96f45"/>
+  <path d="M58 76c-7 0-12 6-12 13 0 8 5 14 13 14l3-25-4-2ZM134 76c7 0 12 6 12 13 0 8-5 14-13 14l-3-25 4-2Z" fill="#a9613c"/>
+  <path d="M65 65c7-8 16-13 28-15 17-2 30 3 41 15-4-21-17-35-38-35-20 0-33 14-31 35Z" fill="#2d1a13"/>
+  <path d="M69 77c6-4 13-4 19 0M104 77c6-4 13-4 19 0" stroke="#2a1711" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="79" cy="88" r="3.4" fill="#17100d"/>
+  <circle cx="113" cy="88" r="3.4" fill="#17100d"/>
+  <path d="M96 88c-2 8-5 16-8 22 5 3 12 3 17 0" stroke="#7f3f2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M78 112c9 11 27 11 36 0" fill="none" stroke="#f8e2d2" stroke-width="5" stroke-linecap="round"/>
+  <path d="M64 57c4-19 16-31 32-31 17 0 29 11 33 31-10-11-22-16-34-16-12 0-22 5-31 16Z" fill="#1b100c"/>
+  <path d="M44 147h104l7 21H37l7-21Z" fill="#0f141d" opacity="0.32"/>
+  <text x="96" y="164" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="20" letter-spacing="0" fill="#0b1119">K3V</text>
 </svg>
