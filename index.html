@@ -1217,6 +1217,7 @@
       const [modal, setModal] = useState(null);
       const [clock, setClock] = useState(Date.now());
       const [listening, setListening] = useState(false);
+      const [liveTimer, setLiveTimer] = useState("00:00");
       const recognitionRef = useRef(null);
       const stateRef = useRef(null);
       const fileJsonRef = useRef(null);
@@ -1230,9 +1231,35 @@
         registerServiceWorker();
       }, []);
 
+      // Fast clock for session elapsed calculations (100ms for smooth UI)
       useEffect(() => {
         const id = window.setInterval(() => setClock(Date.now()), 100);
         return () => window.clearInterval(id);
+      }, []);
+
+      // Live timer display updated every second (like Strong/Hevy)
+      // Uses localStorage timestamp so it survives page refreshes
+      useEffect(() => {
+        function tick() {
+          const startTime = localStorage.getItem('session_start_time');
+          if (startTime) {
+            const elapsedSeconds = Math.floor((Date.now() - Number(startTime)) / 1000);
+            const hours = Math.floor(elapsedSeconds / 3600);
+            const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+            const seconds = elapsedSeconds % 60;
+            let formatted = '';
+            if (hours > 0) {
+              formatted += hours + ':';
+            }
+            formatted += minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            setLiveTimer(formatted);
+          } else {
+            setLiveTimer("00:00");
+          }
+        }
+        tick();
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
       }, []);
 
       // Auto-pause session when app goes to background (like Strong/Hevy)
@@ -1333,9 +1360,12 @@
                 h("p", null, `${day?.label || "Workout"} / ${activeSets.length} sets / ${formatNumber(activeSets.reduce((sum, set) => sum + volume(set), 0))} lb`)
               )
             ),
-            h("div", { class: "sync-chip", "data-state": syncStatus.state },
-              h("i", { class: "sync-dot" }),
-              h("span", null, syncStatus.label)
+            h("div", { style: "display:flex;align-items:center;gap:8px" },
+              liveTimer !== "00:00" && h("span", { class: "session-time", style: "font-size:1rem;font-weight:850;color:var(--accent)" }, liveTimer),
+              h("div", { class: "sync-chip", "data-state": syncStatus.state },
+                h("i", { class: "sync-dot" }),
+                h("span", null, syncStatus.label)
+              )
             )
           ),
           h("section", { class: "toolbar" },
@@ -1415,6 +1445,7 @@
                 active.finished_at = nowISO();
                 active.updated_at = nowISO();
               });
+              localStorage.removeItem('session_start_time');
               showToast("Workout finished! Time saved.");
             } }, "Finish"),
           h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
@@ -1923,6 +1954,8 @@
           notes: ""
         };
         state.sessions.push(session);
+        // Persist start timestamp to localStorage so timer survives page refreshes
+        localStorage.setItem('session_start_time', Date.now());
       }
       return session;
     }
@@ -2411,6 +2444,7 @@
 
     function nowISO() {
       return new Date().toISOString();
+
     }
 
     function cryptoId() {
