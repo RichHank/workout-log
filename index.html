@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f1115">
+  <meta name="theme-color" content="#0e1116">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="K3VSYNC">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,7 +20,6 @@
       --bg: #0e1116;
       --panel: #171c24;
       --panel-2: #202836;
-      --panel-3: #10141b;
       --text: #f5f8fc;
       --muted: #9ca9b8;
       --line: #2c3544;
@@ -29,34 +28,23 @@
       --green: #74e6ad;
       --gold: #ffd08a;
       --danger: #ff8a93;
-      --shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      --shadow: 0 18px 44px rgba(0,0,0,0.28);
       --radius: 8px;
       --tap: 46px;
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-
-    * { box-sizing: border-box; }
-
+    *, *::before, *::after { box-sizing: border-box; }
     html, body { min-height: 100%; }
-
     body {
       margin: 0;
       background:
-        radial-gradient(circle at top left, rgba(143, 183, 255, 0.13), transparent 34rem),
+        radial-gradient(circle at top left, rgba(143,183,255,0.13), transparent 34rem),
         linear-gradient(180deg, #121620 0%, var(--bg) 58%);
       color: var(--text);
     }
-
     button, input, textarea, select { font: inherit; }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    button { border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     button:disabled { cursor: not-allowed; opacity: 0.48; }
-
     input, textarea, select {
       width: 100%;
       min-height: var(--tap);
@@ -67,16 +55,12 @@
       outline: none;
       padding: 10px 12px;
     }
-
-    textarea {
-      resize: vertical;
-      min-height: 86px;
-    }
-
+    textarea { resize: vertical; min-height: 86px; }
     input:focus, textarea:focus, select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(143, 183, 255, 0.16);
+      box-shadow: 0 0 0 3px rgba(143,183,255,0.16);
     }
+    h1, h2, h3, p { margin-top: 0; }
 
     .app-shell {
       width: min(100%, 1040px);
@@ -94,46 +78,33 @@
       justify-content: space-between;
       gap: 12px;
       padding: 12px 0 10px;
-      background: rgba(14, 17, 22, 0.92);
+      background: rgba(14,17,22,0.92);
       backdrop-filter: blur(16px);
     }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
-    }
-
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
     .brand-mark {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
       flex: 0 0 auto;
       border-radius: var(--radius);
       background: linear-gradient(135deg, var(--accent), var(--green));
       color: #08111f;
       font-weight: 950;
-      letter-spacing: 0;
       box-shadow: var(--shadow);
     }
+    .brand h1 { margin: 0; font-size: 1.06rem; line-height: 1.05; }
+    .brand p { margin: 3px 0 0; color: var(--muted); font-size: 0.78rem; line-height: 1.2; }
 
-    h1, h2, h3, p { margin-top: 0; }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 1.06rem;
-      line-height: 1.05;
-      letter-spacing: 0;
+    .timer-pill {
+      font-size: 1rem;
+      font-weight: 850;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, 'SF Mono', monospace;
     }
-
-    .brand p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.2;
-    }
+    .timer-pill.paused { color: var(--gold); opacity: 0.75; }
 
     .sync-chip {
       min-height: 34px;
@@ -143,40 +114,22 @@
       padding: 0 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: rgba(23, 28, 36, 0.86);
+      background: rgba(23,28,36,0.86);
       color: var(--muted);
       font-size: 0.76rem;
       font-weight: 850;
       white-space: nowrap;
     }
-
-    .sync-chip[data-state="syncing"] {
-      color: var(--green);
-      border-color: rgba(116, 230, 173, 0.42);
-    }
-
-    .sync-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: currentColor;
-      box-shadow: 0 0 0 0 rgba(116, 230, 173, 0.45);
-    }
-
-    .sync-chip[data-state="syncing"] .sync-dot {
-      animation: pulse 1.1s infinite;
-    }
-
+    .sync-chip[data-state="syncing"] { color: var(--green); border-color: rgba(116,230,173,0.42); }
+    .sync-dot { width: 8px; height: 8px; border-radius: 999px; background: currentColor; }
+    .sync-chip[data-state="syncing"] .sync-dot { animation: pulse 1.1s infinite; }
     @keyframes pulse {
-      70% { box-shadow: 0 0 0 8px rgba(116, 230, 173, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(116, 230, 173, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(116,230,173,0.45); }
+      70% { box-shadow: 0 0 0 8px rgba(116,230,173,0); }
+      100% { box-shadow: 0 0 0 0 rgba(116,230,173,0); }
     }
 
-    .toolbar {
-      display: grid;
-      gap: 10px;
-      margin: 6px 0 14px;
-    }
+    .toolbar { display: grid; gap: 10px; margin: 6px 0 14px; }
 
     .segmented {
       display: grid;
@@ -188,7 +141,6 @@
       background: var(--panel-2);
       border: 1px solid var(--line);
     }
-
     .segmented button, .day-strip button {
       min-height: 40px;
       border-radius: 6px;
@@ -196,17 +148,12 @@
       color: var(--muted);
       font-weight: 850;
     }
-
     .segmented button[aria-selected="true"], .day-strip button[aria-current="true"] {
       background: var(--text);
       color: #0d121a;
     }
 
-    .date-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-    }
+    .date-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
 
     .day-strip {
       display: grid;
@@ -216,7 +163,6 @@
       overflow-x: auto;
       padding-bottom: 2px;
     }
-
     .day-strip button {
       display: grid;
       align-content: center;
@@ -226,7 +172,6 @@
       border: 1px solid var(--line);
       background: var(--panel);
     }
-
     .day-strip span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -245,29 +190,21 @@
       border-radius: var(--radius);
       font-weight: 900;
     }
-
     .primary-btn {
       padding: 0 14px;
       background: var(--accent);
       color: #08111f;
-      box-shadow: 0 12px 26px rgba(143, 183, 255, 0.18);
+      box-shadow: 0 12px 26px rgba(143,183,255,0.18);
     }
-
     .ghost-btn {
       padding: 0 13px;
       background: var(--panel);
       color: var(--text);
       border: 1px solid var(--line);
     }
-
-    .ghost-btn.danger, .mini-btn.danger {
-      color: var(--danger);
-      border-color: rgba(255, 138, 147, 0.42);
-    }
-
+    .ghost-btn.danger, .mini-btn.danger { color: var(--danger); border-color: rgba(255,138,147,0.42); }
     .mini-btn {
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       min-height: 42px;
       flex: 0 0 auto;
       background: var(--panel);
@@ -275,18 +212,13 @@
       border: 1px solid var(--line);
       padding: 0;
     }
-
-    .mini-btn.primary {
-      background: var(--text);
-      color: #111722;
-      border-color: var(--text);
-    }
+    .mini-btn.primary { background: var(--text); color: #111722; border-color: var(--text); }
 
     .panel {
-      background: rgba(23, 28, 36, 0.94);
+      background: rgba(23,28,36,0.94);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
     }
 
     .section-title {
@@ -296,32 +228,12 @@
       gap: 10px;
       margin: 16px 0 9px;
     }
+    .section-title h2 { margin: 0; font-size: 1rem; line-height: 1.15; }
+    .muted, .section-title span { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
 
-    .section-title h2 {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.15;
-    }
-
-    .muted, .section-title span {
-      color: var(--muted);
-      font-size: 0.78rem;
-      line-height: 1.3;
-    }
-
-    .actions, .form-grid, .row-actions {
-      display: grid;
-      gap: 8px;
-    }
-
-    .actions {
-      grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
-      margin-bottom: 12px;
-    }
-
-    .form-grid {
-      grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
-    }
+    .actions, .form-grid, .row-actions { display: grid; gap: 8px; }
+    .actions { grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); margin-bottom: 12px; }
+    .form-grid { grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); }
 
     .session-strip {
       display: flex;
@@ -330,33 +242,12 @@
       gap: 8px;
       padding: 10px 12px;
       min-height: 56px;
-      background: rgba(23, 28, 36, 0.62);
-      border-color: rgba(44, 53, 68, 0.78);
+      background: rgba(23,28,36,0.62);
+      border-color: rgba(44,53,68,0.78);
       box-shadow: none;
     }
-
-    .session-strip.active {
-      border-color: rgba(143, 183, 255, 0.35);
-      background: rgba(23, 28, 36, 0.78);
-    }
-
-    .session-strip.paused {
-      border-color: rgba(255, 208, 138, 0.25);
-      background: rgba(23, 28, 36, 0.7);
-    }
-
-    .session-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .session-head h2 {
-      margin: 0;
-      font-size: 1.12rem;
-    }
-
+    .session-strip.active { border-color: rgba(143,183,255,0.35); background: rgba(23,28,36,0.78); }
+    .session-strip.paused { border-color: rgba(255,208,138,0.25); background: rgba(23,28,36,0.7); }
     .session-strip-main {
       min-width: 0;
       display: flex;
@@ -364,7 +255,6 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-
     .session-label {
       color: var(--muted);
       font-size: 0.7rem;
@@ -372,61 +262,35 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
-
-    .session-label.paused-label {
-      color: var(--gold);
-    }
-
+    .session-label.paused-label { color: var(--gold); }
     .session-time {
       font-size: 1.35rem;
       font-weight: 950;
       color: var(--text);
       letter-spacing: 0.02em;
       font-variant-numeric: tabular-nums;
-      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', 'Fira Code', monospace;
+      font-family: ui-monospace, 'SF Mono', monospace;
     }
-
-    .session-time.paused-time {
-      color: var(--gold);
-      opacity: 0.7;
-    }
-
-    .session-meta {
-      color: var(--muted);
-      font-size: 0.75rem;
-    }
-
-    .session-edit-btn {
-      min-height: 34px;
-      padding: 0 10px;
-    }
-
-    .session-controls {
-      display: flex;
-      gap: 5px;
-      flex-shrink: 0;
-    }
-
+    .session-time.paused-time { color: var(--gold); opacity: 0.7; }
+    .session-meta { color: var(--muted); font-size: 0.75rem; }
+    .session-controls { display: flex; gap: 5px; flex-shrink: 0; }
+    .session-edit-btn, .session-finish-btn { min-height: 34px; padding: 0 10px; }
     .session-finish-btn {
-      min-height: 34px;
-      padding: 0 12px;
       background: var(--green);
       color: #08111f;
       font-weight: 900;
       border-radius: var(--radius);
     }
+    .session-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .session-head h2 { margin: 0; font-size: 1.12rem; }
 
-    .voice-panel {
-      padding: 12px;
-    }
-
+    .voice-panel { padding: 12px; }
     .voice-grid {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       gap: 8px;
       align-items: start;
     }
-
     .voice-grid textarea {
       min-height: 46px;
       height: 46px;
@@ -443,16 +307,9 @@
       line-height: 1;
       text-transform: uppercase;
     }
+    .stack { display: grid; gap: 12px; }
 
-    .stack {
-      display: grid;
-      gap: 12px;
-    }
-
-    .exercise-card, .day-card, .chart-card, .drive-card {
-      overflow: hidden;
-    }
-
+    .exercise-card, .day-card, .chart-card, .drive-card { overflow: hidden; }
     .card-head {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -461,13 +318,7 @@
       padding: 13px 12px 10px;
       border-bottom: 1px solid var(--line);
     }
-
-    .card-head h2 {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.18;
-    }
-
+    .card-head h2 { margin: 0; font-size: 1rem; line-height: 1.18; }
     .chip-row {
       margin-top: 6px;
       display: flex;
@@ -491,7 +342,6 @@
       color: #c7d7ea;
       white-space: nowrap;
     }
-
     .pill.green { background: #123427; color: #bdf3d0; }
     .pill.gold { background: #3a2913; color: #ffd79a; }
 
@@ -503,16 +353,7 @@
       align-items: end;
       border-bottom: 1px solid var(--line);
     }
-
-    .weight-field {
-      display: grid;
-      grid-template-columns: 1fr 42px;
-      gap: 6px;
-    }
-
-    .set-list, .exercise-list, .plan-blocks {
-      display: grid;
-    }
+    .weight-field { display: grid; grid-template-columns: 1fr 42px; gap: 6px; }
 
     .set-row, .exercise-row, .block-row {
       display: grid;
@@ -524,18 +365,11 @@
       border-bottom: 1px solid var(--line);
       font-size: 0.9rem;
     }
-
-    .exercise-row, .block-row {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-
-    .set-row:last-child, .exercise-row:last-child, .block-row:last-child {
-      border-bottom: 0;
-    }
+    .exercise-row, .block-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .set-row:last-child, .exercise-row:last-child, .block-row:last-child { border-bottom: 0; }
 
     .set-num {
-      width: 32px;
-      height: 32px;
+      width: 32px; height: 32px;
       display: grid;
       place-items: center;
       border-radius: 999px;
@@ -543,18 +377,13 @@
       color: var(--muted);
       font-weight: 950;
     }
-
-    .row-main {
-      min-width: 0;
-    }
-
+    .row-main { min-width: 0; }
     .row-main b {
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
     .row-main span {
       display: block;
       margin-top: 2px;
@@ -564,7 +393,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
     .empty {
       padding: 16px 12px;
       color: var(--muted);
@@ -577,11 +405,7 @@
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 10px;
     }
-
-    .chart-card {
-      padding: 12px;
-    }
-
+    .chart-card { padding: 12px; }
     .chart-head {
       display: flex;
       align-items: center;
@@ -589,13 +413,7 @@
       gap: 8px;
       margin-bottom: 8px;
     }
-
-    .trend-svg {
-      width: 100%;
-      height: 190px;
-      display: block;
-      overflow: visible;
-    }
+    .trend-svg { width: 100%; height: 190px; display: block; overflow: visible; }
 
     .standard-bar {
       position: relative;
@@ -604,7 +422,6 @@
       border-radius: 999px;
       background: linear-gradient(90deg, #435065, #8fb7ff, #74e6ad, #ffd08a);
     }
-
     .standard-marker {
       position: absolute;
       top: -5px;
@@ -617,16 +434,13 @@
 
     .bottom-nav {
       position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      left: 0; right: 0; bottom: 0;
       z-index: 30;
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-      background: rgba(14, 17, 22, 0.94);
+      background: rgba(14,17,22,0.94);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(16px);
     }
-
     .bottom-nav-inner {
       width: min(100%, 1040px);
       margin: 0 auto;
@@ -634,7 +448,6 @@
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
     }
-
     .bottom-nav button {
       min-height: 48px;
       border-radius: var(--radius);
@@ -643,11 +456,7 @@
       font-size: 0.72rem;
       font-weight: 850;
     }
-
-    .bottom-nav button[aria-selected="true"] {
-      background: var(--panel-2);
-      color: var(--text);
-    }
+    .bottom-nav button[aria-selected="true"] { background: var(--panel-2); color: var(--text); }
 
     .modal-backdrop {
       position: fixed;
@@ -656,9 +465,8 @@
       display: grid;
       place-items: end center;
       padding: 18px;
-      background: rgba(0, 0, 0, 0.52);
+      background: rgba(0,0,0,0.52);
     }
-
     .modal-panel {
       width: min(100%, 560px);
       max-height: min(88vh, 760px);
@@ -669,7 +477,6 @@
       box-shadow: var(--shadow);
       padding: 14px;
     }
-
     .modal-head {
       display: flex;
       align-items: center;
@@ -677,16 +484,11 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-
-    .modal-head h2 {
-      margin: 0;
-      font-size: 1rem;
-    }
+    .modal-head h2 { margin: 0; font-size: 1rem; }
 
     .toast {
       position: fixed;
-      left: 14px;
-      right: 14px;
+      left: 14px; right: 14px;
       bottom: calc(78px + env(safe-area-inset-bottom));
       z-index: 60;
       width: min(calc(100% - 28px), 520px);
@@ -701,12 +503,10 @@
 
     .sr-only {
       position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
       overflow: hidden;
-      clip: rect(0, 0, 0, 0);
+      clip: rect(0,0,0,0);
       white-space: nowrap;
       border: 0;
     }
@@ -715,21 +515,11 @@
       .segmented { display: none; }
       .sync-chip { font-size: 0.65rem; padding: 0 7px; gap: 4px; }
       .sync-chip span:last-child { display: none; }
-      .voice-grid {
-        grid-template-columns: auto 1fr;
-      }
-      .voice-grid button:last-child {
-        grid-column: 1 / -1;
-      }
-      .set-form {
-        grid-template-columns: 1fr 70px 70px auto;
-      }
-      .notes-field {
-        grid-column: 1 / -1;
-      }
-      .actions {
-        grid-template-columns: 1fr;
-      }
+      .voice-grid { grid-template-columns: auto 1fr; }
+      .voice-grid button:last-child { grid-column: 1 / -1; }
+      .set-form { grid-template-columns: 1fr 70px 70px auto; }
+      .notes-field { grid-column: 1 / -1; }
+      .actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -739,8 +529,8 @@
     const { h, render } = preact;
     const { useEffect, useMemo, useRef, useState } = preactHooks;
 
+    // --- Constants ---
     const STORAGE_KEY = "workout-log-v2";
-    const LEGACY_STORAGE_KEY = "workout-log-v1";
     const DB_NAME = "workout-log-db";
     const DB_VERSION = 2;
     const DB_STORE = "keyval";
@@ -748,6 +538,7 @@
     const GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
     const GOOGLE_OAUTH_CLIENT_ID = "565625887082-vfb55neduq0bj9trrcgonntckj44mt4d.apps.googleusercontent.com";
     const DRIVE_AUTO_SYNC_DELAY = 2600;
+    const LOCAL_SAVE_DEBOUNCE = 80;
     const BAR_WEIGHT = 45;
     const PLATES = [45, 35, 25, 10, 5, 2.5];
 
@@ -766,12 +557,10 @@
       "pull-up": { lift: "Pull-up", aliases: ["lat-pulldown-close", "lat-pulldown-wide"], male: [0.45, 0.65, 0.9, 1.12, 1.35], female: [0.28, 0.42, 0.58, 0.74, 0.9] }
     };
 
-    function ex(id, name, primary, secondary, pattern, rest, sets, reps, aliases = []) {
+    function ex(id, name, primary, pattern, rest, sets, reps, aliases = []) {
       return {
-        id,
-        name,
+        id, name,
         primary_muscle: primary,
-        secondary_muscles: secondary,
         movement_pattern: pattern,
         default_rest_seconds: rest,
         default_sets: sets,
@@ -784,52 +573,166 @@
     }
 
     const defaultExercises = [
-      ex("bench-press", "Bench Press", "Chest", ["Triceps", "Shoulders"], "press", 180, 3, "4-6", ["bench", "barbell bench"]),
-      ex("incline-db-press", "Incline DB Press", "Chest", ["Shoulders", "Triceps"], "press", 150, 2, "6-10", ["incline press", "incline dumbbell press"]),
-      ex("lat-pulldown-close", "Lat Pulldown, Close Neutral", "Back", ["Biceps"], "pull", 120, 2, "8-10", ["close lat pulldown", "neutral pulldown", "lat pulldown"]),
-      ex("seated-cable-row", "Seated Cable Row", "Back", ["Biceps"], "pull", 120, 2, "10-12", ["seated row", "cable row"]),
-      ex("barbell-curl", "Barbell Curl", "Biceps", [], "pull", 90, 2, "8-10", ["curl"]),
-      ex("hammer-curl", "Hammer Curl", "Biceps", [], "pull", 75, 1, "10-15", ["hammer curls"]),
-      ex("front-squat", "Front Squat", "Quads", ["Glutes", "Core"], "squat", 180, 2, "4-6", ["front squats"]),
-      ex("leg-press", "Leg Press", "Quads", ["Glutes"], "squat", 150, 2, "8-12", []),
-      ex("leg-extension", "Leg Extension", "Quads", [], "squat", 75, 2, "10-15", ["leg extensions"]),
-      ex("romanian-deadlift", "Romanian Deadlift", "Hamstrings", ["Glutes", "Back"], "hinge", 180, 2, "8-10", ["rdl"]),
-      ex("leg-curl", "Leg Curl", "Hamstrings", [], "hinge", 75, 2, "10-15", ["leg curls"]),
-      ex("standing-calf-raise", "Standing Calf Raise", "Calves", [], "carry", 60, 3, "12-15", ["calf raise", "standing calves"]),
-      ex("overhead-press", "Overhead Press", "Shoulders", ["Triceps"], "press", 180, 2, "4-6", ["ohp", "shoulder press"]),
-      ex("lateral-raise", "Lateral Raise", "Shoulders", [], "press", 60, 2, "12-15", ["side raise", "lateral raises"]),
-      ex("lat-pulldown-wide", "Lat Pulldown, Wide", "Back", ["Biceps"], "pull", 120, 2, "8-10", ["wide pulldown", "wide lat pulldown"]),
-      ex("wide-cable-row", "Cable Row, Wide", "Back", ["Biceps"], "pull", 120, 2, "10-12", ["wide row"]),
-      ex("tricep-pushdown", "Tricep Pushdown", "Triceps", [], "press", 75, 2, "10-15", ["pushdown", "triceps pushdown"]),
-      ex("overhead-tricep-extension", "Overhead Tricep Extension", "Triceps", [], "press", 75, 1, "10-15", ["overhead extension", "triceps extension"]),
-      ex("deadlift", "Deadlift", "Hamstrings", ["Glutes", "Back"], "hinge", 240, 2, "4-6", ["deadlifts"]),
-      ex("bulgarian-split-squat", "Bulgarian Split Squat", "Quads", ["Glutes"], "lunge", 120, 2, "8-10", ["bulgarian", "split squat"]),
-      ex("hip-thrust", "Hip Thrust", "Glutes", ["Hamstrings"], "hinge", 150, 2, "10-12", ["hip thrusts"])
+      ex("bench-press", "Bench Press", "Chest", "press", 180, 3, "4-6", ["bench", "barbell bench"]),
+      ex("incline-db-press", "Incline DB Press", "Chest", "press", 150, 2, "6-10", ["incline press", "incline dumbbell press"]),
+      ex("lat-pulldown-close", "Lat Pulldown, Close Neutral", "Back", "pull", 120, 2, "8-10", ["close lat pulldown", "neutral pulldown", "lat pulldown"]),
+      ex("seated-cable-row", "Seated Cable Row", "Back", "pull", 120, 2, "10-12", ["seated row", "cable row"]),
+      ex("barbell-curl", "Barbell Curl", "Biceps", "pull", 90, 2, "8-10", ["curl"]),
+      ex("hammer-curl", "Hammer Curl", "Biceps", "pull", 75, 1, "10-15", ["hammer curls"]),
+      ex("front-squat", "Front Squat", "Quads", "squat", 180, 2, "4-6", ["front squats"]),
+      ex("leg-press", "Leg Press", "Quads", "squat", 150, 2, "8-12", []),
+      ex("leg-extension", "Leg Extension", "Quads", "squat", 75, 2, "10-15", ["leg extensions"]),
+      ex("romanian-deadlift", "Romanian Deadlift", "Hamstrings", "hinge", 180, 2, "8-10", ["rdl"]),
+      ex("leg-curl", "Leg Curl", "Hamstrings", "hinge", 75, 2, "10-15", ["leg curls"]),
+      ex("standing-calf-raise", "Standing Calf Raise", "Calves", "carry", 60, 3, "12-15", ["calf raise", "standing calves"]),
+      ex("overhead-press", "Overhead Press", "Shoulders", "press", 180, 2, "4-6", ["ohp", "shoulder press"]),
+      ex("lateral-raise", "Lateral Raise", "Shoulders", "press", 60, 2, "12-15", ["side raise", "lateral raises"]),
+      ex("lat-pulldown-wide", "Lat Pulldown, Wide", "Back", "pull", 120, 2, "8-10", ["wide pulldown", "wide lat pulldown"]),
+      ex("wide-cable-row", "Cable Row, Wide", "Back", "pull", 120, 2, "10-12", ["wide row"]),
+      ex("tricep-pushdown", "Tricep Pushdown", "Triceps", "press", 75, 2, "10-15", ["pushdown", "triceps pushdown"]),
+      ex("overhead-tricep-extension", "Overhead Tricep Extension", "Triceps", "press", 75, 1, "10-15", ["overhead extension", "triceps extension"]),
+      ex("deadlift", "Deadlift", "Hamstrings", "hinge", 240, 2, "4-6", ["deadlifts"]),
+      ex("bulgarian-split-squat", "Bulgarian Split Squat", "Quads", "lunge", 120, 2, "8-10", ["bulgarian", "split squat"]),
+      ex("hip-thrust", "Hip Thrust", "Glutes", "hinge", 150, 2, "10-12", ["hip thrusts"])
     ];
 
+    // Strength standards table is deterministic from the static models -- compute once at load.
+    const STRENGTH_STANDARDS = (() => {
+      const ageMultipliers = { "18-39": 1, "40-49": 0.92, "50-59": 0.82, "60-69": 0.7 };
+      const out = [];
+      for (const [liftId, model] of Object.entries(strengthStandardModels)) {
+        for (const sex of ["male", "female"]) {
+          for (const bw of bodyweightBrackets) {
+            for (const age of ageBrackets) {
+              standardLevels.forEach((level, index) => {
+                out.push({
+                  lift_id: liftId,
+                  lift: model.lift,
+                  sex,
+                  bodyweight_bracket_lb: bw,
+                  age_bracket: age,
+                  level,
+                  one_rm_lb: Math.round(bw * model[sex][index] * ageMultipliers[age] / 5) * 5
+                });
+              });
+            }
+          }
+        }
+      }
+      return out;
+    })();
+
+    // --- Pure utility helpers ---
+    function todayISO() { return new Date().toISOString().slice(0, 10); }
+    function nowISO() { return new Date().toISOString(); }
+    function cryptoId() { return crypto.randomUUID(); }
+    function cleanValue(v) { return String(v ?? "").trim(); }
+    function normalizeText(v) { return String(v || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+    function cloneState(value) { return structuredClone(value); }
+    function bump(target, patch = {}) { Object.assign(target, patch, { updated_at: nowISO() }); return target; }
+
+    function parseWeight(value) {
+      const cleaned = String(value ?? "").replace(/[^0-9.]/g, "");
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : NaN;
+    }
+    function roundToPlate(value) { return Math.max(BAR_WEIGHT, Math.round(value / 5) * 5); }
+    function formatWeight(value) {
+      const n = Number(value);
+      return Number.isInteger(n) ? `${n}` : `${n.toFixed(1)}`;
+    }
+    function formatNumber(value) { return new Intl.NumberFormat().format(Math.round(value || 0)); }
+
+    function _hms(totalSeconds) {
+      const t = Math.max(0, Math.floor(totalSeconds || 0));
+      return [Math.floor(t / 3600), Math.floor((t % 3600) / 60), t % 60];
+    }
+    function formatRest(seconds) {
+      const [h, m, s] = _hms(seconds);
+      return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${m}:${String(s).padStart(2, "0")}`;
+    }
+    function formatDuration(ms) {
+      const [h, m, s] = _hms((ms || 0) / 1000);
+      return h ? `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}` : `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+    function parseDurationInput(value) {
+      const text = cleanValue(value).toLowerCase();
+      if (!text) return NaN;
+      if (/^\d+(\.\d+)?$/.test(text)) return Number(text) * 60000;
+      const colon = text.match(/^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/);
+      if (colon) {
+        const a = Number(colon[1]), b = Number(colon[2]), c = Number(colon[3] || 0);
+        return colon[3] ? ((a * 3600) + (b * 60) + c) * 1000 : ((a * 60) + b) * 1000;
+      }
+      const hM = text.match(/(\d+(?:\.\d+)?)\s*h/);
+      const mM = text.match(/(\d+(?:\.\d+)?)\s*m/);
+      const sM = text.match(/(\d+(?:\.\d+)?)\s*s/);
+      const total = (hM ? Number(hM[1]) * 3600000 : 0) + (mM ? Number(mM[1]) * 60000 : 0) + (sM ? Number(sM[1]) * 1000 : 0);
+      return total || NaN;
+    }
+    function formatDateTime(value) {
+      try { return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)); }
+      catch { return value; }
+    }
+    function nearest(values, target) {
+      return values.slice().sort((a, b) => Math.abs(a - target) - Math.abs(b - target))[0];
+    }
+    function ageToBracket(age) {
+      if (age >= 60) return "60-69";
+      if (age >= 50) return "50-59";
+      if (age >= 40) return "40-49";
+      return "18-39";
+    }
+    function shortDayLabel(index, label) {
+      return ["M", "T", "W", "T", "F", "S", "S"][index] || (label || "?").slice(0, 1);
+    }
+    function sortRecords(a, b) {
+      return String(a.date || "").localeCompare(String(b.date || ""))
+        || Number(a.set_number || 0) - Number(b.set_number || 0)
+        || String(a.created_at || "").localeCompare(String(b.created_at || ""));
+    }
+    function byOrder(a, b) { return Number(a.order || 0) - Number(b.order || 0); }
+    function byName(a, b) { return a.name.localeCompare(b.name); }
+    function newer(a, b) { return String(a?.updated_at || a?.created_at || "") >= String(b?.updated_at || b?.created_at || ""); }
+    function mergeById(base, incoming) {
+      return [...new Map([...base, ...incoming].map((item) => [item.id, item])).values()];
+    }
+    function csvRecordId(record) { return [record.date, normalizeText(record.exercise), record.set_number].join("|"); }
+
+    function downloadText(text, name, type) {
+      const blob = new Blob([text], { type: `${type};charset=utf-8` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = name;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    function registerServiceWorker() {
+      if ("serviceWorker" in navigator && location.protocol !== "file:") {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
+    }
+
+    // --- Set/session derived values ---
+    function volume(set) { return Number(set.weight_lb || 0) * Number(set.reps || 0); }
+    function e1rm(set) { return Number(set.weight_lb || 0) * (1 + Number(set.reps || 0) / 30); }
+
+    // --- Default state factories ---
     function defaultDriveSettings() {
       return { provider: "google-drive", clientId: "", fileName: DRIVE_STATE_FILE, fileId: "", connectedAt: "", lastSyncAt: "", lastStatus: "", autoSync: true };
     }
 
-    function createDefaultState() {
-      const exercises = defaultExercises.map((item) => ({ ...item }));
-      const programs = [createProgramFromTemplate("Upper/Lower", "Upper/Lower", 4, exercises)];
+    function blockFromExercise(exercise, order = 0) {
       return {
-        schema_version: 2,
-        view: "log",
-        activeDate: todayISO(),
-        activeProgramId: programs[0].id,
-        activeDayId: programs[0].days[0].id,
-        editPlan: false,
-        exercises,
-        programs,
-        sessions: [],
-        sets: [],
-        drafts: {},
-        command: "",
-        profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
-        settings: { muted: false, drive: defaultDriveSettings() },
-        csvPreview: null
+        id: cryptoId(),
+        exercise_id: exercise.id,
+        sets: exercise.default_sets || 3,
+        rep_range: exercise.default_rep_range || "8-12",
+        rest_seconds: exercise.default_rest_seconds || 120,
+        order,
+        updated_at: nowISO()
       };
     }
 
@@ -861,58 +764,134 @@
           label: template[0],
           type: "Strength",
           order: index,
-          blocks: template[1].filter((id) => map[id]).map((id, blockIndex) => blockFromExercise(map[id], blockIndex))
+          blocks: template[1].filter((id) => map[id]).map((id, i) => blockFromExercise(map[id], i))
         };
       });
       return { id: cryptoId(), name, split, days, created_at: nowISO(), updated_at: nowISO() };
     }
 
-    function blockFromExercise(exercise, order = 0) {
-      return { id: cryptoId(), exercise_id: exercise.id, sets: exercise.default_sets || 3, rep_range: exercise.default_rep_range || "8-12", rest_seconds: exercise.default_rest_seconds || 120, order, updated_at: nowISO() };
+    function createDefaultState() {
+      const exercises = defaultExercises.map((item) => ({ ...item }));
+      const programs = [createProgramFromTemplate("Upper/Lower", "Upper/Lower", 4, exercises)];
+      return {
+        schema_version: 3,
+        view: "log",
+        activeDate: todayISO(),
+        activeProgramId: programs[0].id,
+        activeDayId: programs[0].days[0].id,
+        editPlan: false,
+        exercises,
+        programs,
+        sessions: [],
+        sets: [],
+        drafts: {},
+        command: "",
+        profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
+        settings: { muted: false, drive: defaultDriveSettings() },
+        csvPreview: null
+      };
     }
 
+    function createExercise(overrides = {}) {
+      const restNum = Number(overrides.default_rest_seconds);
+      const setsNum = Number(overrides.default_sets);
+      return {
+        id: cryptoId(),
+        name: overrides.name || "New Exercise",
+        primary_muscle: overrides.primary_muscle || "Chest",
+        movement_pattern: overrides.movement_pattern || "press",
+        default_rest_seconds: Number.isFinite(restNum) ? restNum : 120,
+        default_sets: Number.isFinite(setsNum) ? setsNum : 3,
+        default_rep_range: overrides.default_rep_range || "8-12",
+        demo_video_url: overrides.demo_video_url || "",
+        notes: overrides.notes || "",
+        aliases: overrides.aliases || [],
+        updated_at: nowISO()
+      };
+    }
+
+    function normalizeState(saved) {
+      const fallback = createDefaultState();
+      if (!saved || typeof saved !== "object") return fallback;
+      if (saved.schema_version !== 2 && saved.schema_version !== 3) return fallback;
+      const merged = { ...fallback, ...saved, schema_version: 3 };
+      merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
+      merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
+      merged.sessions = (saved.sessions || []).map((session) => ({
+        paused_total_ms: 0, manual_duration_ms: null, notes: "", ...session
+      }));
+      merged.sets = saved.sets || [];
+      merged.drafts = saved.drafts || {};
+      merged.command = saved.command || "";
+      merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
+      merged.settings = {
+        ...fallback.settings, ...(saved.settings || {}),
+        drive: { ...defaultDriveSettings(), ...(saved.settings?.drive || {}) }
+      };
+      merged.view = ["log", "progress", "plan", "exercises", "sync"].includes(saved.view) ? saved.view : "log";
+      if (!merged.activeProgramId || !getProgram(merged)) merged.activeProgramId = merged.programs[0]?.id;
+      if (!merged.activeDayId || !getDay(merged)) merged.activeDayId = getProgram(merged)?.days[0]?.id;
+      return merged;
+    }
+
+    // --- Storage layer (debounced local writes) ---
     const K3V_Storage = {
+      _saveTimer: null,
+      _pending: null,
       async load() {
-        const saved = await this.readStoredState();
+        // Clean up orphan key from older builds
+        try { localStorage.removeItem("session_start_time"); } catch {}
+        const saved = await this._read();
         return normalizeState(saved);
       },
-      async readStoredState() {
+      async _read() {
         try {
-          const saved = await this.idbGet(STORAGE_KEY);
-          if (saved) return saved;
+          const v = await this.idbGet(STORAGE_KEY);
+          if (v) return v;
         } catch {}
-        for (const key of [STORAGE_KEY, LEGACY_STORAGE_KEY]) {
-          try {
-            const saved = JSON.parse(localStorage.getItem(key));
-            if (saved) return saved;
-          } catch {}
-        }
+        try {
+          const v = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          if (v) return v;
+        } catch {}
         return null;
       },
       save(state) {
-        const snapshot = JSON.parse(JSON.stringify({ ...state, csvPreview: null }));
+        this._pending = state;
+        if (this._saveTimer) clearTimeout(this._saveTimer);
+        this._saveTimer = setTimeout(() => this._flush(), LOCAL_SAVE_DEBOUNCE);
+      },
+      saveImmediate(state) {
+        this._pending = state;
+        if (this._saveTimer) { clearTimeout(this._saveTimer); this._saveTimer = null; }
+        this._flush();
+      },
+      _flush() {
+        const state = this._pending;
+        this._pending = null;
+        if (!state) return;
+        const snapshot = structuredClone({ ...state, csvPreview: null });
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot)); } catch {}
         this.idbSet(STORAGE_KEY, snapshot).catch(() => {});
       },
       openDB() {
         return new Promise((resolve, reject) => {
           if (!("indexedDB" in window)) return reject(new Error("IndexedDB unavailable"));
-          const request = indexedDB.open(DB_NAME, DB_VERSION);
-          request.onupgradeneeded = () => {
-            const db = request.result;
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
             if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
           };
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => reject(request.error);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
         });
       },
       async idbGet(key) {
         const db = await this.openDB();
         return new Promise((resolve, reject) => {
           const tx = db.transaction(DB_STORE, "readonly");
-          const request = tx.objectStore(DB_STORE).get(key);
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => reject(request.error);
+          const req = tx.objectStore(DB_STORE).get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
           tx.oncomplete = () => db.close();
         });
       },
@@ -927,6 +906,7 @@
       }
     };
 
+    // --- Drive sync engine ---
     const K3V_SyncEngine = (() => {
       let googleAccessToken = "";
       let googleTokenClient = null;
@@ -937,16 +917,16 @@
       function clientId(state) {
         return GOOGLE_OAUTH_CLIENT_ID || cleanValue(state.settings?.drive?.clientId || "");
       }
-
       function canSync(state) {
-        return Boolean(clientId(state)) && Boolean(googleAccessToken) && state.settings?.drive?.autoSync !== false && navigator.onLine !== false;
+        return Boolean(clientId(state)) && Boolean(googleAccessToken)
+          && state.settings?.drive?.autoSync !== false && navigator.onLine !== false;
       }
 
       function schedule(state, callbacks, delay = DRIVE_AUTO_SYNC_DELAY) {
         if (!canSync(state)) return;
         dirty = true;
-        window.clearTimeout(syncTimer);
-        syncTimer = window.setTimeout(() => run(state, callbacks, { silent: true }), delay);
+        clearTimeout(syncTimer);
+        syncTimer = setTimeout(() => run(state, callbacks, { silent: true }), delay);
       }
 
       async function connect(state, callbacks) {
@@ -960,13 +940,10 @@
       }
 
       async function run(state, callbacks, options = {}) {
-        if (inFlight) {
-          dirty = true;
-          return state;
-        }
+        if (inFlight) { dirty = true; return state; }
         inFlight = true;
         dirty = false;
-        window.clearTimeout(syncTimer);
+        clearTimeout(syncTimer);
         callbacks.onStatus({ state: "syncing", label: "Syncing..." });
         let working = cloneState(state);
         try {
@@ -987,10 +964,7 @@
           throw error;
         } finally {
           inFlight = false;
-          if (dirty) {
-            dirty = false;
-            schedule(working, callbacks, 400);
-          }
+          if (dirty) { dirty = false; schedule(working, callbacks, 400); }
         }
         return working;
       }
@@ -1028,11 +1002,10 @@
         const file = await findDriveStateFile(state);
         const content = backupPayload(state);
         if (file) {
-          await googleDriveRequest(state, `https://www.googleapis.com/upload/drive/v3/files/${file.id}?uploadType=media&fields=id,name,modifiedTime`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: content
-          });
+          await googleDriveRequest(state,
+            `https://www.googleapis.com/upload/drive/v3/files/${file.id}?uploadType=media&fields=id,name,modifiedTime`,
+            { method: "PATCH", headers: { "Content-Type": "application/json" }, body: content }
+          );
           state.settings.drive.fileId = file.id;
           return;
         }
@@ -1043,30 +1016,31 @@
       async function findDriveStateFile(state) {
         const fileName = state.settings.drive?.fileName || DRIVE_STATE_FILE;
         const q = encodeURIComponent(`name='${fileName.replace(/'/g, "\\'")}'`);
-        const response = await googleDriveRequest(state, `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&pageSize=1&fields=files(id,name,modifiedTime)`);
+        const response = await googleDriveRequest(state,
+          `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&pageSize=1&fields=files(id,name,modifiedTime)`
+        );
         const data = await response.json();
         return data.files?.[0] || null;
       }
 
       async function createDriveStateFile(state, content) {
         const boundary = `k3vsync-${Date.now()}`;
-        const metadata = { name: state.settings.drive?.fileName || DRIVE_STATE_FILE, parents: ["appDataFolder"], mimeType: "application/json" };
+        const metadata = {
+          name: state.settings.drive?.fileName || DRIVE_STATE_FILE,
+          parents: ["appDataFolder"],
+          mimeType: "application/json"
+        };
         const body = [
-          `--${boundary}`,
-          "Content-Type: application/json; charset=UTF-8",
-          "",
+          `--${boundary}`, "Content-Type: application/json; charset=UTF-8", "",
           JSON.stringify(metadata),
-          `--${boundary}`,
-          "Content-Type: application/json",
-          "",
+          `--${boundary}`, "Content-Type: application/json", "",
           content,
           `--${boundary}--`
         ].join("\r\n");
-        const response = await googleDriveRequest(state, "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime", {
-          method: "POST",
-          headers: { "Content-Type": `multipart/related; boundary=${boundary}` },
-          body
-        });
+        const response = await googleDriveRequest(state,
+          "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime",
+          { method: "POST", headers: { "Content-Type": `multipart/related; boundary=${boundary}` }, body }
+        );
         return response.json();
       }
 
@@ -1080,17 +1054,12 @@
           googleAccessToken = "";
           throw new Error("Google session expired. Sign in again.");
         }
-        if (!response.ok) throw new Error(await googleErrorMessage(response));
-        return response;
-      }
-
-      async function googleErrorMessage(response) {
-        try {
-          const data = await response.json();
-          return data.error?.message || `Google Drive request failed (${response.status})`;
-        } catch {
-          return `Google Drive request failed (${response.status})`;
+        if (!response.ok) {
+          let msg;
+          try { msg = (await response.json()).error?.message; } catch {}
+          throw new Error(msg || `Google Drive request failed (${response.status})`);
         }
+        return response;
       }
 
       function deepUnionMerge(local, remote) {
@@ -1107,673 +1076,191 @@
         return merged;
       }
 
-      function mergeRecords(localItems = [], remoteItems = []) {
+      function mergeRecords(local = [], remote = []) {
         const map = new Map();
-        [...localItems, ...remoteItems].forEach((item) => {
+        [...local, ...remote].forEach((item) => {
           if (!item?.id) return;
-          const previous = map.get(item.id);
-          if (!previous || newer(item, previous)) map.set(item.id, { ...previous, ...item });
+          const prev = map.get(item.id);
+          if (!prev || newer(item, prev)) map.set(item.id, { ...prev, ...item });
         });
         return [...map.values()];
       }
 
-      function mergePrograms(localPrograms = [], remotePrograms = []) {
+      function mergePrograms(local = [], remote = []) {
         const map = new Map();
-        [...localPrograms, ...remotePrograms].forEach((program) => {
+        [...local, ...remote].forEach((program) => {
           if (!program?.id) return;
-          const previous = map.get(program.id);
-          if (!previous) {
-            map.set(program.id, cloneState(program));
-            return;
-          }
-          const base = newer(program, previous) ? { ...previous, ...program } : { ...program, ...previous };
-          base.days = mergeDays(previous.days || [], program.days || []);
+          const prev = map.get(program.id);
+          if (!prev) { map.set(program.id, cloneState(program)); return; }
+          const base = newer(program, prev) ? { ...prev, ...program } : { ...program, ...prev };
+          base.days = mergeDays(prev.days || [], program.days || []);
           map.set(program.id, base);
         });
         return [...map.values()];
       }
 
-      function mergeDays(localDays = [], remoteDays = []) {
+      function mergeDays(local = [], remote = []) {
         const map = new Map();
-        [...localDays, ...remoteDays].forEach((day) => {
+        [...local, ...remote].forEach((day) => {
           if (!day?.id) return;
-          const previous = map.get(day.id);
-          if (!previous) {
-            map.set(day.id, cloneState(day));
-            return;
-          }
-          const base = newer(day, previous) ? { ...previous, ...day } : { ...day, ...previous };
-          base.blocks = mergeRecords(previous.blocks || [], day.blocks || []).sort(byOrder);
+          const prev = map.get(day.id);
+          if (!prev) { map.set(day.id, cloneState(day)); return; }
+          const base = newer(day, prev) ? { ...prev, ...day } : { ...day, ...prev };
+          base.blocks = mergeRecords(prev.blocks || [], day.blocks || []).sort(byOrder);
           map.set(day.id, base);
         });
         return [...map.values()].sort(byOrder);
       }
 
-      function newer(a, b) {
-        return String(a.updated_at || a.created_at || "") >= String(b.updated_at || b.created_at || "");
-      }
-
+      // Profile is a single record -- compare timestamps so the latest device wins.
       function mergeProfile(local = {}, remote = {}) {
-        return { ...remote, ...local, updated_at: local.updated_at || remote.updated_at || nowISO() };
+        if (newer(local, remote)) return { ...remote, ...local };
+        return { ...local, ...remote };
       }
 
       return { schedule, connect, run, deepUnionMerge, isConnected: () => Boolean(googleAccessToken) };
     })();
 
-    const K3V_UI_Components = {
-      Trendline({ exercise, sets }) {
-        const points = trendPoints(sets);
-        if (!points.length) return h("div", { class: "empty" }, "Log sets to build a PR trendline.");
-        const width = 520;
-        const height = 190;
-        const pad = 24;
-        const minY = Math.min(...points.map((p) => p.e1rm)) * 0.94;
-        const maxY = Math.max(...points.map((p) => p.e1rm)) * 1.04 || 1;
-        const minX = Math.min(...points.map((p) => p.time));
-        const maxX = Math.max(...points.map((p) => p.time));
-        const x = (p) => maxX === minX ? width / 2 : pad + ((p.time - minX) / (maxX - minX)) * (width - pad * 2);
-        const y = (p) => height - pad - ((p.e1rm - minY) / Math.max(1, maxY - minY)) * (height - pad * 2);
-        const d = points.map((p, index) => `${index ? "L" : "M"}${x(p).toFixed(1)} ${y(p).toFixed(1)}`).join(" ");
-        let best = 0;
-        const prPoints = points.filter((p) => {
-          if (p.e1rm > best) {
-            best = p.e1rm;
-            return true;
-          }
-          return false;
-        });
-        return h("svg", { class: "trend-svg", viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${exercise.name} PR trendline` },
-          h("path", { d: `M${pad} ${height - pad}H${width - pad}M${pad} ${pad}V${height - pad}`, fill: "none", stroke: "#3d4b5d", "stroke-width": "1" }),
-          h("path", { d, fill: "none", stroke: "#8fb7ff", "stroke-width": "3", "stroke-linecap": "round", "stroke-linejoin": "round" }),
-          points.map((p) => h("circle", { key: `${p.date}-${p.e1rm}`, cx: x(p), cy: y(p), r: 3, fill: "#f5f8fc" })),
-          prPoints.map((p) => h("g", { key: `pr-${p.date}-${p.e1rm}` },
-            h("circle", { cx: x(p), cy: y(p), r: 6, fill: "#74e6ad", stroke: "#0e1116", "stroke-width": "2" }),
-            h("text", { x: Math.min(width - 76, x(p) + 8), y: Math.max(14, y(p) - 8), fill: "#74e6ad", "font-size": "11", "font-weight": "800" }, `PR ${Math.round(p.e1rm)}`)
-          )),
-          h("text", { x: pad, y: 14, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(maxY)} lb`),
-          h("text", { x: pad, y: height - 5, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(minY)} lb`)
-        );
-      },
-      PlateModal({ weight, onClose }) {
-        const target = Number(weight) || BAR_WEIGHT;
-        const result = calculatePlates(target);
-        return h(Modal, { title: "Plate Calculator", onClose },
-          h("div", { class: "stack" },
-            h("p", { class: "muted" }, `Target: ${formatWeight(target)} on a 45 lb bar.`),
-            h("div", { class: "panel", style: "padding:12px" },
-              h("h3", null, result.loadable ? `${result.perSide} lb per side` : "Below bar weight"),
-              h("p", { class: "muted" }, result.loadable ? `Each side: ${result.plates.length ? result.plates.join(" + ") : "no plates"}` : "Use the empty bar or a lighter implement.")
-            ),
-            h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
-          )
-        );
-      }
-    };
-
-    function K3V_App() {
-      const [state, setState] = useState(null);
-      const [syncStatus, setSyncStatus] = useState({ state: "idle", label: "Local" });
-      const [toast, setToast] = useState("");
-      const [modal, setModal] = useState(null);
-      const [clock, setClock] = useState(Date.now());
-      const [listening, setListening] = useState(false);
-      const recognitionRef = useRef(null);
-      const stateRef = useRef(null);
-      const fileJsonRef = useRef(null);
-      const fileCsvRef = useRef(null);
-
-      useEffect(() => {
-        K3V_Storage.load().then((loaded) => {
-          stateRef.current = loaded;
-          setState(loaded);
-        });
-        registerServiceWorker();
-      }, []);
-
-      // Fast clock for session elapsed calculations (100ms for smooth UI)
-      useEffect(() => {
-        const id = window.setInterval(() => setClock(Date.now()), 100);
-        return () => window.clearInterval(id);
-      }, []);
-
-      // Auto-pause session when app goes to background (like Strong/Hevy)
-      useEffect(() => {
-        const handleVisibility = () => {
-          if (document.hidden) {
-            setState((prev) => {
-              if (!prev) return prev;
-              const session = sessionForActiveDate(prev);
-              // Don't auto-pause if session is already finished
-              if (session && !session.paused_at && !session.finished_at) {
-                const next = cloneState(prev);
-                const active = next.sessions.find((s) => s.id === session.id);
-                if (active) {
-                  active.paused_at = nowISO();
-                  active.updated_at = nowISO();
-                }
-                stateRef.current = next;
-                K3V_Storage.save(next);
-                return next;
-              }
-              return prev;
-            });
-          }
-        };
-        document.addEventListener("visibilitychange", handleVisibility);
-        return () => document.removeEventListener("visibilitychange", handleVisibility);
-      }, []);
-
-      useEffect(() => {
-        const online = () => stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 250);
-        const visible = () => !document.hidden && stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 300);
-        const pageHide = () => stateRef.current && K3V_SyncEngine.run(stateRef.current, callbacks(), { silent: true }).catch(() => {});
-        window.addEventListener("online", online);
-        document.addEventListener("visibilitychange", visible);
-        window.addEventListener("pagehide", pageHide);
-        return () => {
-          window.removeEventListener("online", online);
-          document.removeEventListener("visibilitychange", visible);
-          window.removeEventListener("pagehide", pageHide);
-        };
-      }, []);
-
-      function callbacks() {
-        return {
-          onState: applyRemoteState,
-          onStatus: setSyncStatus,
-          onToast: showToast
-        };
-      }
-
-      function showToast(message) {
-        setToast(message);
-        window.clearTimeout(showToast.timer);
-        showToast.timer = window.setTimeout(() => setToast(""), 2600);
-      }
-
-      function applyRemoteState(next, options = {}) {
-        const normalized = normalizeState(next);
-        stateRef.current = normalized;
-        setState(normalized);
-        K3V_Storage.save(normalized);
-        if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks());
-      }
-
-      function updateState(mutator, options = {}) {
-        setState((previous) => {
-          const base = cloneState(previous || createDefaultState());
-          const next = mutator(base) || base;
-          const normalized = normalizeState(next);
-          stateRef.current = normalized;
-          K3V_Storage.save(normalized);
-          if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks(), options.syncDelay || DRIVE_AUTO_SYNC_DELAY);
-          return normalized;
-        });
-      }
-
-      if (!state) return h("main", { class: "app-shell" }, h("div", { class: "empty panel" }, "Loading K3VSYNC..."));
-
+    // --- State queries (no mutation) ---
+    function getProgram(state) {
+      return state.programs.find((p) => p.id === state.activeProgramId) || state.programs[0];
+    }
+    function getDay(state) {
       const program = getProgram(state);
-      const day = getDay(state);
-      const activeSets = setsForDate(state, state.activeDate);
-      // Derive topbar timer from the same state + clock that SessionPanel uses
-      const activeSessionForTimer = state ? sessionForActiveDate(state) : null;
-      const liveTimer = (!activeSessionForTimer || activeSessionForTimer.finished_at)
-        ? "00:00"
-        : formatDuration(sessionElapsedMs(activeSessionForTimer, clock));
-      const views = [
-        ["log", "Log"],
-        ["progress", "Stats"],
-        ["plan", "Plan"],
-        ["exercises", "Exercises"],
-        ["sync", "Drive"]
-      ];
-
-      return h("div", null,
-        h("main", { class: "app-shell" },
-          h("header", { class: "topbar" },
-            h("div", { class: "brand" },
-              h("div", { class: "brand-mark" }, "K3V"),
-              h("div", null,
-                h("h1", null, "K3VSYNC"),
-                h("p", null, `${day?.label || "Workout"} / ${activeSets.length} sets / ${formatNumber(activeSets.reduce((sum, set) => sum + volume(set), 0))} lb`)
-              )
-            ),
-            h("div", { style: "display:flex;align-items:center;gap:8px" },
-              liveTimer !== "00:00" && h("span", { class: "session-time", style: "font-size:1rem;font-weight:850;color:var(--accent)" }, liveTimer),
-              h("div", { class: "sync-chip", "data-state": syncStatus.state },
-                h("i", { class: "sync-dot" }),
-                h("span", null, syncStatus.label)
-              )
-            )
-          ),
-          h("section", { class: "toolbar" },
-            h("nav", { class: "segmented", "aria-label": "Primary" },
-              views.map(([id, label]) => h("button", { key: id, type: "button", "aria-selected": state.view === id, onClick: () => updateState((draft) => { draft.view = id; }, { localOnly: true }) }, label))
-            ),
-            h("div", { class: "date-row" },
-              h("input", { type: "date", value: state.activeDate, onInput: (event) => updateState((draft) => { draft.activeDate = event.currentTarget.value || todayISO(); }, { localOnly: true }) }),
-              h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { draft.activeDate = todayISO(); }, { localOnly: true }) }, "Today")
-            ),
-            h("div", { class: "day-strip", "aria-label": "Workout day" },
-              (program?.days || []).sort(byOrder).map((item, index) => h("button", { key: item.id, type: "button", "aria-current": item.id === state.activeDayId, onClick: () => updateState((draft) => { draft.activeDayId = item.id; }, { localOnly: true }) },
-                h("strong", null, shortDayLabel(index, item.label)),
-                h("span", null, item.label)
-              ))
-            )
-          ),
-          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock, listening, setListening, recognitionRef }),
-          state.view === "progress" && h(ProgressView, { state, updateState }),
-          state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
-          state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
-          state.view === "sync" && h(DriveView, { state, updateState, showToast, syncStatus, connect: () => K3V_SyncEngine.connect(stateRef.current, callbacks()).catch(() => {}), syncNow: () => K3V_SyncEngine.run(stateRef.current, callbacks()).catch(() => {}), fileJsonRef, fileCsvRef })
-        ),
-        h("nav", { class: "bottom-nav", "aria-label": "Primary" },
-          h("div", { class: "bottom-nav-inner" }, views.map(([id, label]) => h("button", { key: id, type: "button", "aria-selected": state.view === id, onClick: () => updateState((draft) => { draft.view = id; }, { localOnly: true }) }, label)))
-        ),
-        h("input", { ref: fileJsonRef, class: "sr-only", type: "file", accept: "application/json,.json", onChange: (event) => importJSONFile(event, updateState, showToast) }),
-        h("input", { ref: fileCsvRef, class: "sr-only", type: "file", accept: ".csv,text/csv", onChange: (event) => importCSVFile(event, updateState, showToast) }),
-        modal,
-        toast && h("div", { class: "toast", role: "status" }, toast)
-      );
+      return program?.days.find((d) => d.id === state.activeDayId) || program?.days[0];
+    }
+    function getDayById(state, dayId) {
+      return state.programs.flatMap((p) => p.days).find((d) => d.id === dayId);
+    }
+    function getExercise(state, id) {
+      return state.exercises.find((e) => e.id === id);
+    }
+    function setsForDate(state, date) {
+      return state.sets.filter((s) => s.date === date).sort(sortRecords);
+    }
+    function setsForExercise(state, exerciseId) {
+      return state.sets.filter((s) => s.exercise_id === exerciseId).sort(sortRecords);
+    }
+    function mostLoggedExercises(state) {
+      return state.exercises
+        .map((exercise) => ({ exercise, count: setsForExercise(state, exercise.id).length }))
+        .filter((item) => item.count)
+        .sort((a, b) => b.count - a.count)
+        .map((item) => item.exercise);
+    }
+    function lastWeightForExercise(state, exerciseId) {
+      return setsForExercise(state, exerciseId).slice(-1)[0]?.weight_lb || "";
+    }
+    function sessionForActiveDate(state) {
+      return state.sessions.find((s) => s.date === state.activeDate && s.day_id === state.activeDayId);
+    }
+    function sessionElapsedMs(session, clock = Date.now()) {
+      if (!session) return 0;
+      if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
+      const started = new Date(session.session_start || session.started_at || session.created_at || nowISO()).getTime();
+      const paused = Number(session.paused_total_ms || 0);
+      let elapsed = clock - started - paused;
+      if (session.paused_at) {
+        const pausedStart = new Date(session.paused_at).getTime();
+        elapsed = pausedStart - started - paused;
+      }
+      return Math.max(0, elapsed);
     }
 
-    function LogView({ state, updateState, showToast, openModal, clock, listening, setListening, recognitionRef }) {
-      const day = getDay(state);
-      const blocks = (day?.blocks || []).slice().sort(byOrder);
-      return h("section", { class: "stack" },
-        h(SessionPanel, { state, updateState, clock, showToast, openModal }),
-        h(VoicePanel, { state, updateState, showToast, listening, setListening, recognitionRef }),
-        blocks.length ? blocks.map((block) => h(ExerciseBlock, { key: block.id, state, block, updateState, showToast, openModal })) : h("div", { class: "empty panel" }, "No exercises on this day yet. Add blocks from Plan.")
-      );
-    }
-
-    function SessionPanel({ state, updateState, clock, showToast, openModal }) {
-      const session = sessionForActiveDate(state);
-      const elapsed = session ? sessionElapsedMs(session, clock) : 0;
-      const setCount = setsForDate(state, state.activeDate).length;
-      const isPaused = session?.paused_at != null;
-      const isFinished = session?.finished_at != null;
-      const isActive = session && !isPaused && !isFinished;
+    // --- State mutations ---
+    function activeSession(state) {
+      let session = sessionForActiveDate(state);
       if (!session) {
-        return h("article", { class: "session-strip panel" },
-          h("div", { class: "session-strip-main" },
-            h("span", { class: "session-label" }, "Session not started"),
-            h("button", { class: "primary-btn", type: "button", onClick: () => updateState((draft) => { activeSession(draft); showToast("Workout started!"); }) }, "Start Workout")
-          )
-        );
+        const now = nowISO();
+        session = {
+          id: cryptoId(),
+          date: state.activeDate,
+          program_id: state.activeProgramId,
+          day_id: state.activeDayId,
+          session_start: now,
+          started_at: now,
+          updated_at: now,
+          paused_total_ms: 0,
+          paused_at: null,
+          manual_duration_ms: null,
+          notes: ""
+        };
+        state.sessions.push(session);
       }
-      const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : isFinished ? "" : "");
-      return h("article", { class: stripClass },
-        h("div", { class: "session-strip-main" },
-          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") }, isFinished ? "COMPLETED" : isPaused ? "PAUSED" : "LIVE"),
-          h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
-          h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
-          session?.notes && h("span", { class: "pill green" }, "notes")
-        ),
-        h("div", { class: "session-controls" },
-          isFinished ? h("span", { class: "session-meta", style: "font-size:0.78rem;padding:0 8px" }, "Done ✓") :
-          isPaused ?
-            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { resumeSession(draft); showToast("Workout resumed!"); }) }, "Resume") :
-            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { pauseSession(draft); showToast("Workout paused."); }) }, "Pause"),
-          isFinished ? null :
-            h("button", { class: "session-finish-btn", type: "button", onClick: () => {
-              updateState((draft) => {
-                const active = activeSession(draft);
-                active.manual_duration_ms = sessionElapsedMs(active);
-                active.finished_at = nowISO();
-                active.updated_at = nowISO();
-              });
-              showToast("Workout finished! Time saved.");
-
-            } }, "Finish"),
-          h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
-        )
-      );
+      return session;
     }
 
-    function SessionEditorModal({ state, updateState, showToast, onClose }) {
-      const session = sessionForActiveDate(state);
-      const [displayMs, setDisplayMs] = useState(session ? sessionElapsedMs(session) : 0);
-      const [timeDraft, setTimeDraft] = useState("");
-      const [notes, setNotes] = useState(session?.notes || "");
-      const commitDuration = (ms) => {
-        updateState((draft) => {
-          const active = activeSession(draft);
-          active.manual_duration_ms = Math.max(0, ms);
-          active.updated_at = nowISO();
-          draft.sessionTimeDraft = "";
-        });
-        setDisplayMs(Math.max(0, ms));
-      };
-      return h(Modal, { title: "Session Details", onClose },
-        h("div", { class: "stack" },
-          h("div", { class: "panel", style: "padding:12px" },
-            h("div", { class: "session-head" },
-              h("div", null,
-                h("h2", null, formatDuration(displayMs)),
-                h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Editable elapsed time and daily notes." : "Starts when the workout session begins.")
-              )
-            )
-          ),
-          h("div", { class: "form-grid" },
-            h(FieldInput, { label: "Set elapsed time", value: timeDraft, placeholder: "75m or 1:15:00", onInput: setTimeDraft }),
-            h("div", { class: "field" },
-              h("label", null, "Controls"),
-              h("div", { class: "row-actions", style: "grid-template-columns:repeat(3, minmax(0, 1fr))" },
-                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs - 300000) }, "-5m"),
-                h("button", { class: "ghost-btn", type: "button", onClick: () => {
-                  const ms = parseDurationInput(timeDraft);
-                  if (!Number.isFinite(ms)) {
-                    showToast("Use 75m, 1:15, or 1:15:00.");
-                    return;
-                  }
-                  commitDuration(ms);
-                  setTimeDraft("");
-                  showToast("Session time updated.");
-                } }, "Set"),
-                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs + 300000) }, "+5m")
-              )
-            )
-          ),
-          h("textarea", {
-            placeholder: "How did the workout feel today?",
-            value: notes,
-            onInput: (event) => {
-              const value = event.currentTarget.value;
-              setNotes(value);
-              updateState((draft) => {
-                const active = activeSession(draft);
-                active.notes = value;
-                active.updated_at = nowISO();
-              });
-            }
-          }),
-          h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
-        )
-      );
+    function pauseSession(state) {
+      const session = activeSession(state);
+      if (!session.paused_at) bump(session, { paused_at: nowISO() });
     }
 
-    function VoicePanel({ state, updateState, showToast, listening, setListening, recognitionRef }) {
-      return h("article", { class: "voice-panel panel" },
-        h("div", { class: "voice-grid" },
-          h("button", { class: listening ? "mini-btn danger" : "mini-btn", type: "button", "aria-label": "Voice input", onClick: () => toggleVoice(state, updateState, showToast, listening, setListening, recognitionRef) }, listening ? "Stop" : "Mic"),
-          h("textarea", { value: state.command || "", placeholder: "Say or type: bench press 225 for 5 rpe 8 note felt fast", onInput: (event) => updateState((draft) => { draft.command = event.currentTarget.value; }, { localOnly: true }) }),
-          h("button", { class: "primary-btn", type: "button", onClick: () => {
-            const result = parseVoiceCommand(state, updateState);
-            showToast(result.message);
-          } }, "Add")
-        ),
-        h("p", { class: "muted", style: "margin:8px 0 0" }, "Voice commands use the same local-first draft state, then sync after the debounce.")
-      );
+    function resumeSession(state) {
+      const session = activeSession(state);
+      if (!session.paused_at) return;
+      const pausedStart = new Date(session.paused_at).getTime();
+      session.paused_total_ms = (session.paused_total_ms || 0) + (Date.now() - pausedStart);
+      bump(session, { paused_at: null });
     }
 
-    function ExerciseBlock({ state, block, updateState, showToast, openModal }) {
-      const exercise = getExercise(state, block.exercise_id);
-      const draft = state.drafts[block.id] || {};
-      const logs = state.sets.filter((set) => set.date === state.activeDate && set.exercise_id === block.exercise_id).sort(sortRecords);
-      if (!exercise) return null;
-      const updateDraft = (field, value) => updateState((next) => {
-        next.drafts[block.id] ||= {};
-        next.drafts[block.id][field] = value;
+    function adjustSessionDuration(updateState, deltaMs) {
+      updateState((draft) => {
+        const session = activeSession(draft);
+        bump(session, { manual_duration_ms: Math.max(0, sessionElapsedMs(session) + deltaMs) });
+        draft.sessionTimeDraft = "";
       });
-      return h("article", { class: "exercise-card panel" },
-        h("div", { class: "card-head" },
-          h("div", null,
-            h("h2", null, exercise.name),
-            h("div", { class: "chip-row" },
-              h("span", { class: "pill" }, exercise.primary_muscle),
-              h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatTimer(block.rest_seconds)} rest`)
-            )
-          ),
-          h("button", { class: "ghost-btn", type: "button", onClick: () => addWarmups(state, block, updateState, showToast) }, "Warmup")
-        ),
-        h("div", { class: "set-form" },
-          h("div", { class: "field" },
-            h("label", null, "Weight"),
-            h("div", { class: "weight-field" },
-              h("input", { inputMode: "decimal", placeholder: "lb", value: draft.weight_lb || "", onInput: (event) => updateDraft("weight_lb", event.currentTarget.value) }),
-              h("button", { class: "mini-btn", type: "button", title: "Plate calculator", onClick: () => openModal(h(K3V_UI_Components.PlateModal, { weight: draft.weight_lb || lastWeightForExercise(state, exercise.id) || BAR_WEIGHT, onClose: () => openModal(null) })) }, "🏋️")
-            )
-          ),
-          h("div", { class: "field" }, h("label", null, "Reps"), h("input", { inputMode: "numeric", placeholder: "0", value: draft.reps || "", onInput: (event) => updateDraft("reps", event.currentTarget.value) })),
-          h("div", { class: "field" }, h("label", null, "RPE"), h("input", { inputMode: "decimal", placeholder: "7.5", value: draft.rpe || "", onInput: (event) => updateDraft("rpe", event.currentTarget.value) })),
-          h("div", { class: "field notes-field" }, h("label", null, "Notes"), h("input", { placeholder: "optional", value: draft.notes || "", onInput: (event) => updateDraft("notes", event.currentTarget.value) })),
-          h("button", { class: "mini-btn primary", type: "button", "aria-label": "Add set", onClick: () => addSet(state, block, updateState, showToast) }, "+")
-        ),
-        h("div", { class: "set-list" },
-          logs.length ? logs.map((set) => h(SetRow, { key: set.id, set, updateState })) : h("div", { class: "empty" }, "No sets logged yet.")
-        )
-      );
     }
 
-    function SetRow({ set, updateState }) {
-      return h("div", { class: "set-row" },
-        h("div", { class: "set-num" }, set.set_number),
-        h("div", { class: "row-main" },
-          h("b", null, `${formatWeight(set.weight_lb)} x ${set.reps}`),
-          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}${Number.isFinite(Number(set.session_elapsed_ms)) ? ` at ${formatDuration(Number(set.session_elapsed_ms))}` : set.time_logged ? ` at ${set.time_logged}` : ""}`)
-        ),
-        h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
-          draft.sets = draft.sets.filter((item) => item.id !== set.id);
-          renumberSets(draft, set.session_id, set.exercise_id);
-        }) }, "Del")
-      );
-    }
-
-    function ProgressView({ state, updateState }) {
-      const selected = state.progressExerciseId || "";
-      const ranked = mostLoggedExercises(state).slice(0, 5);
-      const exercises = selected ? [getExercise(state, selected)].filter(Boolean) : ranked;
-      const profile = state.profile || {};
-      return h("section", null,
-        h("div", { class: "section-title" }, h("h2", null, "SVG PR Trendlines"), h("span", null, "Epley e1RM")),
-        h("div", { class: "actions" },
-          h("select", { value: selected, onChange: (event) => updateState((draft) => { draft.progressExerciseId = event.currentTarget.value; }, { localOnly: true }) },
-            h("option", { value: "" }, "Top 5 most logged"),
-            state.exercises.slice().sort(byName).map((exercise) => h("option", { key: exercise.id, value: exercise.id }, exercise.name))
-          )
-        ),
-        h("div", { class: "chart-grid" },
-          exercises.length ? exercises.map((exercise) => h("article", { key: exercise.id, class: "chart-card panel" },
-            h("div", { class: "chart-head" }, h("b", null, exercise.name), h("span", { class: "muted" }, `${setsForExercise(state, exercise.id).length} sets`)),
-            h(K3V_UI_Components.Trendline, { exercise, sets: setsForExercise(state, exercise.id) })
-          )) : h("div", { class: "empty panel" }, "Log sets to see trendlines.")
-        ),
-        h("div", { class: "section-title" }, h("h2", null, "Strength Standards"), h("span", null, "Context bands")),
-        h("section", { class: "panel", style: "padding:12px; margin-bottom:12px" },
-          h("div", { class: "form-grid" },
-            h(FieldSelect, { label: "Sex", value: profile.sex || "male", options: ["male", "female"], onChange: (value) => updateState((draft) => { draft.profile.sex = value; }) }),
-            h(FieldInput, { label: "Bodyweight lb", value: profile.bodyweight_lb || "", inputMode: "decimal", placeholder: "180", onInput: (value) => updateState((draft) => { draft.profile.bodyweight_lb = value; }) }),
-            h(FieldInput, { label: "Age", value: profile.age || "", inputMode: "numeric", placeholder: "32", onInput: (value) => updateState((draft) => { draft.profile.age = value; }) }),
-            h(FieldInput, { label: "Height", value: profile.height || "", placeholder: "optional", onInput: (value) => updateState((draft) => { draft.profile.height = value; }) })
-          )
-        ),
-        h("section", { class: "stack" }, renderStandards(state))
-      );
-    }
-
-    function PlanView({ state, updateState, showToast, openModal }) {
-      const program = getProgram(state);
-      return h("section", null,
-        h("div", { class: "actions" },
-          h("button", { class: "primary-btn", type: "button", onClick: () => createNewPlan(updateState, showToast) }, "New Plan"),
-          h("select", { value: state.activeProgramId, onChange: (event) => updateState((draft) => { draft.activeProgramId = event.currentTarget.value; draft.activeDayId = getProgram(draft)?.days[0]?.id; }) },
-            state.programs.map((item) => h("option", { key: item.id, value: item.id }, item.name))
-          )
-        ),
-        h("section", { class: "stack" },
-          (program?.days || []).slice().sort(byOrder).map((day) => h("article", { key: day.id, class: "day-card panel" },
-            h("div", { class: "card-head" },
-              h("div", null, h("h2", null, day.label), h("div", { class: "chip-row" }, h("span", { class: "pill gold" }, day.type), h("span", null, `${day.blocks.length} blocks`))),
-              h("select", { value: day.type, onChange: (event) => updateState((draft) => {
-                const found = getDayById(draft, day.id);
-                found.type = event.currentTarget.value;
-                found.updated_at = nowISO();
-                if (found.type === "Rest") found.blocks = [];
-              }) }, dayTypes.map((type) => h("option", { key: type, value: type }, type)))
-            ),
-            h("div", { class: "plan-blocks" },
-              day.blocks.slice().sort(byOrder).map((block) => h(PlanBlockRow, { key: block.id, state, day, block, updateState })),
-              h("button", { class: "ghost-btn", style: "margin:10px 12px", type: "button", onClick: () => openModal(h(AddBlockModal, { state, dayId: day.id, updateState, onClose: () => openModal(null) })) }, "+ Add exercise")
-            )
-          ))
-        )
-      );
-    }
-
-    function PlanBlockRow({ state, day, block, updateState }) {
+    function appendSet(state, block, weight, reps, rpe = "", notes = "") {
       const exercise = getExercise(state, block.exercise_id);
-      if (!exercise) return null;
-      return h("div", { class: "block-row" },
-        h("div", { class: "row-main" }, h("b", null, exercise.name), h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatTimer(block.rest_seconds)} rest`)),
-        h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
-          const found = getDayById(draft, day.id);
-          found.blocks = found.blocks.filter((item) => item.id !== block.id);
-          found.updated_at = nowISO();
-        }) }, "Del")
-      );
+      const session = activeSession(state);
+      const existing = state.sets.filter((s) => s.session_id === session.id && s.exercise_id === block.exercise_id);
+      const now = nowISO();
+      state.sets.push({
+        id: cryptoId(),
+        session_id: session.id,
+        date: state.activeDate,
+        exercise_id: block.exercise_id,
+        exercise: exercise?.name || "Exercise",
+        set_number: existing.length + 1,
+        reps,
+        weight_lb: weight,
+        rpe,
+        notes,
+        time_logged: new Date().toTimeString().slice(0, 8),
+        session_elapsed_ms: sessionElapsedMs(session),
+        created_at: now,
+        updated_at: now
+      });
+      bump(session);
     }
 
-    function AddBlockModal({ state, dayId, updateState, onClose }) {
-      const [query, setQuery] = useState("");
-      const filtered = state.exercises.filter((exercise) => normalizeText(exercise.name).includes(normalizeText(query))).slice(0, 30);
-      return h(Modal, { title: "Add Exercise", onClose },
-        h("div", { class: "stack" },
-          h("input", { value: query, placeholder: "Search exercises", onInput: (event) => setQuery(event.currentTarget.value) }),
-          h("div", { class: "panel" }, filtered.map((exercise) => h("button", { key: exercise.id, class: "ghost-btn", style: "width:100%; justify-content:flex-start; border-radius:0", type: "button", onClick: () => {
-            updateState((draft) => {
-              const day = getDayById(draft, dayId);
-              day.blocks.push(blockFromExercise(exercise, day.blocks.length));
-              day.updated_at = nowISO();
-            });
-            onClose();
-          } }, exercise.name))),
-          !filtered.length && h("button", { class: "primary-btn", type: "button", onClick: () => {
-            const name = cleanValue(query) || "New Exercise";
-            updateState((draft) => {
-              const exercise = createExercise({ name });
-              draft.exercises.push(exercise);
-              const day = getDayById(draft, dayId);
-              day.blocks.push(blockFromExercise(exercise, day.blocks.length));
-            });
-            onClose();
-          } }, "Create new exercise")
-        )
-      );
+    function renumberSets(state, sessionId, exerciseId) {
+      state.sets
+        .filter((s) => s.session_id === sessionId && s.exercise_id === exerciseId)
+        .sort(sortRecords)
+        .forEach((s, i) => bump(s, { set_number: i + 1 }));
     }
 
-    function ExercisesView({ state, updateState, showToast, openModal }) {
-      const query = state.exerciseQuery || "";
-      const muscle = state.exerciseMuscle || "";
-      const pattern = state.exercisePattern || "";
-      const filtered = state.exercises.filter((exercise) =>
-        (!query || normalizeText(exercise.name).includes(normalizeText(query))) &&
-        (!muscle || exercise.primary_muscle === muscle) &&
-        (!pattern || exercise.movement_pattern === pattern)
-      ).sort(byName);
-      return h("section", null,
-        h("div", { class: "actions" },
-          h("button", { class: "primary-btn", type: "button", onClick: () => openModal(h(ExerciseFormModal, { onClose: () => openModal(null), updateState })) }, "New Exercise"),
-          h("input", { placeholder: "Search exercises", value: query, onInput: (event) => updateState((draft) => { draft.exerciseQuery = event.currentTarget.value; }, { localOnly: true }) }),
-          h("select", { value: muscle, onChange: (event) => updateState((draft) => { draft.exerciseMuscle = event.currentTarget.value; }, { localOnly: true }) }, h("option", { value: "" }, "All muscles"), muscles.map((item) => h("option", { key: item, value: item }, item))),
-          h("select", { value: pattern, onChange: (event) => updateState((draft) => { draft.exercisePattern = event.currentTarget.value; }, { localOnly: true }) }, h("option", { value: "" }, "All patterns"), patterns.map((item) => h("option", { key: item, value: item }, item)))
-        ),
-        h("section", { class: "panel exercise-list" },
-          filtered.length ? filtered.map((exercise) => h("div", { key: exercise.id, class: "exercise-row" },
-            h("div", { class: "row-main" }, h("b", null, exercise.name), h("span", null, `${exercise.primary_muscle} / ${exercise.movement_pattern} / ${exercise.default_sets} x ${exercise.default_rep_range} / ${formatTimer(exercise.default_rest_seconds)}`)),
-            h("div", { class: "row-actions", style: "grid-auto-flow:column" },
-              h("button", { class: "mini-btn", type: "button", onClick: () => openModal(h(ExerciseFormModal, { exercise, updateState, onClose: () => openModal(null) })) }, "Edit"),
-              h("button", { class: "mini-btn danger", type: "button", onClick: () => deleteExercise(exercise.id, updateState, showToast) }, "Del")
-            )
-          )) : h("div", { class: "empty" }, "No exercises found.")
-        )
-      );
+    function deleteExercise(id, updateState, showToast) {
+      updateState((draft) => {
+        const used = draft.programs.some((p) => p.days.some((d) => d.blocks.some((b) => b.exercise_id === id)));
+        if (used) { showToast("Exercise is used in a plan. Remove the block first."); return draft; }
+        draft.exercises = draft.exercises.filter((e) => e.id !== id);
+      });
     }
 
-    function ExerciseFormModal({ exercise, updateState, onClose }) {
-      const [form, setForm] = useState(exercise || createExercise({ name: "" }));
-      const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
-      return h(Modal, { title: exercise ? "Edit Exercise" : "New Exercise", onClose },
-        h("div", { class: "stack" },
-          h("div", { class: "form-grid" },
-            h(FieldInput, { label: "Name", value: form.name, onInput: (value) => set("name", value) }),
-            h(FieldSelect, { label: "Primary muscle", value: form.primary_muscle, options: muscles, onChange: (value) => set("primary_muscle", value) }),
-            h(FieldSelect, { label: "Pattern", value: form.movement_pattern, options: patterns, onChange: (value) => set("movement_pattern", value) }),
-            h(FieldInput, { label: "Default rest", value: form.default_rest_seconds, inputMode: "numeric", onInput: (value) => set("default_rest_seconds", value) }),
-            h(FieldInput, { label: "Sets", value: form.default_sets, inputMode: "numeric", onInput: (value) => set("default_sets", value) }),
-            h(FieldInput, { label: "Rep range", value: form.default_rep_range, onInput: (value) => set("default_rep_range", value) })
-          ),
-          h("textarea", { value: form.notes || "", placeholder: "Notes", onInput: (event) => set("notes", event.currentTarget.value) }),
-          h("button", { class: "primary-btn", type: "button", onClick: () => {
-            if (!cleanValue(form.name)) return;
-            updateState((draft) => {
-              const payload = { ...form, default_rest_seconds: Number(form.default_rest_seconds) || 120, default_sets: Number(form.default_sets) || 3, updated_at: nowISO() };
-              const index = draft.exercises.findIndex((item) => item.id === payload.id);
-              if (index >= 0) draft.exercises[index] = payload;
-              else draft.exercises.push(payload);
-            });
-            onClose();
-          } }, "Save Exercise")
-        )
-      );
+    function createNewPlan(updateState, showToast) {
+      updateState((draft) => {
+        const plan = createProgramFromTemplate(`K3V Plan ${draft.programs.length + 1}`, "Upper/Lower", 4, draft.exercises);
+        draft.programs.push(plan);
+        draft.activeProgramId = plan.id;
+        draft.activeDayId = plan.days[0]?.id;
+      });
+      showToast("Plan created.");
     }
 
-    function DriveView({ state, updateState, connect, syncNow, fileJsonRef, fileCsvRef }) {
-      const drive = state.settings.drive || defaultDriveSettings();
-      const connected = K3V_SyncEngine.isConnected();
-      return h("section", { class: "stack" },
-        h("article", { class: "drive-card panel", style: "padding:12px" },
-          h("div", { class: "section-title", style: "margin-top:0" }, h("h2", null, "Google Drive Sync"), h("span", null, connected ? "Connected" : "Ready")),
-          h("p", { class: "muted" }, "K3VSYNC stores one JSON file in this user's hidden Google Drive app-data folder. Deep-union sync keeps local-only and remote-only records instead of deleting them."),
-          h("div", { class: "form-grid" },
-            h(FieldSelect, { label: "Auto sync", value: drive.autoSync === false ? "off" : "on", options: ["on", "off"], onChange: (value) => updateState((draft) => { draft.settings.drive.autoSync = value !== "off"; }) }),
-            h(FieldInput, { label: "Drive file", value: drive.fileName || DRIVE_STATE_FILE, onInput: (value) => updateState((draft) => { draft.settings.drive.fileName = value || DRIVE_STATE_FILE; }) })
-          ),
-          h("div", { class: "actions", style: "margin-top:12px" },
-            h("button", { class: "primary-btn", type: "button", onClick: connect }, connected ? "Reconnect Google" : "Sign in with Google"),
-            h("button", { class: "ghost-btn", type: "button", disabled: !connected, onClick: syncNow }, "Sync now")
-          ),
-          h("p", { class: "muted" }, drive.lastStatus || "Sign in to start cross-device sync."),
-          h("p", { class: "muted" }, drive.lastSyncAt ? `Last sync: ${formatDateTime(drive.lastSyncAt)}` : "Not synced yet.")
-        ),
-        h("article", { class: "drive-card panel", style: "padding:12px" },
-          h("div", { class: "section-title", style: "margin-top:0" }, h("h2", null, "Backup Tools"), h("span", null, "No Export tab")),
-          h("div", { class: "actions" },
-            h("button", { class: "ghost-btn", type: "button", onClick: () => downloadText(toCSV(state.sets), `k3vsync-sets-${todayISO()}.csv`, "text/csv") }, "CSV"),
-            h("button", { class: "ghost-btn", type: "button", onClick: () => fileCsvRef.current?.click() }, "Import CSV"),
-            h("button", { class: "ghost-btn", type: "button", onClick: () => downloadText(backupPayload(state), `k3vsync-backup-${todayISO()}.json`, "application/json") }, "JSON"),
-            h("button", { class: "ghost-btn", type: "button", onClick: () => fileJsonRef.current?.click() }, "Import JSON")
-          ),
-          state.csvPreview && h(CsvPreview, { preview: state.csvPreview, updateState })
-        )
-      );
-    }
-
-    function CsvPreview({ preview, updateState }) {
-      return h("div", { class: "stack" },
-        h("p", { class: "muted" }, `${preview.added} added / ${preview.changed} changed / ${preview.unchanged} unchanged / ${preview.errored} errors`),
-        h("button", { class: "primary-btn", type: "button", disabled: preview.errored > 0, onClick: () => commitCSVImport(updateState) }, "Commit Import")
-      );
-    }
-
-    function FieldInput({ label, value, onInput, inputMode, placeholder }) {
-      return h("div", { class: "field" }, h("label", null, label), h("input", { value: value ?? "", inputMode, placeholder, onInput: (event) => onInput(event.currentTarget.value) }));
-    }
-
-    function FieldSelect({ label, value, options, onChange }) {
-      return h("div", { class: "field" }, h("label", null, label), h("select", { value, onChange: (event) => onChange(event.currentTarget.value) }, options.map((option) => h("option", { key: option, value: option }, option))));
-    }
-
-    function Modal({ title, onClose, children }) {
-      return h("div", { class: "modal-backdrop", onClick: (event) => event.target === event.currentTarget && onClose() },
-        h("div", { class: "modal-panel" },
-          h("div", { class: "modal-head" }, h("h2", null, title), h("button", { class: "mini-btn", type: "button", onClick: onClose }, "X")),
-          children
-        )
-      );
-    }
-
+    // --- Set add helpers ---
     function addSet(state, block, updateState, showToast) {
       const draft = state.drafts[block.id] || {};
       const reps = Number(draft.reps);
@@ -1792,42 +1279,35 @@
     function addWarmups(state, block, updateState, showToast) {
       const draft = state.drafts[block.id] || {};
       const target = parseWeight(draft.weight_lb) || lastWeightForExercise(state, block.exercise_id) || BAR_WEIGHT;
-      const warmups = [[0.5, 5], [0.7, 3], [0.85, 1]].map(([percent, reps]) => [roundToPlate(target * percent), reps, `${Math.round(percent * 100)}% warm-up`]);
+      const warmups = [[0.5, 5], [0.7, 3], [0.85, 1]].map(([percent, reps]) => [
+        roundToPlate(target * percent), reps, `${Math.round(percent * 100)}% warm-up`
+      ]);
       updateState((next) => {
         warmups.forEach(([weight, reps, notes]) => appendSet(next, block, weight, reps, "", notes));
       });
       showToast("Warm-up sets added.");
     }
 
+    // --- Voice ---
     function toggleVoice(state, updateState, showToast, listening, setListening, recognitionRef) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        showToast("Voice entry is not available in this browser.");
-        return;
-      }
-      if (listening && recognitionRef.current) {
-        recognitionRef.current.stop();
-        return;
-      }
-      const recognition = new SpeechRecognition();
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { showToast("Voice entry is not available in this browser."); return; }
+      if (listening && recognitionRef.current) { recognitionRef.current.stop(); return; }
+      const recognition = new SR();
       recognition.lang = "en-US";
       recognition.interimResults = true;
       recognition.continuous = false;
       recognition.onstart = () => setListening(true);
-      recognition.onend = () => setListening(false);
-      recognition.onerror = () => {
-        setListening(false);
-        showToast("Voice entry stopped.");
-      };
+      recognition.onend = () => { setListening(false); recognitionRef.current = null; };
+      recognition.onerror = () => { setListening(false); showToast("Voice entry stopped."); };
       recognition.onresult = (event) => {
-        const text = Array.from(event.results).map((result) => result[0]?.transcript || "").join(" ").trim();
+        const text = Array.from(event.results).map((r) => r[0]?.transcript || "").join(" ").trim();
         updateState((draft) => { draft.command = text; }, { localOnly: true });
-        const final = Array.from(event.results).some((result) => result.isFinal);
+        const final = Array.from(event.results).some((r) => r.isFinal);
         if (final) {
           const next = cloneState(state);
           next.command = text;
-          const result = parseVoiceCommand(next, updateState);
-          showToast(result.message);
+          showToast(parseVoiceCommand(next, updateState).message);
         }
       };
       recognitionRef.current = recognition;
@@ -1847,7 +1327,7 @@
         if (!block) {
           block = blockFromExercise(match.exercise, day.blocks.length);
           day.blocks.push(block);
-          day.updated_at = nowISO();
+          bump(day);
         }
         sets.forEach((item) => appendSet(draft, block, Number(item.weight_lb), Number(item.reps), item.rpe || "", item.notes || ""));
         draft.command = "";
@@ -1885,45 +1365,148 @@
       while ((match = pairPattern.exec(body))) sets.push({ weight_lb: match[1], reps: match[2], rpe, notes });
       if (sets.length) return sets;
       const numbers = body.match(/\d+(?:\.\d+)?/g) || [];
-      for (let index = 0; index < numbers.length - 1; index += 2) sets.push({ weight_lb: numbers[index], reps: numbers[index + 1], rpe, notes });
+      for (let i = 0; i < numbers.length - 1; i += 2) {
+        sets.push({ weight_lb: numbers[i], reps: numbers[i + 1], rpe, notes });
+      }
       return sets;
     }
 
-    function appendSet(state, block, weight, reps, rpe = "", notes = "") {
-      const exercise = getExercise(state, block.exercise_id);
-      const session = activeSession(state);
-      const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === block.exercise_id);
-      const now = nowISO();
-      const elapsedMs = sessionElapsedMs(session);
-      const timeLogged = new Date().toTimeString().slice(0, 8);
-      state.sets.push({
-        id: cryptoId(),
-        session_id: session.id,
-        date: state.activeDate,
-        exercise_id: block.exercise_id,
-        exercise: exercise?.name || "Exercise",
-        set_number: existing.length + 1,
-        reps,
-        weight_lb: weight,
-        rpe,
-        notes,
-        time_logged: timeLogged,
-        session_elapsed_ms: elapsedMs,
-        created_at: now,
-        updated_at: now
-      });
-      session.updated_at = now;
+    // --- CSV import/export (RFC 4180 quoted) ---
+    function csvCell(value) {
+      const s = String(value ?? "");
+      return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     }
 
-    function activeSession(state) {
-      let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
+    function toCSV(sets) {
+      const headers = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes", "time_logged"];
+      const rows = sets.slice().sort(sortRecords).map((s) => [s.date, s.exercise, s.set_number, s.reps, s.weight_lb, s.rpe, s.notes, s.time_logged]);
+      return [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+    }
+
+    function parseCSVRows(text) {
+      const rows = [];
+      let row = [], cur = "", inQuote = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQuote) {
+          if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+          else if (c === '"') inQuote = false;
+          else cur += c;
+        } else if (c === '"') inQuote = true;
+        else if (c === ",") { row.push(cur); cur = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (cur || row.length) { row.push(cur); rows.push(row); row = []; cur = ""; }
+          if (c === "\r" && text[i + 1] === "\n") i++;
+        } else cur += c;
+      }
+      if (cur || row.length) { row.push(cur); rows.push(row); }
+      return rows.filter((r) => r.length && r.some((cell) => cell.trim()));
+    }
+
+    function parseCSV(text) {
+      const rows = parseCSVRows(text);
+      const headers = rows.shift()?.map((s) => s.trim()) || [];
+      const expected = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes"];
+      if (!expected.every((item) => headers.includes(item))) {
+        throw new Error("CSV headers must include date,exercise,set_number,reps,weight_lb,rpe,notes");
+      }
+      return rows.map((cells, index) => {
+        const record = Object.fromEntries(headers.map((key, i) => [key, (cells[i] || "").trim()]));
+        const errors = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) errors.push("bad ISO date");
+        if (!record.exercise) errors.push("missing exercise");
+        if (!Number(record.set_number)) errors.push("bad set_number");
+        if (!Number(record.reps)) errors.push("bad reps");
+        if (!Number(record.weight_lb)) errors.push("bad weight_lb");
+        return {
+          row: index + 2,
+          record: {
+            ...record,
+            set_number: Number(record.set_number),
+            reps: Number(record.reps),
+            weight_lb: Number(record.weight_lb)
+          },
+          errors
+        };
+      });
+    }
+
+    // Pure -- does NOT mutate state. New exercises are flagged for creation at commit time.
+    function previewCSV(state, text) {
+      const rows = parseCSV(text).map((item) => {
+        if (item.errors.length) {
+          return { row: item.row, record: item.record, status: "errored", message: item.errors.join("; ") };
+        }
+        const existingExercise = state.exercises.find((e) => normalizeText(e.name) === normalizeText(item.record.exercise));
+        const id = csvRecordId(item.record);
+        const existingSet = state.sets.find((s) => csvRecordId(s) === id);
+        return {
+          row: item.row,
+          record: {
+            ...item.record,
+            exercise_id: existingExercise?.id || null,
+            needs_new_exercise: !existingExercise
+          },
+          status: existingSet ? "changed" : "added",
+          message: ""
+        };
+      });
+      return {
+        rows,
+        added: rows.filter((r) => r.status === "added").length,
+        changed: rows.filter((r) => r.status === "changed").length,
+        unchanged: rows.filter((r) => r.status === "unchanged").length,
+        errored: rows.filter((r) => r.status === "errored").length
+      };
+    }
+
+    function commitCSVImport(updateState) {
+      updateState((state) => {
+        if (!state.csvPreview || state.csvPreview.errored) return;
+        state.csvPreview.rows
+          .filter((r) => r.status !== "unchanged" && r.status !== "errored")
+          .forEach((row) => {
+            const record = row.record;
+            let exerciseId = record.exercise_id;
+            if (record.needs_new_exercise || !exerciseId) {
+              const exercise = createExercise({ name: record.exercise });
+              state.exercises.push(exercise);
+              exerciseId = exercise.id;
+            }
+            const session = getOrCreateImportedSession(state, record.date);
+            const id = csvRecordId(record);
+            const existingIndex = state.sets.findIndex((s) => csvRecordId(s) === id);
+            const payload = {
+              id: existingIndex >= 0 ? state.sets[existingIndex].id : cryptoId(),
+              session_id: session.id,
+              date: record.date,
+              exercise_id: exerciseId,
+              exercise: record.exercise,
+              set_number: Number(record.set_number),
+              reps: Number(record.reps),
+              weight_lb: Number(record.weight_lb),
+              rpe: record.rpe,
+              notes: record.notes,
+              time_logged: record.time_logged || "",
+              created_at: existingIndex >= 0 ? state.sets[existingIndex].created_at : nowISO(),
+              updated_at: nowISO()
+            };
+            if (existingIndex >= 0) state.sets[existingIndex] = payload;
+            else state.sets.push(payload);
+          });
+        state.csvPreview = null;
+      });
+    }
+
+    // Imported sessions are tagged as imports, NOT to the currently-active day.
+    function getOrCreateImportedSession(state, date) {
+      let session = state.sessions.find((s) => s.date === date && s.imported);
       if (!session) {
         const now = nowISO();
         session = {
           id: cryptoId(),
-          date: state.activeDate,
-          program_id: state.activeProgramId,
-          day_id: state.activeDayId,
+          date,
+          imported: true,
           session_start: now,
           started_at: now,
           updated_at: now,
@@ -1934,117 +1517,7 @@
         };
         state.sessions.push(session);
       }
-
       return session;
-    }
-
-    function pauseSession(state) {
-      const session = activeSession(state);
-      if (!session.paused_at) {
-        session.paused_at = nowISO();
-        session.updated_at = nowISO();
-      }
-    }
-
-    function resumeSession(state) {
-      const session = activeSession(state);
-      if (session.paused_at) {
-        const pausedStart = new Date(session.paused_at).getTime();
-        const now = Date.now();
-        session.paused_total_ms = (session.paused_total_ms || 0) + (now - pausedStart);
-        session.paused_at = null;
-        session.updated_at = nowISO();
-      }
-    }
-
-    function sessionElapsedMs(session, clock = Date.now()) {
-      if (!session) return 0;
-      if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
-      const started = new Date(session.session_start || session.started_at || session.created_at || nowISO()).getTime();
-      const paused = Number(session.paused_total_ms || 0);
-      let elapsed = clock - started - paused;
-      if (session.paused_at) {
-        const pausedStart = new Date(session.paused_at).getTime();
-        elapsed = pausedStart - started - paused;
-      }
-      return Math.max(0, elapsed);
-    }
-
-    function adjustSessionDuration(updateState, deltaMs) {
-      updateState((draft) => {
-        const session = activeSession(draft);
-        session.manual_duration_ms = Math.max(0, sessionElapsedMs(session) + deltaMs);
-        session.updated_at = nowISO();
-        draft.sessionTimeDraft = "";
-      });
-    }
-
-    function setSessionDurationFromDraft(state, updateState, showToast) {
-      const ms = parseDurationInput(state.sessionTimeDraft);
-      if (!Number.isFinite(ms)) {
-        showToast("Use 75m, 1:15, or 1:15:00.");
-        return;
-      }
-      updateState((draft) => {
-        const session = activeSession(draft);
-        session.manual_duration_ms = ms;
-        session.updated_at = nowISO();
-        draft.sessionTimeDraft = "";
-      });
-      showToast("Session time updated.");
-    }
-
-    function renumberSets(state, sessionId, exerciseId) {
-      state.sets.filter((set) => set.session_id === sessionId && set.exercise_id === exerciseId).sort(sortRecords).forEach((set, index) => {
-        set.set_number = index + 1;
-        set.updated_at = nowISO();
-      });
-    }
-
-    function sessionForActiveDate(state) {
-      return state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
-    }
-
-    function createNewPlan(updateState, showToast) {
-      updateState((draft) => {
-        const plan = createProgramFromTemplate(`K3V Plan ${draft.programs.length + 1}`, "Upper/Lower", 4, draft.exercises);
-        draft.programs.push(plan);
-        draft.activeProgramId = plan.id;
-        draft.activeDayId = plan.days[0]?.id;
-      });
-      showToast("New plan created.");
-    }
-
-    function createExercise(overrides = {}) {
-      return {
-        id: cryptoId(),
-        name: overrides.name || "New Exercise",
-        primary_muscle: overrides.primary_muscle || "Chest",
-        secondary_muscles: overrides.secondary_muscles || [],
-        movement_pattern: overrides.movement_pattern || "press",
-        default_rest_seconds: Number(overrides.default_rest_seconds) || 120,
-        default_sets: Number(overrides.default_sets) || 3,
-        default_rep_range: overrides.default_rep_range || "8-12",
-        demo_video_url: overrides.demo_video_url || "",
-        notes: overrides.notes || "",
-        aliases: overrides.aliases || [],
-        updated_at: nowISO()
-      };
-    }
-
-    function deleteExercise(id, updateState, showToast) {
-      updateState((draft) => {
-        const isUsed = draft.programs.some((program) => program.days.some((day) => day.blocks.some((block) => block.exercise_id === id)));
-        if (isUsed) {
-          showToast("Exercise is used in a plan. Remove the block first.");
-          return draft;
-        }
-        draft.exercises = draft.exercises.filter((exercise) => exercise.id !== id);
-      });
-    }
-
-    function backupPayload(state) {
-      return JSON.stringify({ app: "K3VSYNC", version: 3, exported_at: nowISO(), state: { ...state, csvPreview: null } }, null, 2);
     }
 
     async function importJSONFile(event, updateState, showToast) {
@@ -2066,175 +1539,23 @@
       if (!file) return;
       try {
         const text = await file.text();
-        updateState((draft) => {
-          draft.csvPreview = previewCSV(draft, text);
-        }, { localOnly: true });
+        // Read-only preview: do NOT mutate exercises here.
+        updateState((draft) => { draft.csvPreview = previewCSV(draft, text); }, { localOnly: true });
       } catch (error) {
         showToast(error.message);
       }
     }
 
-    function toCSV(sets) {
-      const headers = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes", "time_logged"];
-      const rows = sets.slice().sort(sortRecords).map((set) => [set.date, set.exercise, set.set_number, set.reps, set.weight_lb, set.rpe, set.notes, set.time_logged]);
-      return [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+    function backupPayload(state) {
+      return JSON.stringify({ app: "K3VSYNC", version: 3, exported_at: nowISO(), state: { ...state, csvPreview: null } }, null, 2);
     }
 
-    function csvCell(value) {
-      return String(value ?? "").replace(/[\r\n,]/g, " ").trim();
-    }
-
-    function previewCSV(state, text) {
-      const rows = parseCSV(text).map((item) => {
-        if (item.errors.length) return { row: item.row, record: item.record, status: "errored", message: item.errors.join("; ") };
-        const exercise = ensureExerciseByName(state, item.record.exercise);
-        const id = csvRecordId(item.record);
-        const existing = state.sets.find((set) => csvRecordId(set) === id);
-        const status = existing ? "changed" : "added";
-        return { row: item.row, record: { ...item.record, exercise_id: exercise.id }, status, message: "" };
-      });
-      return {
-        rows,
-        added: rows.filter((row) => row.status === "added").length,
-        changed: rows.filter((row) => row.status === "changed").length,
-        unchanged: rows.filter((row) => row.status === "unchanged").length,
-        errored: rows.filter((row) => row.status === "errored").length
-      };
-    }
-
-    function parseCSV(text) {
-      const lines = text.split(/\r?\n/).filter((line) => line.trim());
-      const headers = lines.shift()?.split(",").map((item) => item.trim()) || [];
-      const expected = ["date", "exercise", "set_number", "reps", "weight_lb", "rpe", "notes"];
-      const hasTimeLogged = headers.includes("time_logged");
-      if (!expected.every((item) => headers.includes(item))) throw new Error("CSV headers must include date,exercise,set_number,reps,weight_lb,rpe,notes");
-      return lines.map((line, index) => {
-        const cells = line.split(",");
-        const record = Object.fromEntries(headers.map((key, keyIndex) => [key, (cells[keyIndex] || "").trim()]));
-        const errors = [];
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) errors.push("bad ISO date");
-        if (!record.exercise) errors.push("missing exercise");
-        if (!Number(record.set_number)) errors.push("bad set_number");
-        if (!Number(record.reps)) errors.push("bad reps");
-        if (!Number(record.weight_lb)) errors.push("bad weight_lb");
-        return { row: index + 2, record: { ...record, set_number: Number(record.set_number), reps: Number(record.reps), weight_lb: Number(record.weight_lb) }, errors };
-      });
-    }
-
-    function commitCSVImport(updateState) {
-      updateState((state) => {
-        if (!state.csvPreview || state.csvPreview.errored) return;
-        state.csvPreview.rows.filter((row) => row.status !== "unchanged" && row.status !== "errored").forEach((row) => {
-          const record = row.record;
-          const session = getOrCreateImportedSession(state, record.date);
-          const id = csvRecordId(record);
-          const existing = state.sets.findIndex((set) => csvRecordId(set) === id);
-          const payload = {
-            id: existing >= 0 ? state.sets[existing].id : cryptoId(),
-            session_id: session.id,
-            date: record.date,
-            exercise_id: record.exercise_id,
-            exercise: record.exercise,
-            set_number: Number(record.set_number),
-            reps: Number(record.reps),
-            weight_lb: Number(record.weight_lb),
-            rpe: record.rpe,
-            notes: record.notes,
-            time_logged: record.time_logged || "",
-            created_at: existing >= 0 ? state.sets[existing].created_at : nowISO(),
-            updated_at: nowISO()
-          };
-          if (existing >= 0) state.sets[existing] = payload;
-          else state.sets.push(payload);
-        });
-        state.csvPreview = null;
-      });
-    }
-
-    function ensureExerciseByName(state, name) {
-      const existing = state.exercises.find((exercise) => normalizeText(exercise.name) === normalizeText(name));
-      if (existing) return existing;
-      const exercise = createExercise({ name });
-      state.exercises.push(exercise);
-      return exercise;
-    }
-
-    function getOrCreateImportedSession(state, date) {
-      let session = state.sessions.find((item) => item.date === date && item.day_id === state.activeDayId);
-      if (!session) {
-        const now = nowISO();
-        session = { id: cryptoId(), date, program_id: state.activeProgramId, day_id: state.activeDayId, session_start: now, started_at: now, updated_at: now, paused_total_ms: 0, paused_at: null, manual_duration_ms: null, notes: "" };
-        state.sessions.push(session);
-      }
-      return session;
-    }
-
-    function normalizeState(saved) {
-      const fallback = createDefaultState();
-      if (!saved || typeof saved !== "object") return fallback;
-      if (saved.schema_version === 2 || saved.schema_version === 3) {
-        const merged = { ...fallback, ...saved, schema_version: 3 };
-        merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
-        merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
-        merged.sessions = saved.sessions || [];
-        merged.sessions = merged.sessions.map((session) => ({ paused_total_ms: 0, manual_duration_ms: null, notes: "", ...session }));
-        merged.sets = saved.sets || [];
-        merged.drafts = saved.drafts || {};
-        merged.command = saved.command || "";
-        merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
-        merged.settings = { ...fallback.settings, ...(saved.settings || {}), drive: { ...defaultDriveSettings(), ...(saved.settings?.drive || {}) } };
-        merged.view = ["log", "progress", "plan", "exercises", "sync"].includes(saved.view) ? saved.view : "log";
-        if (!merged.activeProgramId || !getProgram(merged)) merged.activeProgramId = merged.programs[0]?.id;
-        if (!merged.activeDayId || !getDay(merged)) merged.activeDayId = getProgram(merged)?.days[0]?.id;
-        return merged;
-      }
-      return fallback;
-    }
-
-    function renderStandards(state) {
-      const sex = state.profile.sex || "male";
-      const bodyweight = Number(state.profile.bodyweight_lb) || 180;
-      const age = Number(state.profile.age) || 30;
-      const bracket = nearest(bodyweightBrackets, bodyweight);
-      const ageBracket = ageToBracket(age);
-      return Object.entries(strengthStandardModels).map(([liftId, model]) => {
-        const standards = buildStrengthStandards().filter((row) => row.lift_id === liftId && row.sex === sex && row.bodyweight_bracket_lb === bracket && row.age_bracket === ageBracket);
-        const best = bestE1RMForModel(state, model);
-        const elite = standards.find((row) => row.level === "elite")?.one_rm_lb || 1;
-        const position = Math.min(100, Math.max(0, best ? (best / elite) * 100 : 0));
-        const level = best ? currentStandardLevel(best, standards) : "no data";
-        return h("article", { key: liftId, class: "panel", style: "padding:12px" },
-          h("div", { class: "chart-head" }, h("b", null, model.lift), h("span", { class: "muted" }, best ? `${Math.round(best)} lb / ${level}` : "no data")),
-          h("div", { class: "standard-bar" }, h("span", { class: "standard-marker", style: `left:calc(${position}% - 2px)` })),
-          h("p", { class: "muted" }, `${sex} / ${bracket} lb / age ${ageBracket}`)
-        );
-      });
-    }
-
-    function buildStrengthStandards() {
-      const ageMultipliers = { "18-39": 1, "40-49": 0.92, "50-59": 0.82, "60-69": 0.7 };
-      return Object.entries(strengthStandardModels).flatMap(([liftId, model]) =>
-        ["male", "female"].flatMap((sex) =>
-          bodyweightBrackets.flatMap((bodyweight) =>
-            ageBrackets.flatMap((age) =>
-              standardLevels.map((level, index) => ({
-                lift_id: liftId,
-                lift: model.lift,
-                sex,
-                bodyweight_bracket_lb: bodyweight,
-                age_bracket: age,
-                level,
-                one_rm_lb: Math.round(bodyweight * model[sex][index] * ageMultipliers[age] / 5) * 5
-              }))
-            )
-          )
-        )
-      );
-    }
-
+    // --- Standards rendering helpers ---
     function bestE1RMForModel(state, model) {
       const ids = new Set(model.aliases);
-      return Math.max(0, ...state.sets.filter((set) => ids.has(set.exercise_id) || model.aliases.some((alias) => normalizeText(set.exercise).includes(normalizeText(alias)))).map(e1rm));
+      return Math.max(0, ...state.sets
+        .filter((set) => ids.has(set.exercise_id) || model.aliases.some((alias) => normalizeText(set.exercise).includes(normalizeText(alias))))
+        .map(e1rm));
     }
 
     function currentStandardLevel(value, standards) {
@@ -2246,7 +1567,9 @@
       sets.forEach((set) => {
         const value = e1rm(set);
         const previous = byDate.get(set.date);
-        if (!previous || value > previous.e1rm) byDate.set(set.date, { date: set.date, time: new Date(`${set.date}T12:00:00`).getTime(), e1rm: value });
+        if (!previous || value > previous.e1rm) {
+          byDate.set(set.date, { date: set.date, time: new Date(`${set.date}T12:00:00`).getTime(), e1rm: value });
+        }
       });
       return [...byDate.values()].sort((a, b) => a.time - b.time);
     }
@@ -2257,195 +1580,827 @@
       let left = remaining;
       const plates = [];
       PLATES.forEach((plate) => {
-        while (left + 0.001 >= plate) {
-          plates.push(plate);
-          left -= plate;
-        }
+        while (left + 0.001 >= plate) { plates.push(plate); left -= plate; }
       });
       return { loadable: true, perSide: remaining, plates, leftover: left };
     }
 
-    function getProgram(state) {
-      return state.programs.find((program) => program.id === state.activeProgramId) || state.programs[0];
+    // --- Components ---
+    function Trendline({ exercise, sets }) {
+      const points = trendPoints(sets);
+      if (!points.length) return h("div", { class: "empty" }, "Log sets to build a PR trendline.");
+      const width = 520, height = 190, pad = 24;
+      const minY = Math.min(...points.map((p) => p.e1rm)) * 0.94;
+      const maxY = Math.max(...points.map((p) => p.e1rm)) * 1.04 || 1;
+      const minX = Math.min(...points.map((p) => p.time));
+      const maxX = Math.max(...points.map((p) => p.time));
+      const x = (p) => maxX === minX ? width / 2 : pad + ((p.time - minX) / (maxX - minX)) * (width - pad * 2);
+      const y = (p) => height - pad - ((p.e1rm - minY) / Math.max(1, maxY - minY)) * (height - pad * 2);
+      const d = points.map((p, i) => `${i ? "L" : "M"}${x(p).toFixed(1)} ${y(p).toFixed(1)}`).join(" ");
+      let best = 0;
+      const prPoints = points.filter((p) => { if (p.e1rm > best) { best = p.e1rm; return true; } return false; });
+      return h("svg", { class: "trend-svg", viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${exercise.name} PR trendline` },
+        h("path", { d: `M${pad} ${height - pad}H${width - pad}M${pad} ${pad}V${height - pad}`, fill: "none", stroke: "#3d4b5d", "stroke-width": "1" }),
+        h("path", { d, fill: "none", stroke: "#8fb7ff", "stroke-width": "3", "stroke-linecap": "round", "stroke-linejoin": "round" }),
+        points.map((p) => h("circle", { key: `${p.date}-${p.e1rm}`, cx: x(p), cy: y(p), r: 3, fill: "#f5f8fc" })),
+        prPoints.map((p) => h("g", { key: `pr-${p.date}-${p.e1rm}` },
+          h("circle", { cx: x(p), cy: y(p), r: 6, fill: "#74e6ad", stroke: "#0e1116", "stroke-width": "2" }),
+          h("text", { x: Math.min(width - 76, x(p) + 8), y: Math.max(14, y(p) - 8), fill: "#74e6ad", "font-size": "11", "font-weight": "800" }, `PR ${Math.round(p.e1rm)}`)
+        )),
+        h("text", { x: pad, y: 14, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(maxY)} lb`),
+        h("text", { x: pad, y: height - 5, fill: "#9ca9b8", "font-size": "11" }, `${Math.round(minY)} lb`)
+      );
     }
 
-    function getDay(state) {
+    function PlateModal({ weight, onClose }) {
+      const target = Number(weight) || BAR_WEIGHT;
+      const result = calculatePlates(target);
+      return h(Modal, { title: "Plate Calculator", onClose },
+        h("div", { class: "stack" },
+          h("p", { class: "muted" }, `Target: ${formatWeight(target)} on a 45 lb bar.`),
+          h("div", { class: "panel", style: "padding:12px" },
+            h("h3", null, result.loadable ? `${result.perSide} lb per side` : "Below bar weight"),
+            h("p", { class: "muted" }, result.loadable
+              ? `Each side: ${result.plates.length ? result.plates.join(" + ") : "no plates"}`
+              : "Use the empty bar or a lighter implement."
+            )
+          ),
+          h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
+        )
+      );
+    }
+
+    function Modal({ title, onClose, children }) {
+      return h("div", { class: "modal-backdrop", onClick: (e) => e.target === e.currentTarget && onClose() },
+        h("div", { class: "modal-panel" },
+          h("div", { class: "modal-head" },
+            h("h2", null, title),
+            h("button", { class: "mini-btn", type: "button", onClick: onClose }, "X")
+          ),
+          children
+        )
+      );
+    }
+
+    function FieldInput({ label, value, onInput, inputMode, placeholder }) {
+      return h("div", { class: "field" },
+        h("label", null, label),
+        h("input", { value: value ?? "", inputMode, placeholder, onInput: (e) => onInput(e.currentTarget.value) })
+      );
+    }
+
+    function FieldSelect({ label, value, options, onChange }) {
+      return h("div", { class: "field" },
+        h("label", null, label),
+        h("select", { value, onChange: (e) => onChange(e.currentTarget.value) },
+          options.map((option) => h("option", { key: option, value: option }, option))
+        )
+      );
+    }
+
+    // --- Main app ---
+    function K3V_App() {
+      const [state, setState] = useState(null);
+      const [syncStatus, setSyncStatus] = useState({ state: "idle", label: "Local" });
+      const [toast, setToast] = useState("");
+      const [modal, setModal] = useState(null);
+      const [clock, setClock] = useState(Date.now());
+      const [listening, setListening] = useState(false);
+      const recognitionRef = useRef(null);
+      const stateRef = useRef(null);
+      const fileJsonRef = useRef(null);
+      const fileCsvRef = useRef(null);
+
+      useEffect(() => {
+        K3V_Storage.load().then((loaded) => {
+          stateRef.current = loaded;
+          setState(loaded);
+        });
+        registerServiceWorker();
+      }, []);
+
+      // Single ticking clock drives every elapsed display.
+      useEffect(() => {
+        const id = setInterval(() => setClock(Date.now()), 1000);
+        return () => clearInterval(id);
+      }, []);
+
+      // Sync triggers on connectivity & visibility changes (no auto-pause -- user controls pause).
+      useEffect(() => {
+        const online = () => stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 250);
+        const visible = () => !document.hidden && stateRef.current && K3V_SyncEngine.schedule(stateRef.current, callbacks(), 300);
+        const pageHide = () => {
+          if (stateRef.current) {
+            K3V_Storage.saveImmediate(stateRef.current);
+            K3V_SyncEngine.run(stateRef.current, callbacks(), { silent: true }).catch(() => {});
+          }
+        };
+        window.addEventListener("online", online);
+        document.addEventListener("visibilitychange", visible);
+        window.addEventListener("pagehide", pageHide);
+        return () => {
+          window.removeEventListener("online", online);
+          document.removeEventListener("visibilitychange", visible);
+          window.removeEventListener("pagehide", pageHide);
+        };
+      }, []);
+
+      function callbacks() {
+        return { onState: applyRemoteState, onStatus: setSyncStatus, onToast: showToast };
+      }
+
+      function showToast(message) {
+        setToast(message);
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => setToast(""), 2600);
+      }
+
+      function applyRemoteState(next, options = {}) {
+        const normalized = normalizeState(next);
+        stateRef.current = normalized;
+        setState(normalized);
+        K3V_Storage.save(normalized);
+        if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks());
+      }
+
+      function updateState(mutator, options = {}) {
+        setState((previous) => {
+          const base = cloneState(previous || createDefaultState());
+          const next = mutator(base) || base;
+          const normalized = normalizeState(next);
+          stateRef.current = normalized;
+          K3V_Storage.save(normalized);
+          if (!options.localOnly) K3V_SyncEngine.schedule(normalized, callbacks(), options.syncDelay || DRIVE_AUTO_SYNC_DELAY);
+          return normalized;
+        });
+      }
+
+      // Top-level derived values (memoized against the things they actually depend on).
+      const program = state ? getProgram(state) : null;
+      const day = state ? getDay(state) : null;
+      const activeSets = useMemo(
+        () => state ? setsForDate(state, state.activeDate) : [],
+        [state?.sets, state?.activeDate]
+      );
+      const activeSession_ = state ? sessionForActiveDate(state) : null;
+      const liveElapsedMs = activeSession_ && !activeSession_.finished_at ? sessionElapsedMs(activeSession_, clock) : 0;
+
+      if (!state) return h("main", { class: "app-shell" }, h("div", { class: "empty panel" }, "Loading K3VSYNC..."));
+
+      const views = [
+        ["log", "Log"],
+        ["progress", "Stats"],
+        ["plan", "Plan"],
+        ["exercises", "Exercises"],
+        ["sync", "Drive"]
+      ];
+
+      const showTimer = liveElapsedMs > 0;
+      const timerPaused = Boolean(activeSession_?.paused_at);
+
+      return h("div", null,
+        h("main", { class: "app-shell" },
+          h("header", { class: "topbar" },
+            h("div", { class: "brand" },
+              h("div", { class: "brand-mark" }, "K3V"),
+              h("div", null,
+                h("h1", null, "K3VSYNC"),
+                h("p", null, `${day?.label || "Workout"} / ${activeSets.length} sets / ${formatNumber(activeSets.reduce((sum, s) => sum + volume(s), 0))} lb`)
+              )
+            ),
+            h("div", { class: "topbar-right" },
+              showTimer && h("span", { class: "timer-pill" + (timerPaused ? " paused" : "") }, formatDuration(liveElapsedMs)),
+              h("div", { class: "sync-chip", "data-state": syncStatus.state },
+                h("i", { class: "sync-dot" }),
+                h("span", null, syncStatus.label)
+              )
+            )
+          ),
+          h("section", { class: "toolbar" },
+            h("nav", { class: "segmented", "aria-label": "Sections (top)" },
+              views.map(([id, label]) => h("button", {
+                key: id, type: "button",
+                "aria-selected": state.view === id,
+                onClick: () => updateState((d) => { d.view = id; }, { localOnly: true })
+              }, label))
+            ),
+            h("div", { class: "date-row" },
+              h("input", { type: "date", value: state.activeDate,
+                onInput: (e) => updateState((d) => { d.activeDate = e.currentTarget.value || todayISO(); }, { localOnly: true })
+              }),
+              h("button", { class: "ghost-btn", type: "button",
+                onClick: () => updateState((d) => { d.activeDate = todayISO(); }, { localOnly: true })
+              }, "Today")
+            ),
+            h("div", { class: "day-strip", "aria-label": "Workout day" },
+              (program?.days || []).slice().sort(byOrder).map((item, index) => h("button", {
+                key: item.id, type: "button",
+                "aria-current": item.id === state.activeDayId,
+                onClick: () => updateState((d) => { d.activeDayId = item.id; }, { localOnly: true })
+              },
+                h("strong", null, shortDayLabel(index, item.label)),
+                h("span", null, item.label)
+              ))
+            )
+          ),
+          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock, listening, setListening, recognitionRef }),
+          state.view === "progress" && h(ProgressView, { state, updateState }),
+          state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "sync" && h(DriveView, {
+            state, updateState, showToast, syncStatus,
+            connect: () => K3V_SyncEngine.connect(stateRef.current, callbacks()).catch(() => {}),
+            syncNow: () => K3V_SyncEngine.run(stateRef.current, callbacks()).catch(() => {}),
+            fileJsonRef, fileCsvRef
+          })
+        ),
+        h("nav", { class: "bottom-nav", "aria-label": "Sections (bottom)" },
+          h("div", { class: "bottom-nav-inner" }, views.map(([id, label]) => h("button", {
+            key: id, type: "button",
+            "aria-selected": state.view === id,
+            onClick: () => updateState((d) => { d.view = id; }, { localOnly: true })
+          }, label)))
+        ),
+        h("input", { ref: fileJsonRef, class: "sr-only", type: "file", accept: "application/json,.json",
+          onChange: (e) => importJSONFile(e, updateState, showToast)
+        }),
+        h("input", { ref: fileCsvRef, class: "sr-only", type: "file", accept: ".csv,text/csv",
+          onChange: (e) => importCSVFile(e, updateState, showToast)
+        }),
+        modal,
+        toast && h("div", { class: "toast", role: "status" }, toast)
+      );
+    }
+
+    function LogView({ state, updateState, showToast, openModal, clock, listening, setListening, recognitionRef }) {
+      const day = getDay(state);
+      const blocks = useMemo(() => (day?.blocks || []).slice().sort(byOrder), [day]);
+      // Index sets by exercise+date once so each block can do an O(1) lookup.
+      const setsByExercise = useMemo(() => {
+        const map = new Map();
+        for (const s of state.sets) {
+          if (s.date !== state.activeDate) continue;
+          if (!map.has(s.exercise_id)) map.set(s.exercise_id, []);
+          map.get(s.exercise_id).push(s);
+        }
+        for (const arr of map.values()) arr.sort(sortRecords);
+        return map;
+      }, [state.sets, state.activeDate]);
+      return h("section", { class: "stack" },
+        h(SessionPanel, { state, updateState, clock, showToast, openModal }),
+        h(VoicePanel, { state, updateState, showToast, listening, setListening, recognitionRef }),
+        blocks.length
+          ? blocks.map((block) => h(ExerciseBlock, {
+              key: block.id, state, block, updateState, showToast, openModal,
+              logs: setsByExercise.get(block.exercise_id) || []
+            }))
+          : h("div", { class: "empty panel" }, "No exercises on this day yet. Add blocks from Plan.")
+      );
+    }
+
+    function SessionPanel({ state, updateState, clock, showToast, openModal }) {
+      const session = sessionForActiveDate(state);
+      const elapsed = session ? sessionElapsedMs(session, clock) : 0;
+      const setCount = useMemo(() => setsForDate(state, state.activeDate).length, [state.sets, state.activeDate]);
+      const isPaused = session?.paused_at != null;
+      const isFinished = session?.finished_at != null;
+      const isActive = session && !isPaused && !isFinished;
+
+      if (!session) {
+        return h("article", { class: "session-strip panel" },
+          h("div", { class: "session-strip-main" },
+            h("span", { class: "session-label" }, "Session not started"),
+            h("button", { class: "primary-btn", type: "button",
+              onClick: () => updateState((d) => { activeSession(d); showToast("Workout started!"); })
+            }, "Start Workout")
+          )
+        );
+      }
+
+      const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : "");
+      return h("article", { class: stripClass },
+        h("div", { class: "session-strip-main" },
+          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") },
+            isFinished ? "COMPLETED" : isPaused ? "PAUSED" : "LIVE"),
+          h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
+          h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
+          session?.notes && h("span", { class: "pill green" }, "notes")
+        ),
+        h("div", { class: "session-controls" },
+          isFinished
+            ? h("span", { class: "session-meta", style: "font-size:0.78rem;padding:0 8px" }, "Done ✓")
+            : isPaused
+              ? h("button", { class: "ghost-btn", type: "button",
+                  onClick: () => updateState((d) => { resumeSession(d); showToast("Workout resumed!"); })
+                }, "Resume")
+              : h("button", { class: "ghost-btn", type: "button",
+                  onClick: () => updateState((d) => { pauseSession(d); showToast("Workout paused."); })
+                }, "Pause"),
+          !isFinished && h("button", { class: "session-finish-btn", type: "button",
+            onClick: () => {
+              updateState((d) => {
+                const active = activeSession(d);
+                bump(active, { manual_duration_ms: sessionElapsedMs(active), finished_at: nowISO() });
+              });
+              showToast("Workout finished! Time saved.");
+            }
+          }, "Finish"),
+          h("button", { class: "ghost-btn session-edit-btn", type: "button",
+            onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) }))
+          }, "Edit")
+        )
+      );
+    }
+
+    function SessionEditorModal({ state, updateState, showToast, onClose }) {
+      const session = sessionForActiveDate(state);
+      const [displayMs, setDisplayMs] = useState(session ? sessionElapsedMs(session) : 0);
+      const [timeDraft, setTimeDraft] = useState("");
+      const [notes, setNotes] = useState(session?.notes || "");
+      const commitDuration = (ms) => {
+        updateState((draft) => {
+          const active = activeSession(draft);
+          bump(active, { manual_duration_ms: Math.max(0, ms) });
+          draft.sessionTimeDraft = "";
+        });
+        setDisplayMs(Math.max(0, ms));
+      };
+      return h(Modal, { title: "Session Details", onClose },
+        h("div", { class: "stack" },
+          h("div", { class: "panel", style: "padding:12px" },
+            h("div", { class: "session-head" },
+              h("div", null,
+                h("h2", null, formatDuration(displayMs)),
+                h("p", { class: "muted", style: "margin:4px 0 0" },
+                  session ? "Editable elapsed time and daily notes." : "Starts when the workout session begins.")
+              )
+            )
+          ),
+          h("div", { class: "form-grid" },
+            h(FieldInput, { label: "Set elapsed time", value: timeDraft, placeholder: "75m or 1:15:00", onInput: setTimeDraft }),
+            h("div", { class: "field" },
+              h("label", null, "Controls"),
+              h("div", { class: "row-actions", style: "grid-template-columns:repeat(3, minmax(0, 1fr))" },
+                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs - 300000) }, "-5m"),
+                h("button", { class: "ghost-btn", type: "button", onClick: () => {
+                  const ms = parseDurationInput(timeDraft);
+                  if (!Number.isFinite(ms)) { showToast("Use 75m, 1:15, or 1:15:00."); return; }
+                  commitDuration(ms);
+                  setTimeDraft("");
+                  showToast("Session time updated.");
+                } }, "Set"),
+                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs + 300000) }, "+5m")
+              )
+            )
+          ),
+          h("textarea", {
+            placeholder: "How did the workout feel today?",
+            value: notes,
+            onInput: (event) => {
+              const value = event.currentTarget.value;
+              setNotes(value);
+              updateState((draft) => { bump(activeSession(draft), { notes: value }); });
+            }
+          }),
+          h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
+        )
+      );
+    }
+
+    function VoicePanel({ state, updateState, showToast, listening, setListening, recognitionRef }) {
+      return h("article", { class: "voice-panel panel" },
+        h("div", { class: "voice-grid" },
+          h("button", {
+            class: listening ? "mini-btn danger" : "mini-btn",
+            type: "button", "aria-label": "Voice input",
+            onClick: () => toggleVoice(state, updateState, showToast, listening, setListening, recognitionRef)
+          }, listening ? "Stop" : "Mic"),
+          h("textarea", {
+            value: state.command || "",
+            placeholder: "Say or type: bench press 225 for 5 rpe 8 note felt fast",
+            onInput: (e) => updateState((d) => { d.command = e.currentTarget.value; }, { localOnly: true })
+          }),
+          h("button", { class: "primary-btn", type: "button",
+            onClick: () => showToast(parseVoiceCommand(state, updateState).message)
+          }, "Add")
+        ),
+        h("p", { class: "muted", style: "margin:8px 0 0" }, "Voice commands use the same local-first draft state, then sync after the debounce.")
+      );
+    }
+
+    function ExerciseBlock({ state, block, updateState, showToast, openModal, logs }) {
+      const exercise = getExercise(state, block.exercise_id);
+      const draft = state.drafts[block.id] || {};
+      if (!exercise) return null;
+      const updateDraft = (field, value) => updateState((next) => {
+        next.drafts[block.id] ||= {};
+        next.drafts[block.id][field] = value;
+      }, { localOnly: true });
+
+      return h("article", { class: "exercise-card panel" },
+        h("div", { class: "card-head" },
+          h("div", null,
+            h("h2", null, exercise.name),
+            h("div", { class: "chip-row" },
+              h("span", { class: "pill" }, exercise.primary_muscle),
+              h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatRest(block.rest_seconds)} rest`)
+            )
+          ),
+          h("button", { class: "ghost-btn", type: "button",
+            onClick: () => addWarmups(state, block, updateState, showToast)
+          }, "Warmup")
+        ),
+        h("div", { class: "set-form" },
+          h("div", { class: "field" },
+            h("label", null, "Weight"),
+            h("div", { class: "weight-field" },
+              h("input", { inputMode: "decimal", placeholder: "lb", value: draft.weight_lb || "",
+                onInput: (e) => updateDraft("weight_lb", e.currentTarget.value)
+              }),
+              h("button", { class: "mini-btn", type: "button", title: "Plate calculator",
+                onClick: () => openModal(h(PlateModal, {
+                  weight: draft.weight_lb || lastWeightForExercise(state, exercise.id) || BAR_WEIGHT,
+                  onClose: () => openModal(null)
+                }))
+              }, "🏋️")
+            )
+          ),
+          h("div", { class: "field" }, h("label", null, "Reps"),
+            h("input", { inputMode: "numeric", placeholder: "0", value: draft.reps || "",
+              onInput: (e) => updateDraft("reps", e.currentTarget.value)
+            })),
+          h("div", { class: "field" }, h("label", null, "RPE"),
+            h("input", { inputMode: "decimal", placeholder: "7.5", value: draft.rpe || "",
+              onInput: (e) => updateDraft("rpe", e.currentTarget.value)
+            })),
+          h("div", { class: "field notes-field" }, h("label", null, "Notes"),
+            h("input", { placeholder: "optional", value: draft.notes || "",
+              onInput: (e) => updateDraft("notes", e.currentTarget.value)
+            })),
+          h("button", { class: "mini-btn primary", type: "button", "aria-label": "Add set",
+            onClick: () => addSet(state, block, updateState, showToast)
+          }, "+")
+        ),
+        h("div", { class: "set-list" },
+          logs.length
+            ? logs.map((set) => h(SetRow, { key: set.id, set, updateState }))
+            : h("div", { class: "empty" }, "No sets logged yet.")
+        )
+      );
+    }
+
+    function SetRow({ set, updateState }) {
+      return h("div", { class: "set-row" },
+        h("div", { class: "set-num" }, set.set_number),
+        h("div", { class: "row-main" },
+          h("b", null, `${formatWeight(set.weight_lb)} x ${set.reps}`),
+          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}${
+            Number.isFinite(Number(set.session_elapsed_ms)) ? ` at ${formatDuration(Number(set.session_elapsed_ms))}`
+            : set.time_logged ? ` at ${set.time_logged}` : ""
+          }`)
+        ),
+        h("button", { class: "mini-btn danger", type: "button",
+          onClick: () => updateState((draft) => {
+            draft.sets = draft.sets.filter((item) => item.id !== set.id);
+            renumberSets(draft, set.session_id, set.exercise_id);
+          })
+        }, "Del")
+      );
+    }
+
+    function ProgressView({ state, updateState }) {
+      const selected = state.progressExerciseId || "";
+      const exercises = useMemo(() => {
+        if (selected) return [getExercise(state, selected)].filter(Boolean);
+        return mostLoggedExercises(state).slice(0, 5);
+      }, [state.exercises, state.sets, selected]);
+      const profile = state.profile || {};
+      return h("section", null,
+        h("div", { class: "section-title" }, h("h2", null, "SVG PR Trendlines"), h("span", null, "Epley e1RM")),
+        h("div", { class: "actions" },
+          h("select", {
+            value: selected,
+            onChange: (e) => updateState((d) => { d.progressExerciseId = e.currentTarget.value; }, { localOnly: true })
+          },
+            h("option", { value: "" }, "Top 5 most logged"),
+            state.exercises.slice().sort(byName).map((exercise) =>
+              h("option", { key: exercise.id, value: exercise.id }, exercise.name))
+          )
+        ),
+        h("div", { class: "chart-grid" },
+          exercises.length
+            ? exercises.map((exercise) => h("article", { key: exercise.id, class: "chart-card panel" },
+                h("div", { class: "chart-head" },
+                  h("b", null, exercise.name),
+                  h("span", { class: "muted" }, `${setsForExercise(state, exercise.id).length} sets`)
+                ),
+                h(Trendline, { exercise, sets: setsForExercise(state, exercise.id) })
+              ))
+            : h("div", { class: "empty panel" }, "Log sets to see trendlines.")
+        ),
+        h("div", { class: "section-title" }, h("h2", null, "Strength Standards"), h("span", null, "Context bands")),
+        h("section", { class: "panel", style: "padding:12px; margin-bottom:12px" },
+          h("div", { class: "form-grid" },
+            h(FieldSelect, { label: "Sex", value: profile.sex || "male", options: ["male", "female"],
+              onChange: (v) => updateState((d) => { d.profile.sex = v; })
+            }),
+            h(FieldInput, { label: "Bodyweight lb", value: profile.bodyweight_lb || "", inputMode: "decimal", placeholder: "180",
+              onInput: (v) => updateState((d) => { d.profile.bodyweight_lb = v; })
+            }),
+            h(FieldInput, { label: "Age", value: profile.age || "", inputMode: "numeric", placeholder: "32",
+              onInput: (v) => updateState((d) => { d.profile.age = v; })
+            }),
+            h(FieldInput, { label: "Height", value: profile.height || "", placeholder: "optional",
+              onInput: (v) => updateState((d) => { d.profile.height = v; })
+            })
+          )
+        ),
+        h("section", { class: "stack" }, renderStandards(state))
+      );
+    }
+
+    function renderStandards(state) {
+      const sex = state.profile.sex || "male";
+      const bodyweight = Number(state.profile.bodyweight_lb) || 180;
+      const age = Number(state.profile.age) || 30;
+      const bracket = nearest(bodyweightBrackets, bodyweight);
+      const ageBracket = ageToBracket(age);
+      return Object.entries(strengthStandardModels).map(([liftId, model]) => {
+        const standards = STRENGTH_STANDARDS.filter((row) =>
+          row.lift_id === liftId && row.sex === sex
+          && row.bodyweight_bracket_lb === bracket && row.age_bracket === ageBracket
+        );
+        const best = bestE1RMForModel(state, model);
+        const elite = standards.find((row) => row.level === "elite")?.one_rm_lb || 1;
+        const position = Math.min(100, Math.max(0, best ? (best / elite) * 100 : 0));
+        const level = best ? currentStandardLevel(best, standards) : "no data";
+        return h("article", { key: liftId, class: "panel", style: "padding:12px" },
+          h("div", { class: "chart-head" },
+            h("b", null, model.lift),
+            h("span", { class: "muted" }, best ? `${Math.round(best)} lb / ${level}` : "no data")
+          ),
+          h("div", { class: "standard-bar" }, h("span", { class: "standard-marker", style: `left:calc(${position}% - 2px)` })),
+          h("p", { class: "muted" }, `${sex} / ${bracket} lb / age ${ageBracket}`)
+        );
+      });
+    }
+
+    function PlanView({ state, updateState, showToast, openModal }) {
       const program = getProgram(state);
-      return program?.days.find((day) => day.id === state.activeDayId) || program?.days[0];
+      return h("section", null,
+        h("div", { class: "actions" },
+          h("button", { class: "primary-btn", type: "button",
+            onClick: () => createNewPlan(updateState, showToast) }, "New Plan"),
+          h("select", {
+            value: state.activeProgramId,
+            onChange: (e) => updateState((d) => {
+              d.activeProgramId = e.currentTarget.value;
+              d.activeDayId = getProgram(d)?.days[0]?.id;
+            })
+          }, state.programs.map((item) => h("option", { key: item.id, value: item.id }, item.name)))
+        ),
+        h("section", { class: "stack" },
+          (program?.days || []).slice().sort(byOrder).map((day) => h("article", { key: day.id, class: "day-card panel" },
+            h("div", { class: "card-head" },
+              h("div", null,
+                h("h2", null, day.label),
+                h("div", { class: "chip-row" },
+                  h("span", { class: "pill gold" }, day.type),
+                  h("span", null, `${day.blocks.length} blocks`)
+                )
+              ),
+              h("select", {
+                value: day.type,
+                onChange: (e) => updateState((d) => {
+                  const found = getDayById(d, day.id);
+                  bump(found, { type: e.currentTarget.value });
+                  if (found.type === "Rest") found.blocks = [];
+                })
+              }, dayTypes.map((type) => h("option", { key: type, value: type }, type)))
+            ),
+            h("div", { class: "plan-blocks" },
+              day.blocks.slice().sort(byOrder).map((block) => h(PlanBlockRow, { key: block.id, state, day, block, updateState })),
+              h("button", { class: "ghost-btn", style: "margin:10px 12px", type: "button",
+                onClick: () => openModal(h(AddBlockModal, { state, dayId: day.id, updateState, onClose: () => openModal(null) }))
+              }, "+ Add exercise")
+            )
+          ))
+        )
+      );
     }
 
-    function getDayById(state, dayId) {
-      return state.programs.flatMap((program) => program.days).find((day) => day.id === dayId);
+    function PlanBlockRow({ state, day, block, updateState }) {
+      const exercise = getExercise(state, block.exercise_id);
+      if (!exercise) return null;
+      return h("div", { class: "block-row" },
+        h("div", { class: "row-main" },
+          h("b", null, exercise.name),
+          h("span", null, `${block.sets} sets / ${block.rep_range} reps / ${formatRest(block.rest_seconds)} rest`)
+        ),
+        h("button", { class: "mini-btn danger", type: "button",
+          onClick: () => updateState((d) => {
+            const found = getDayById(d, day.id);
+            found.blocks = found.blocks.filter((item) => item.id !== block.id);
+            bump(found);
+          })
+        }, "Del")
+      );
     }
 
-    function getExercise(state, id) {
-      return state.exercises.find((exercise) => exercise.id === id);
+    function AddBlockModal({ state, dayId, updateState, onClose }) {
+      const [query, setQuery] = useState("");
+      const filtered = useMemo(
+        () => state.exercises.filter((e) => normalizeText(e.name).includes(normalizeText(query))).slice(0, 30),
+        [state.exercises, query]
+      );
+      return h(Modal, { title: "Add Exercise", onClose },
+        h("div", { class: "stack" },
+          h("input", { value: query, placeholder: "Search exercises",
+            onInput: (e) => setQuery(e.currentTarget.value) }),
+          h("div", { class: "panel" }, filtered.map((exercise) => h("button", {
+            key: exercise.id, class: "ghost-btn",
+            style: "width:100%; justify-content:flex-start; border-radius:0",
+            type: "button",
+            onClick: () => {
+              updateState((draft) => {
+                const day = getDayById(draft, dayId);
+                day.blocks.push(blockFromExercise(exercise, day.blocks.length));
+                bump(day);
+              });
+              onClose();
+            }
+          }, exercise.name))),
+          !filtered.length && h("button", { class: "primary-btn", type: "button",
+            onClick: () => {
+              const name = cleanValue(query) || "New Exercise";
+              updateState((draft) => {
+                const exercise = createExercise({ name });
+                draft.exercises.push(exercise);
+                const day = getDayById(draft, dayId);
+                day.blocks.push(blockFromExercise(exercise, day.blocks.length));
+                bump(day);
+              });
+              onClose();
+            }
+          }, "Create new exercise")
+        )
+      );
     }
 
-    function setsForDate(state, date) {
-      return state.sets.filter((set) => set.date === date).sort(sortRecords);
+    function ExercisesView({ state, updateState, showToast, openModal }) {
+      const query = state.exerciseQuery || "";
+      const muscle = state.exerciseMuscle || "";
+      const pattern = state.exercisePattern || "";
+      const filtered = useMemo(() =>
+        state.exercises.filter((e) =>
+          (!query || normalizeText(e.name).includes(normalizeText(query)))
+          && (!muscle || e.primary_muscle === muscle)
+          && (!pattern || e.movement_pattern === pattern)
+        ).sort(byName),
+        [state.exercises, query, muscle, pattern]
+      );
+      return h("section", null,
+        h("div", { class: "actions" },
+          h("button", { class: "primary-btn", type: "button",
+            onClick: () => openModal(h(ExerciseFormModal, { onClose: () => openModal(null), updateState }))
+          }, "New Exercise"),
+          h("input", { placeholder: "Search exercises", value: query,
+            onInput: (e) => updateState((d) => { d.exerciseQuery = e.currentTarget.value; }, { localOnly: true })
+          }),
+          h("select", {
+            value: muscle,
+            onChange: (e) => updateState((d) => { d.exerciseMuscle = e.currentTarget.value; }, { localOnly: true })
+          }, h("option", { value: "" }, "All muscles"),
+            muscles.map((item) => h("option", { key: item, value: item }, item))),
+          h("select", {
+            value: pattern,
+            onChange: (e) => updateState((d) => { d.exercisePattern = e.currentTarget.value; }, { localOnly: true })
+          }, h("option", { value: "" }, "All patterns"),
+            patterns.map((item) => h("option", { key: item, value: item }, item)))
+        ),
+        h("section", { class: "panel exercise-list" },
+          filtered.length
+            ? filtered.map((exercise) => h("div", { key: exercise.id, class: "exercise-row" },
+                h("div", { class: "row-main" },
+                  h("b", null, exercise.name),
+                  h("span", null, `${exercise.primary_muscle} / ${exercise.movement_pattern} / ${exercise.default_sets} x ${exercise.default_rep_range} / ${formatRest(exercise.default_rest_seconds)}`)
+                ),
+                h("div", { class: "row-actions", style: "grid-auto-flow:column" },
+                  h("button", { class: "mini-btn", type: "button",
+                    onClick: () => openModal(h(ExerciseFormModal, { exercise, updateState, onClose: () => openModal(null) }))
+                  }, "Edit"),
+                  h("button", { class: "mini-btn danger", type: "button",
+                    onClick: () => deleteExercise(exercise.id, updateState, showToast)
+                  }, "Del")
+                )
+              ))
+            : h("div", { class: "empty" }, "No exercises found.")
+        )
+      );
     }
 
-    function setsForExercise(state, exerciseId) {
-      return state.sets.filter((set) => set.exercise_id === exerciseId).sort(sortRecords);
+    function ExerciseFormModal({ exercise, updateState, onClose }) {
+      const [form, setForm] = useState(exercise || createExercise({ name: "" }));
+      const set = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
+      return h(Modal, { title: exercise ? "Edit Exercise" : "New Exercise", onClose },
+        h("div", { class: "stack" },
+          h("div", { class: "form-grid" },
+            h(FieldInput, { label: "Name", value: form.name, onInput: (v) => set("name", v) }),
+            h(FieldSelect, { label: "Muscle", value: form.primary_muscle || "Chest", options: muscles,
+              onChange: (v) => set("primary_muscle", v) }),
+            h(FieldSelect, { label: "Pattern", value: form.movement_pattern || "press", options: patterns,
+              onChange: (v) => set("movement_pattern", v) }),
+            h(FieldInput, { label: "Default sets", value: form.default_sets, inputMode: "numeric",
+              onInput: (v) => set("default_sets", v) }),
+            h(FieldInput, { label: "Default reps", value: form.default_rep_range,
+              onInput: (v) => set("default_rep_range", v) }),
+            h(FieldInput, { label: "Default rest (sec)", value: form.default_rest_seconds, inputMode: "numeric",
+              onInput: (v) => set("default_rest_seconds", v) }),
+            h(FieldInput, { label: "Aliases (comma)", value: (form.aliases || []).join(", "),
+              onInput: (v) => set("aliases", v.split(",").map((s) => s.trim()).filter(Boolean)) })
+          ),
+          h("button", { class: "primary-btn", type: "button",
+            onClick: () => {
+              const restNum = Number(form.default_rest_seconds);
+              const setsNum = Number(form.default_sets);
+              const payload = {
+                ...form,
+                default_rest_seconds: Number.isFinite(restNum) ? restNum : 120,
+                default_sets: Number.isFinite(setsNum) ? setsNum : 3,
+                updated_at: nowISO()
+              };
+              updateState((draft) => {
+                if (exercise) {
+                  const idx = draft.exercises.findIndex((e) => e.id === exercise.id);
+                  if (idx >= 0) draft.exercises[idx] = payload;
+                } else {
+                  draft.exercises.push(payload);
+                }
+              });
+              onClose();
+            }
+          }, "Save")
+        )
+      );
     }
 
-    function mostLoggedExercises(state) {
-      return state.exercises.map((exercise) => ({ exercise, count: setsForExercise(state, exercise.id).length })).filter((item) => item.count).sort((a, b) => b.count - a.count).map((item) => item.exercise);
+    function DriveView({ state, updateState, connect, syncNow, fileJsonRef, fileCsvRef }) {
+      const drive = state.settings.drive || defaultDriveSettings();
+      const connected = K3V_SyncEngine.isConnected();
+      return h("section", { class: "stack" },
+        h("article", { class: "drive-card panel", style: "padding:12px" },
+          h("div", { class: "section-title", style: "margin-top:0" },
+            h("h2", null, "Google Drive Sync"),
+            h("span", null, connected ? "Connected" : "Ready")
+          ),
+          h("p", { class: "muted" }, "K3VSYNC stores one JSON file in this user's hidden Google Drive app-data folder. Deep-union sync keeps local-only and remote-only records instead of deleting them."),
+          h("div", { class: "form-grid" },
+            h(FieldSelect, { label: "Auto sync", value: drive.autoSync === false ? "off" : "on", options: ["on", "off"],
+              onChange: (v) => updateState((d) => { d.settings.drive.autoSync = v !== "off"; })
+            }),
+            h(FieldInput, { label: "Drive file", value: drive.fileName || DRIVE_STATE_FILE,
+              onInput: (v) => updateState((d) => { d.settings.drive.fileName = v || DRIVE_STATE_FILE; })
+            })
+          ),
+          h("div", { class: "actions", style: "margin-top:12px" },
+            h("button", { class: "primary-btn", type: "button", onClick: connect },
+              connected ? "Reconnect Google" : "Sign in with Google"),
+            h("button", { class: "ghost-btn", type: "button", disabled: !connected, onClick: syncNow }, "Sync now")
+          ),
+          h("p", { class: "muted" }, drive.lastStatus || "Sign in to start cross-device sync."),
+          h("p", { class: "muted" }, drive.lastSyncAt ? `Last sync: ${formatDateTime(drive.lastSyncAt)}` : "Not synced yet.")
+        ),
+        h("article", { class: "drive-card panel", style: "padding:12px" },
+          h("div", { class: "section-title", style: "margin-top:0" },
+            h("h2", null, "Backup Tools"),
+            h("span", null, "No Export tab")
+          ),
+          h("div", { class: "actions" },
+            h("button", { class: "ghost-btn", type: "button",
+              onClick: () => downloadText(toCSV(state.sets), `k3vsync-sets-${todayISO()}.csv`, "text/csv")
+            }, "CSV"),
+            h("button", { class: "ghost-btn", type: "button",
+              onClick: () => fileCsvRef.current?.click()
+            }, "Import CSV"),
+            h("button", { class: "ghost-btn", type: "button",
+              onClick: () => downloadText(backupPayload(state), `k3vsync-backup-${todayISO()}.json`, "application/json")
+            }, "JSON"),
+            h("button", { class: "ghost-btn", type: "button",
+              onClick: () => fileJsonRef.current?.click()
+            }, "Import JSON")
+          ),
+          state.csvPreview && h(CsvPreview, { preview: state.csvPreview, updateState })
+        )
+      );
     }
 
-    function lastWeightForExercise(state, exerciseId) {
-      return setsForExercise(state, exerciseId).slice(-1)[0]?.weight_lb || "";
-    }
-
-    function volume(set) {
-      return Number(set.weight_lb || 0) * Number(set.reps || 0);
-    }
-
-    function e1rm(set) {
-      return Number(set.weight_lb || 0) * (1 + Number(set.reps || 0) / 30);
-    }
-
-    function csvRecordId(record) {
-      return [record.date, normalizeText(record.exercise), record.set_number].join("|");
-    }
-
-    function mergeById(base, incoming) {
-      return [...new Map([...base, ...incoming].map((item) => [item.id, item])).values()];
-    }
-
-    function cloneState(value) {
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    function parseWeight(value) {
-      const cleaned = String(value ?? "").replace(/[^0-9.]/g, "");
-      const parsed = Number(cleaned);
-      return Number.isFinite(parsed) ? parsed : NaN;
-    }
-
-    function roundToPlate(value) {
-      return Math.max(BAR_WEIGHT, Math.round(value / 5) * 5);
-    }
-
-    function formatWeight(value) {
-      const number = Number(value);
-      return Number.isInteger(number) ? `${number}` : `${number.toFixed(1)}`;
-    }
-
-    function formatNumber(value) {
-      return new Intl.NumberFormat().format(Math.round(value || 0));
-    }
-
-    function formatTimer(seconds) {
-      const mins = Math.floor(Number(seconds || 0) / 60);
-      const secs = Math.floor(Number(seconds || 0) % 60);
-      return `${mins}:${String(secs).padStart(2, "0")}`;
-    }
-
-    function formatDuration(ms) {
-      const totalSeconds = Math.max(0, Math.floor(Number(ms || 0) / 1000));
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }
-
-    function parseDurationInput(value) {
-      const text = cleanValue(value).toLowerCase();
-      if (!text) return NaN;
-      if (/^\d+(\.\d+)?$/.test(text)) return Number(text) * 60000;
-      const colon = text.match(/^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/);
-      if (colon) {
-        const first = Number(colon[1]);
-        const second = Number(colon[2]);
-        const third = Number(colon[3] || 0);
-        return colon[3] ? ((first * 3600) + (second * 60) + third) * 1000 : ((first * 60) + second) * 1000;
-      }
-      const hours = text.match(/(\d+(?:\.\d+)?)\s*h/);
-      const minutes = text.match(/(\d+(?:\.\d+)?)\s*m/);
-      const seconds = text.match(/(\d+(?:\.\d+)?)\s*s/);
-      const total =
-        (hours ? Number(hours[1]) * 3600000 : 0) +
-        (minutes ? Number(minutes[1]) * 60000 : 0) +
-        (seconds ? Number(seconds[1]) * 1000 : 0);
-      return total || NaN;
-    }
-
-    function formatDateTime(value) {
-      try {
-        return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
-      } catch {
-        return value;
-      }
-    }
-
-    function sortRecords(a, b) {
-      return String(a.date || "").localeCompare(String(b.date || "")) || Number(a.set_number || 0) - Number(b.set_number || 0) || String(a.created_at || "").localeCompare(String(b.created_at || ""));
-    }
-
-    function byOrder(a, b) {
-      return Number(a.order || 0) - Number(b.order || 0);
-    }
-
-    function byName(a, b) {
-      return a.name.localeCompare(b.name);
-    }
-
-    function shortDayLabel(index, label) {
-      return ["M", "T", "W", "T", "F", "S", "S"][index] || label.slice(0, 1);
-    }
-
-    function ageToBracket(age) {
-      if (age >= 60) return "60-69";
-      if (age >= 50) return "50-59";
-      if (age >= 40) return "40-49";
-      return "18-39";
-    }
-
-    function nearest(values, target) {
-      return values.slice().sort((a, b) => Math.abs(a - target) - Math.abs(b - target))[0];
-    }
-
-    function normalizeText(value) {
-      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-    }
-
-    function cleanValue(value) {
-      return String(value ?? "").trim();
-    }
-
-    function todayISO() {
-      return new Date().toISOString().slice(0, 10);
-    }
-
-    function nowISO() {
-      return new Date().toISOString();
-
-    }
-
-    function cryptoId() {
-      if (crypto.randomUUID) return crypto.randomUUID();
-      return `k3v-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    }
-
-    function downloadText(text, name, type) {
-      const blob = new Blob([text], { type: `${type};charset=utf-8` });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = name;
-      document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    function registerServiceWorker() {
-      if ("serviceWorker" in navigator && location.protocol !== "file:") {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
-      }
+    function CsvPreview({ preview, updateState }) {
+      return h("div", { class: "stack" },
+        h("p", { class: "muted" }, `${preview.added} added / ${preview.changed} changed / ${preview.unchanged} unchanged / ${preview.errored} errors`),
+        h("button", { class: "primary-btn", type: "button", disabled: preview.errored > 0,
+          onClick: () => commitCSVImport(updateState)
+        }, "Commit Import")
+      );
     }
 
     render(h(K3V_App), document.getElementById("root"));
