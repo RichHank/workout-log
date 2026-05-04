@@ -323,6 +323,50 @@
       grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
     }
 
+    .session-panel {
+      padding: 12px;
+    }
+
+    .session-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .session-head h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .session-time {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 950;
+      font-size: 1.18rem;
+      white-space: nowrap;
+    }
+
+    .voice-panel {
+      padding: 12px;
+    }
+
+    .voice-grid {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .voice-grid textarea {
+      min-height: 46px;
+      height: 46px;
+      max-height: 132px;
+      padding-top: 11px;
+    }
+
     .field label {
       display: block;
       margin: 0 0 5px;
@@ -603,6 +647,16 @@
     @media (max-width: 760px) {
       .segmented { display: none; }
       .sync-chip span:last-child { display: none; }
+      .session-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .voice-grid {
+        grid-template-columns: auto 1fr;
+      }
+      .voice-grid button:last-child {
+        grid-column: 1 / -1;
+      }
       .set-form {
         grid-template-columns: 1fr 70px 70px auto;
       }
@@ -708,6 +762,7 @@
         sessions: [],
         sets: [],
         drafts: {},
+        command: "",
         profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
         settings: { muted: false, drive: defaultDriveSettings() },
         csvPreview: null
@@ -1097,6 +1152,8 @@
       const [toast, setToast] = useState("");
       const [modal, setModal] = useState(null);
       const [clock, setClock] = useState(Date.now());
+      const [listening, setListening] = useState(false);
+      const recognitionRef = useRef(null);
       const stateRef = useRef(null);
       const fileJsonRef = useRef(null);
       const fileCsvRef = useRef(null);
@@ -1205,7 +1262,7 @@
               ))
             )
           ),
-          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal }),
+          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock, listening, setListening, recognitionRef }),
           state.view === "progress" && h(ProgressView, { state, updateState }),
           state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
           state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
@@ -1221,11 +1278,62 @@
       );
     }
 
-    function LogView({ state, updateState, showToast, openModal }) {
+    function LogView({ state, updateState, showToast, openModal, clock, listening, setListening, recognitionRef }) {
       const day = getDay(state);
       const blocks = (day?.blocks || []).slice().sort(byOrder);
       return h("section", { class: "stack" },
+        h(SessionPanel, { state, updateState, clock, showToast }),
+        h(VoicePanel, { state, updateState, showToast, listening, setListening, recognitionRef }),
         blocks.length ? blocks.map((block) => h(ExerciseBlock, { key: block.id, state, block, updateState, showToast, openModal })) : h("div", { class: "empty panel" }, "No exercises on this day yet. Add blocks from Plan.")
+      );
+    }
+
+    function SessionPanel({ state, updateState, clock, showToast }) {
+      const session = sessionForActiveDate(state);
+      const elapsed = session ? sessionElapsedMs(session, clock) : 0;
+      return h("article", { class: "session-panel panel" },
+        h("div", { class: "session-head" },
+          h("div", null,
+            h("h2", null, "Session Timer"),
+            h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Tracks this workout day. Edit it anytime." : "Starts when the first set is logged.")
+          ),
+          h("div", { class: "session-time" }, formatDuration(elapsed))
+        ),
+        h("div", { class: "form-grid" },
+          h(FieldInput, { label: "Set elapsed time", value: state.sessionTimeDraft ?? "", placeholder: "75m or 1:15:00", onInput: (value) => updateState((draft) => { draft.sessionTimeDraft = value; }, { localOnly: true }) }),
+          h("div", { class: "field" },
+            h("label", null, "Controls"),
+            h("div", { class: "row-actions", style: "grid-template-columns:repeat(3, minmax(0, 1fr))" },
+              h("button", { class: "ghost-btn", type: "button", onClick: () => adjustSessionDuration(updateState, -300000) }, "-5m"),
+              h("button", { class: "ghost-btn", type: "button", onClick: () => setSessionDurationFromDraft(state, updateState, showToast) }, "Set"),
+              h("button", { class: "ghost-btn", type: "button", onClick: () => adjustSessionDuration(updateState, 300000) }, "+5m")
+            )
+          )
+        ),
+        h("textarea", {
+          style: "margin-top:10px",
+          placeholder: "How did the workout feel today?",
+          value: session?.notes || "",
+          onInput: (event) => updateState((draft) => {
+            const active = activeSession(draft);
+            active.notes = event.currentTarget.value;
+            active.updated_at = nowISO();
+          })
+        })
+      );
+    }
+
+    function VoicePanel({ state, updateState, showToast, listening, setListening, recognitionRef }) {
+      return h("article", { class: "voice-panel panel" },
+        h("div", { class: "voice-grid" },
+          h("button", { class: listening ? "mini-btn danger" : "mini-btn", type: "button", "aria-label": "Voice input", onClick: () => toggleVoice(state, updateState, showToast, listening, setListening, recognitionRef) }, listening ? "Stop" : "Mic"),
+          h("textarea", { value: state.command || "", placeholder: "Say or type: bench press 225 for 5 rpe 8 note felt fast", onInput: (event) => updateState((draft) => { draft.command = event.currentTarget.value; }, { localOnly: true }) }),
+          h("button", { class: "primary-btn", type: "button", onClick: () => {
+            const result = parseVoiceCommand(state, updateState);
+            showToast(result.message);
+          } }, "Add")
+        ),
+        h("p", { class: "muted", style: "margin:8px 0 0" }, "Voice commands use the same local-first draft state, then sync after the debounce.")
       );
     }
 
@@ -1520,6 +1628,96 @@
       showToast("Warm-up sets added.");
     }
 
+    function toggleVoice(state, updateState, showToast, listening, setListening, recognitionRef) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast("Voice entry is not available in this browser.");
+        return;
+      }
+      if (listening && recognitionRef.current) {
+        recognitionRef.current.stop();
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      recognition.onstart = () => setListening(true);
+      recognition.onend = () => setListening(false);
+      recognition.onerror = () => {
+        setListening(false);
+        showToast("Voice entry stopped.");
+      };
+      recognition.onresult = (event) => {
+        const text = Array.from(event.results).map((result) => result[0]?.transcript || "").join(" ").trim();
+        updateState((draft) => { draft.command = text; }, { localOnly: true });
+        const final = Array.from(event.results).some((result) => result.isFinal);
+        if (final) {
+          const next = cloneState(state);
+          next.command = text;
+          const result = parseVoiceCommand(next, updateState);
+          showToast(result.message);
+        }
+      };
+      recognitionRef.current = recognition;
+      recognition.start();
+    }
+
+    function parseVoiceCommand(state, updateState) {
+      const raw = cleanValue(state.command);
+      if (!raw) return { ok: false, message: "No command text." };
+      const match = findExerciseMatch(state, raw);
+      if (!match) return { ok: false, message: "No matching exercise." };
+      const sets = extractSets(raw, match.alias);
+      if (!sets.length) return { ok: false, message: "No weight and reps found." };
+      updateState((draft) => {
+        let day = getDay(draft);
+        let block = day.blocks.find((item) => item.exercise_id === match.exercise.id);
+        if (!block) {
+          block = blockFromExercise(match.exercise, day.blocks.length);
+          day.blocks.push(block);
+          day.updated_at = nowISO();
+        }
+        sets.forEach((item) => appendSet(draft, block, Number(item.weight_lb), Number(item.reps), item.rpe || "", item.notes || ""));
+        draft.command = "";
+      });
+      return { ok: true, message: `${sets.length} set${sets.length === 1 ? "" : "s"} added.` };
+    }
+
+    function findExerciseMatch(state, text) {
+      const normalized = normalizeText(text);
+      const matches = [];
+      state.exercises.forEach((exercise) => {
+        [exercise.name, ...(exercise.aliases || [])].map(normalizeText).forEach((alias) => {
+          if (alias && normalized.includes(alias)) matches.push({ exercise, alias, score: alias.length });
+        });
+      });
+      matches.sort((a, b) => b.score - a.score);
+      return matches[0] || null;
+    }
+
+    function extractSets(text, alias) {
+      let body = normalizeText(text)
+        .replace(alias, " ")
+        .replace(/\b(add|set|sets|logged|log|did|pounds|pound|lbs|lb|reps|rep)\b/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const rpeMatch = body.match(/\b(?:rpe|r p e)\s*(\d+(?:\.\d+)?)\b/);
+      const rpe = rpeMatch ? rpeMatch[1] : "";
+      if (rpeMatch) body = body.replace(rpeMatch[0], " ");
+      const notesMatch = body.match(/\bnote\s+(.+)$/);
+      const notes = notesMatch ? notesMatch[1].trim() : "";
+      if (notesMatch) body = body.replace(notesMatch[0], " ");
+      const sets = [];
+      const pairPattern = /(\d+(?:\.\d+)?)\s*(?:x|by|for|with)\s*(\d{1,3})/g;
+      let match;
+      while ((match = pairPattern.exec(body))) sets.push({ weight_lb: match[1], reps: match[2], rpe, notes });
+      if (sets.length) return sets;
+      const numbers = body.match(/\d+(?:\.\d+)?/g) || [];
+      for (let index = 0; index < numbers.length - 1; index += 2) sets.push({ weight_lb: numbers[index], reps: numbers[index + 1], rpe, notes });
+      return sets;
+    }
+
     function appendSet(state, block, weight, reps, rpe = "", notes = "") {
       const exercise = getExercise(state, block.exercise_id);
       const session = activeSession(state);
@@ -1545,10 +1743,46 @@
     function activeSession(state) {
       let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
       if (!session) {
-        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO() };
+        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO(), paused_total_ms: 0, manual_duration_ms: null, notes: "" };
         state.sessions.push(session);
       }
       return session;
+    }
+
+    function sessionForActiveDate(state) {
+      return state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
+    }
+
+    function sessionElapsedMs(session, clock = Date.now()) {
+      if (!session) return 0;
+      if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
+      const started = new Date(session.started_at || session.created_at || nowISO()).getTime();
+      const paused = Number(session.paused_total_ms || 0);
+      return Math.max(0, clock - started - paused);
+    }
+
+    function adjustSessionDuration(updateState, deltaMs) {
+      updateState((draft) => {
+        const session = activeSession(draft);
+        session.manual_duration_ms = Math.max(0, sessionElapsedMs(session) + deltaMs);
+        session.updated_at = nowISO();
+        draft.sessionTimeDraft = "";
+      });
+    }
+
+    function setSessionDurationFromDraft(state, updateState, showToast) {
+      const ms = parseDurationInput(state.sessionTimeDraft);
+      if (!Number.isFinite(ms)) {
+        showToast("Use 75m, 1:15, or 1:15:00.");
+        return;
+      }
+      updateState((draft) => {
+        const session = activeSession(draft);
+        session.manual_duration_ms = ms;
+        session.updated_at = nowISO();
+        draft.sessionTimeDraft = "";
+      });
+      showToast("Session time updated.");
     }
 
     function renumberSets(state, sessionId, exerciseId) {
@@ -1727,8 +1961,10 @@
         merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
         merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
         merged.sessions = saved.sessions || [];
+        merged.sessions = merged.sessions.map((session) => ({ paused_total_ms: 0, manual_duration_ms: null, notes: "", ...session }));
         merged.sets = saved.sets || [];
         merged.drafts = saved.drafts || {};
+        merged.command = saved.command || "";
         merged.profile = { ...fallback.profile, ...(saved.profile || {}) };
         merged.settings = { ...fallback.settings, ...(saved.settings || {}), drive: { ...defaultDriveSettings(), ...(saved.settings?.drive || {}) } };
         merged.view = ["log", "progress", "plan", "exercises", "sync"].includes(saved.view) ? saved.view : "log";
@@ -1889,6 +2125,36 @@
       const mins = Math.floor(Number(seconds || 0) / 60);
       const secs = Math.floor(Number(seconds || 0) % 60);
       return `${mins}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function formatDuration(ms) {
+      const totalSeconds = Math.max(0, Math.floor(Number(ms || 0) / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function parseDurationInput(value) {
+      const text = cleanValue(value).toLowerCase();
+      if (!text) return NaN;
+      if (/^\d+(\.\d+)?$/.test(text)) return Number(text) * 60000;
+      const colon = text.match(/^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/);
+      if (colon) {
+        const first = Number(colon[1]);
+        const second = Number(colon[2]);
+        const third = Number(colon[3] || 0);
+        return colon[3] ? ((first * 3600) + (second * 60) + third) * 1000 : ((first * 60) + second) * 1000;
+      }
+      const hours = text.match(/(\d+(?:\.\d+)?)\s*h/);
+      const minutes = text.match(/(\d+(?:\.\d+)?)\s*m/);
+      const seconds = text.match(/(\d+(?:\.\d+)?)\s*s/);
+      const total =
+        (hours ? Number(hours[1]) * 3600000 : 0) +
+        (minutes ? Number(minutes[1]) * 60000 : 0) +
+        (seconds ? Number(seconds[1]) * 1000 : 0);
+      return total || NaN;
     }
 
     function formatDateTime(value) {
