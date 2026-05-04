@@ -33,7 +33,7 @@ date,exercise,set_number,reps,weight_lb,rpe,notes
 - CSV import preview with added/changed/unchanged/errored counts.
 - JSON backup/import.
 - PR trendline canvas view using Epley e1RM.
-- Daily workout notes and session duration tracking.
+- Daily workout notes and editable session duration tracking.
 - Exercise-level duration and average-rest summaries.
 - Strength standards comparison using bundled starter data in `strength-standards.json`.
 - Gist sync fallback screen.

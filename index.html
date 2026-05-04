@@ -1346,6 +1346,15 @@
               <button class="ghost-btn" type="button" id="sessionFinishBtn">${session.finished_at ? "Reopen" : "Finish"}</button>
             </div>
           </div>
+          <div class="form-grid" style="margin-top:10px">
+            <div class="field">
+              <label for="sessionTimeInput">Session time</label>
+              <input id="sessionTimeInput" inputmode="text" value="${formatDuration(sessionElapsedMs(session))}" placeholder="75m or 1:15:00">
+            </div>
+            <button class="ghost-btn" type="button" data-session-adjust="-300000">-5m</button>
+            <button class="primary-btn" type="button" id="sessionSetTimeBtn">Set Time</button>
+            <button class="ghost-btn" type="button" data-session-adjust="300000">+5m</button>
+          </div>
           <label class="sr-only" for="sessionNotes">Workout notes</label>
           <textarea id="sessionNotes" data-session-notes="${session.id}" placeholder="How did this workout feel? Energy, soreness, aches, pump, sleep, anything worth remembering.">${escapeHtml(session.notes || "")}</textarea>
         </section>
@@ -1849,6 +1858,31 @@
       }
       session.updated_at = new Date().toISOString();
       render();
+    }
+
+    function setSessionDuration(ms) {
+      const session = activeSession();
+      const desired = Math.max(0, Number(ms || 0));
+      const end = session.finished_at ? new Date(session.finished_at).getTime() : (session.timer_paused_at || Date.now());
+      session.timer_started_at = end - Number(session.paused_total_ms || 0) - desired;
+      session.updated_at = new Date().toISOString();
+      render();
+    }
+
+    function setSessionDurationFromInput() {
+      const input = document.getElementById("sessionTimeInput");
+      const ms = parseDurationInput(input?.value);
+      if (!Number.isFinite(ms)) {
+        showToast("Use time like 75m, 1:15, or 1:15:00.");
+        return;
+      }
+      setSessionDuration(ms);
+      showToast("Session time updated.");
+    }
+
+    function adjustSessionDuration(deltaMs) {
+      const session = activeSession();
+      setSessionDuration(sessionElapsedMs(session) + Number(deltaMs || 0));
     }
 
     function exerciseTiming(logs, session) {
@@ -2468,6 +2502,9 @@
       }
       if (event.target.closest("#sessionToggleBtn")) return toggleSessionTimer();
       if (event.target.closest("#sessionFinishBtn")) return finishSession();
+      if (event.target.closest("#sessionSetTimeBtn")) return setSessionDurationFromInput();
+      const sessionAdjust = event.target.closest("[data-session-adjust]");
+      if (sessionAdjust) return adjustSessionDuration(Number(sessionAdjust.dataset.sessionAdjust));
       if (event.target.closest("#voiceBtn")) return startVoice();
       if (event.target.closest("#parseBtn")) {
         const result = parseCommand(state.command || document.getElementById("commandInput").value);
@@ -2619,6 +2656,11 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
+      if (event.target.id === "sessionTimeInput") {
+        event.preventDefault();
+        setSessionDurationFromInput();
+        return;
+      }
       const form = event.target.closest("[data-block-form]");
       if (!form) return;
       event.preventDefault();
@@ -2769,6 +2811,27 @@
       const seconds = totalSeconds % 60;
       if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
       return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function parseDurationInput(value) {
+      const text = cleanValue(value).toLowerCase();
+      if (!text) return NaN;
+      if (/^\d+(\.\d+)?$/.test(text)) return Number(text) * 60000;
+      const colon = text.match(/^(\d+):([0-5]?\d)(?::([0-5]?\d))?$/);
+      if (colon) {
+        const first = Number(colon[1]);
+        const second = Number(colon[2]);
+        const third = Number(colon[3] || 0);
+        return colon[3] ? ((first * 3600) + (second * 60) + third) * 1000 : ((first * 60) + second) * 1000;
+      }
+      const hours = text.match(/(\d+(?:\.\d+)?)\s*h/);
+      const minutes = text.match(/(\d+(?:\.\d+)?)\s*m/);
+      const seconds = text.match(/(\d+(?:\.\d+)?)\s*s/);
+      const total =
+        (hours ? Number(hours[1]) * 3600000 : 0) +
+        (minutes ? Number(minutes[1]) * 60000 : 0) +
+        (seconds ? Number(seconds[1]) * 1000 : 0);
+      return total || NaN;
     }
 
     function shortDayLabel(index, label) {
