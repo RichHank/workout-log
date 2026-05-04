@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0e1116">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="K3VSYNC">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +16,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://unpkg.com/preact@10.26.9/dist/preact.umd.js"></script>
   <script src="https://unpkg.com/preact@10.26.9/hooks/dist/hooks.umd.js"></script>
-  <title>K3VSYNC</title>
+  <title>K3VSYNC Timer Hard Fix</title>
   <style>
     :root {
       color-scheme: dark;
@@ -105,6 +108,58 @@
       font-family: ui-monospace, 'SF Mono', monospace;
     }
     .timer-pill.paused { color: var(--gold); opacity: 0.75; }
+    .timer-pill.resting { color: var(--green); }
+    .timer-pill.expired { color: var(--danger); }
+
+    .rest-strip {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      background: rgba(15,21,31,0.62);
+    }
+    .rest-strip.done { border-top-color: rgba(116,230,173,0.3); }
+    .rest-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .rest-title {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .rest-title b { font-size: 0.86rem; line-height: 1.1; }
+    .rest-title span { color: var(--muted); font-size: 0.72rem; }
+    .rest-time {
+      font-size: 1.6rem;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, 'SF Mono', monospace;
+      color: var(--green);
+      white-space: nowrap;
+    }
+    .rest-time.paused { color: var(--gold); }
+    .rest-time.expired { color: var(--danger); }
+    .rest-progress {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #0f1622;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 9px;
+    }
+    .rest-progress > i {
+      display: block;
+      height: 100%;
+      width: var(--pct, 100%);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--accent));
+      transition: width 0.25s linear;
+    }
+    .rest-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .rest-actions .ghost-btn { min-height: 36px; padding: 0 10px; font-size: 0.78rem; }
 
     .sync-chip {
       min-height: 34px;
@@ -710,8 +765,12 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     function registerServiceWorker() {
-      if ("serviceWorker" in navigator && location.protocol !== "file:") {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      // Disabled for this single-file build. A stale PWA/service-worker cache can keep serving
+      // an older broken timer even after index.html is replaced. Also unregister any old worker.
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations?.()
+          .then((regs) => regs.forEach((reg) => reg.unregister()))
+          .catch(() => {});
       }
     }
 
@@ -818,7 +877,10 @@
       merged.exercises = mergeById(fallback.exercises, saved.exercises || []);
       merged.programs = saved.programs?.length ? saved.programs : fallback.programs;
       merged.sessions = (saved.sessions || []).map((session) => ({
-        paused_total_ms: 0, manual_duration_ms: null, notes: "", ...session
+        paused_total_ms: 0, manual_duration_ms: null, notes: "",
+        rest_started_at: null, rest_duration_ms: 0, rest_paused_at: null, rest_paused_total_ms: 0,
+        rest_label: "", rest_completed_at: null,
+        ...session
       }));
       merged.sets = saved.sets || [];
       merged.drafts = saved.drafts || {};
@@ -1156,7 +1218,15 @@
     }
     function sessionElapsedMs(session, clock = Date.now()) {
       if (!session) return 0;
-      if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
+
+      const manual = Number(session.manual_duration_ms);
+      if (Number.isFinite(manual)) {
+        if (session.finished_at) return Math.max(0, manual);
+        const anchor = new Date(session.manual_duration_set_at || session.updated_at || session.session_start || session.started_at || session.created_at || nowISO()).getTime();
+        const end = session.paused_at ? new Date(session.paused_at).getTime() : clock;
+        return Math.max(0, manual + Math.max(0, end - anchor));
+      }
+
       const started = new Date(session.session_start || session.started_at || session.created_at || nowISO()).getTime();
       const paused = Number(session.paused_total_ms || 0);
       let elapsed = clock - started - paused;
@@ -1165,6 +1235,26 @@
         elapsed = pausedStart - started - paused;
       }
       return Math.max(0, elapsed);
+    }
+
+    function restElapsedMs(session, clock = Date.now()) {
+      if (!session?.rest_started_at || !Number(session.rest_duration_ms)) return 0;
+      const started = new Date(session.rest_started_at).getTime();
+      const paused = Number(session.rest_paused_total_ms || 0);
+      const end = session.rest_paused_at ? new Date(session.rest_paused_at).getTime() : clock;
+      return Math.max(0, end - started - paused);
+    }
+    function restRemainingMs(session, clock = Date.now()) {
+      if (!session?.rest_started_at || !Number(session.rest_duration_ms)) return 0;
+      return Math.max(0, Number(session.rest_duration_ms || 0) - restElapsedMs(session, clock));
+    }
+    function restProgressPct(session, clock = Date.now()) {
+      if (!session?.rest_started_at || !Number(session.rest_duration_ms)) return 0;
+      const elapsed = restElapsedMs(session, clock);
+      return Math.max(0, Math.min(100, 100 - (elapsed / Number(session.rest_duration_ms)) * 100));
+    }
+    function restTimerVisible(session) {
+      return Boolean(session?.rest_started_at) && !session?.finished_at;
     }
 
     // --- State mutations ---
@@ -1183,7 +1273,14 @@
           paused_total_ms: 0,
           paused_at: null,
           manual_duration_ms: null,
-          notes: ""
+          manual_duration_set_at: null,
+          notes: "",
+          rest_started_at: null,
+          rest_duration_ms: 0,
+          rest_paused_at: null,
+          rest_paused_total_ms: 0,
+          rest_label: "",
+          rest_completed_at: null
         };
         state.sessions.push(session);
       }
@@ -1203,10 +1300,57 @@
       bump(session, { paused_at: null });
     }
 
+    function startRestTimer(state, block, exercise) {
+      const session = activeSession(state);
+      const seconds = Math.max(0, Number(block?.rest_seconds || exercise?.default_rest_seconds || 0));
+      if (!seconds) return;
+      bump(session, {
+        rest_started_at: nowISO(),
+        rest_duration_ms: seconds * 1000,
+        rest_paused_at: null,
+        rest_paused_total_ms: 0,
+        rest_label: exercise?.name || "Rest",
+        rest_completed_at: null
+      });
+    }
+
+    function pauseRestTimer(state) {
+      const session = activeSession(state);
+      if (session.rest_started_at && !session.rest_paused_at && !session.rest_completed_at) {
+        bump(session, { rest_paused_at: nowISO() });
+      }
+    }
+
+    function resumeRestTimer(state) {
+      const session = activeSession(state);
+      if (!session.rest_paused_at) return;
+      const pausedStart = new Date(session.rest_paused_at).getTime();
+      session.rest_paused_total_ms = (session.rest_paused_total_ms || 0) + (Date.now() - pausedStart);
+      bump(session, { rest_paused_at: null });
+    }
+
+    function skipRestTimer(state) {
+      const session = activeSession(state);
+      bump(session, { rest_started_at: null, rest_duration_ms: 0, rest_paused_at: null, rest_paused_total_ms: 0, rest_label: "", rest_completed_at: null });
+    }
+
+    function adjustRestTimer(state, deltaMs) {
+      const session = activeSession(state);
+      if (!session.rest_started_at) return;
+      const remaining = Math.max(0, restRemainingMs(session) + deltaMs);
+      bump(session, {
+        rest_started_at: nowISO(),
+        rest_duration_ms: remaining,
+        rest_paused_at: null,
+        rest_paused_total_ms: 0,
+        rest_completed_at: null
+      });
+    }
+
     function adjustSessionDuration(updateState, deltaMs) {
       updateState((draft) => {
         const session = activeSession(draft);
-        bump(session, { manual_duration_ms: Math.max(0, sessionElapsedMs(session) + deltaMs) });
+        bump(session, { manual_duration_ms: Math.max(0, sessionElapsedMs(session) + deltaMs), manual_duration_set_at: nowISO() });
         draft.sessionTimeDraft = "";
       });
     }
@@ -1232,6 +1376,7 @@
         created_at: now,
         updated_at: now
       });
+      startRestTimer(state, block, exercise);
       bump(session);
     }
 
@@ -1513,6 +1658,7 @@
           paused_total_ms: 0,
           paused_at: null,
           manual_duration_ms: null,
+          manual_duration_set_at: null,
           notes: ""
         };
         state.sessions.push(session);
@@ -1658,6 +1804,79 @@
       );
     }
 
+    function playTimerDoneCue(state) {
+      try { navigator.vibrate?.([140, 70, 140]); } catch {}
+      if (state?.settings?.muted) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.42);
+        gain.connect(ctx.destination);
+        [660, 880].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.value = freq;
+          osc.connect(gain);
+          osc.start(ctx.currentTime + i * 0.12);
+          osc.stop(ctx.currentTime + 0.36 + i * 0.12);
+        });
+        setTimeout(() => ctx.close?.(), 800);
+      } catch {}
+    }
+
+    function useLiveClock(active = true) {
+      const [now, setNow] = useState(() => Date.now());
+      useEffect(() => {
+        if (!active) return;
+        let stopped = false;
+        let rafId = 0;
+        let timeoutId = 0;
+        let lastPaint = 0;
+
+        const publish = () => {
+          if (stopped) return;
+          setNow(Date.now());
+        };
+
+        const rafLoop = () => {
+          if (stopped) return;
+          const t = Date.now();
+          if (t - lastPaint >= 250) {
+            lastPaint = t;
+            setNow(t);
+          }
+          rafId = requestAnimationFrame(rafLoop);
+        };
+
+        const intervalLoop = () => {
+          if (stopped) return;
+          publish();
+          timeoutId = setTimeout(intervalLoop, 1000);
+        };
+
+        const wake = () => publish();
+        publish();
+        rafId = requestAnimationFrame(rafLoop);
+        timeoutId = setTimeout(intervalLoop, 1000);
+        window.addEventListener("focus", wake);
+        window.addEventListener("pageshow", wake);
+        document.addEventListener("visibilitychange", wake);
+        return () => {
+          stopped = true;
+          cancelAnimationFrame(rafId);
+          clearTimeout(timeoutId);
+          window.removeEventListener("focus", wake);
+          window.removeEventListener("pageshow", wake);
+          document.removeEventListener("visibilitychange", wake);
+        };
+      }, [active]);
+      return now;
+    }
+
     // --- Main app ---
     function K3V_App() {
       const [state, setState] = useState(null);
@@ -1665,6 +1884,7 @@
       const [toast, setToast] = useState("");
       const [modal, setModal] = useState(null);
       const [clock, setClock] = useState(Date.now());
+      const liveClock = useLiveClock(true);
       const [listening, setListening] = useState(false);
       const recognitionRef = useRef(null);
       const stateRef = useRef(null);
@@ -1679,11 +1899,41 @@
         registerServiceWorker();
       }, []);
 
-      // Single ticking clock drives every elapsed display.
+      // Single ticking clock drives every elapsed display. Uses timeout instead of a plain interval
+      // so it re-arms cleanly after tab sleep, phone lock, or browser throttling.
       useEffect(() => {
-        const id = setInterval(() => setClock(Date.now()), 1000);
-        return () => clearInterval(id);
+        let stopped = false;
+        let timerId = 0;
+        const tick = () => {
+          if (stopped) return;
+          setClock(Date.now());
+          timerId = setTimeout(tick, 1000);
+        };
+        const wake = () => setClock(Date.now());
+        timerId = setTimeout(tick, 250);
+        window.addEventListener("focus", wake);
+        document.addEventListener("visibilitychange", wake);
+        return () => {
+          stopped = true;
+          clearTimeout(timerId);
+          window.removeEventListener("focus", wake);
+          document.removeEventListener("visibilitychange", wake);
+        };
       }, []);
+
+      // Rest timer completion cue. Works off timestamps, so it still expires correctly after tab sleep/lock.
+      useEffect(() => {
+        const current = stateRef.current;
+        const session = current ? sessionForActiveDate(current) : null;
+        if (!session || !restTimerVisible(session) || session.rest_paused_at || session.rest_completed_at) return;
+        if (restRemainingMs(session, liveClock) > 0) return;
+        playTimerDoneCue(current);
+        showToast("Rest complete. Next set.");
+        updateState((draft) => {
+          const active = sessionForActiveDate(draft);
+          if (active && !active.rest_completed_at) bump(active, { rest_completed_at: nowISO() });
+        }, { localOnly: true });
+      }, [liveClock]);
 
       // Sync triggers on connectivity & visibility changes (no auto-pause -- user controls pause).
       useEffect(() => {
@@ -1743,7 +1993,8 @@
         [state?.sets, state?.activeDate]
       );
       const activeSession_ = state ? sessionForActiveDate(state) : null;
-      const liveElapsedMs = activeSession_ && !activeSession_.finished_at ? sessionElapsedMs(activeSession_, clock) : 0;
+      const liveElapsedMs = activeSession_ && !activeSession_.finished_at ? sessionElapsedMs(activeSession_, liveClock) : 0;
+      const liveRestMs = activeSession_ && restTimerVisible(activeSession_) ? restRemainingMs(activeSession_, liveClock) : 0;
 
       if (!state) return h("main", { class: "app-shell" }, h("div", { class: "empty panel" }, "Loading K3VSYNC..."));
 
@@ -1755,8 +2006,10 @@
         ["sync", "Drive"]
       ];
 
-      const showTimer = liveElapsedMs > 0;
-      const timerPaused = Boolean(activeSession_?.paused_at);
+      const showTimer = liveElapsedMs > 0 || restTimerVisible(activeSession_);
+      const timerPaused = Boolean(activeSession_?.paused_at || activeSession_?.rest_paused_at);
+      const timerExpired = restTimerVisible(activeSession_) && activeSession_?.rest_completed_at;
+      const timerIsRest = restTimerVisible(activeSession_);
 
       return h("div", null,
         h("main", { class: "app-shell" },
@@ -1769,7 +2022,9 @@
               )
             ),
             h("div", { class: "topbar-right" },
-              showTimer && h("span", { class: "timer-pill" + (timerPaused ? " paused" : "") }, formatDuration(liveElapsedMs)),
+              showTimer && h("span", { class: "timer-pill" + (timerPaused ? " paused" : timerExpired ? " expired" : timerIsRest ? " resting" : "") },
+                timerIsRest ? `REST ${formatDuration(liveRestMs)}` : formatDuration(liveElapsedMs)
+              ),
               h("div", { class: "sync-chip", "data-state": syncStatus.state },
                 h("i", { class: "sync-dot" }),
                 h("span", null, syncStatus.label)
@@ -1803,7 +2058,7 @@
               ))
             )
           ),
-          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock, listening, setListening, recognitionRef }),
+          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock: liveClock, listening, setListening, recognitionRef }),
           state.view === "progress" && h(ProgressView, { state, updateState }),
           state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
           state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
@@ -1860,11 +2115,18 @@
 
     function SessionPanel({ state, updateState, clock, showToast, openModal }) {
       const session = sessionForActiveDate(state);
+      const componentClock = useLiveClock(Boolean(session && !session.finished_at));
+      clock = componentClock || clock || Date.now();
       const elapsed = session ? sessionElapsedMs(session, clock) : 0;
+      const restVisible = restTimerVisible(session);
+      const restRemaining = restVisible ? restRemainingMs(session, clock) : 0;
+      const restPct = restVisible ? restProgressPct(session, clock) : 0;
       const setCount = useMemo(() => setsForDate(state, state.activeDate).length, [state.sets, state.activeDate]);
       const isPaused = session?.paused_at != null;
       const isFinished = session?.finished_at != null;
       const isActive = session && !isPaused && !isFinished;
+      const restPaused = Boolean(session?.rest_paused_at);
+      const restDone = Boolean(session?.rest_completed_at);
 
       if (!session) {
         return h("article", { class: "session-strip panel" },
@@ -1878,36 +2140,56 @@
       }
 
       const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : "");
-      return h("article", { class: stripClass },
-        h("div", { class: "session-strip-main" },
-          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") },
-            isFinished ? "COMPLETED" : isPaused ? "PAUSED" : "LIVE"),
-          h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
-          h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
-          session?.notes && h("span", { class: "pill green" }, "notes")
+      return h("article", { class: stripClass, style: "display:block" },
+        h("div", { style: "display:flex;align-items:center;justify-content:space-between;gap:8px" },
+          h("div", { class: "session-strip-main" },
+            h("span", { class: "session-label" + (isPaused ? " paused-label" : "") },
+              isFinished ? "COMPLETED" : isPaused ? "PAUSED" : "LIVE"),
+            h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
+            h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
+            session?.notes && h("span", { class: "pill green" }, "notes")
+          ),
+          h("div", { class: "session-controls" },
+            isFinished
+              ? h("span", { class: "session-meta", style: "font-size:0.78rem;padding:0 8px" }, "Done ✓")
+              : isPaused
+                ? h("button", { class: "ghost-btn", type: "button",
+                    onClick: () => updateState((d) => { resumeSession(d); showToast("Workout resumed!"); })
+                  }, "Resume")
+                : h("button", { class: "ghost-btn", type: "button",
+                    onClick: () => updateState((d) => { pauseSession(d); showToast("Workout paused."); })
+                  }, "Pause"),
+            !isFinished && h("button", { class: "session-finish-btn", type: "button",
+              onClick: () => {
+                updateState((d) => {
+                  const active = activeSession(d);
+                  bump(active, { manual_duration_ms: sessionElapsedMs(active), manual_duration_set_at: nowISO(), finished_at: nowISO(), rest_started_at: null, rest_duration_ms: 0 });
+                });
+                showToast("Workout finished! Time saved.");
+              }
+            }, "Finish"),
+            h("button", { class: "ghost-btn session-edit-btn", type: "button",
+              onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) }))
+            }, "Edit")
+          )
         ),
-        h("div", { class: "session-controls" },
-          isFinished
-            ? h("span", { class: "session-meta", style: "font-size:0.78rem;padding:0 8px" }, "Done ✓")
-            : isPaused
-              ? h("button", { class: "ghost-btn", type: "button",
-                  onClick: () => updateState((d) => { resumeSession(d); showToast("Workout resumed!"); })
-                }, "Resume")
-              : h("button", { class: "ghost-btn", type: "button",
-                  onClick: () => updateState((d) => { pauseSession(d); showToast("Workout paused."); })
-                }, "Pause"),
-          !isFinished && h("button", { class: "session-finish-btn", type: "button",
-            onClick: () => {
-              updateState((d) => {
-                const active = activeSession(d);
-                bump(active, { manual_duration_ms: sessionElapsedMs(active), finished_at: nowISO() });
-              });
-              showToast("Workout finished! Time saved.");
-            }
-          }, "Finish"),
-          h("button", { class: "ghost-btn session-edit-btn", type: "button",
-            onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) }))
-          }, "Edit")
+        restVisible && h("div", { class: "rest-strip" + (restDone ? " done" : "") },
+          h("div", { class: "rest-head" },
+            h("div", { class: "rest-title" },
+              h("b", null, restDone ? "Rest complete" : restPaused ? "Rest paused" : "Rest timer"),
+              h("span", null, session.rest_label ? `After ${session.rest_label}` : "Auto-starts after every completed set")
+            ),
+            h("div", { class: "rest-time" + (restPaused ? " paused" : restDone ? " expired" : "") }, formatDuration(restRemaining))
+          ),
+          h("div", { class: "rest-progress", style: `--pct:${restPct}%` }, h("i")),
+          h("div", { class: "rest-actions" },
+            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((d) => adjustRestTimer(d, -15000), { localOnly: true }) }, "-15s"),
+            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((d) => adjustRestTimer(d, 15000), { localOnly: true }) }, "+15s"),
+            restPaused
+              ? h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((d) => { resumeRestTimer(d); showToast("Rest resumed."); }, { localOnly: true }) }, "Resume rest")
+              : !restDone && h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((d) => { pauseRestTimer(d); showToast("Rest paused."); }, { localOnly: true }) }, "Pause rest"),
+            h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((d) => { skipRestTimer(d); showToast("Rest skipped."); }, { localOnly: true }) }, restDone ? "Clear" : "Skip")
+          )
         )
       );
     }
@@ -1920,7 +2202,7 @@
       const commitDuration = (ms) => {
         updateState((draft) => {
           const active = activeSession(draft);
-          bump(active, { manual_duration_ms: Math.max(0, ms) });
+          bump(active, { manual_duration_ms: Math.max(0, ms), manual_duration_set_at: nowISO() });
           draft.sessionTimeDraft = "";
         });
         setDisplayMs(Math.max(0, ms));
