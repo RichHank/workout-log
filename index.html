@@ -1,0 +1,1890 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111318">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Workout Log">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Workout Log</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f8;
+      --panel: #ffffff;
+      --panel-2: #eef2f5;
+      --text: #111318;
+      --muted: #69727d;
+      --line: #dce3e8;
+      --line-strong: #c8d1d8;
+      --accent: #5338c9;
+      --accent-2: #0b806f;
+      --accent-3: #c26a12;
+      --danger: #ba2f36;
+      --shadow: 0 18px 44px rgba(17, 19, 24, 0.08);
+      --radius: 8px;
+      --tap: 46px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, #f9fafb 0%, #f1f5f7 40%, #edf2f4 100%);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      min-height: var(--tap);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      padding: 10px 12px;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(83, 56, 201, 0.13);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 86px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .shell {
+      width: min(100%, 780px);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: env(safe-area-inset-top) 14px calc(82px + env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0 10px;
+      background: linear-gradient(180deg, rgba(249, 250, 251, 0.96), rgba(249, 250, 251, 0.82));
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: #111318;
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+
+    .icon-btn {
+      width: var(--tap);
+      height: var(--tap);
+      display: inline-grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 20px rgba(17, 19, 24, 0.05);
+    }
+
+    .icon-btn:active,
+    .primary-btn:active,
+    .ghost-btn:active,
+    .segmented button:active {
+      transform: translateY(1px);
+    }
+
+    .icon-btn svg,
+    .primary-btn svg,
+    .ghost-btn svg,
+    .mini-btn svg {
+      width: 19px;
+      height: 19px;
+      stroke-width: 2;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      margin: 6px 0 14px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      padding: 4px;
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+
+    .segmented button {
+      min-height: 40px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .segmented button[aria-selected="true"] {
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(17, 19, 24, 0.08);
+    }
+
+    .date-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .date-row input {
+      min-height: 42px;
+    }
+
+    .day-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .day-strip button {
+      min-height: 54px;
+      padding: 7px 5px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: grid;
+      gap: 2px;
+      justify-items: center;
+    }
+
+    .day-strip button strong {
+      color: inherit;
+      font-size: 0.84rem;
+      letter-spacing: 0;
+    }
+
+    .day-strip button span {
+      font-size: 0.7rem;
+      line-height: 1.1;
+    }
+
+    .day-strip button[aria-current="true"] {
+      background: #111318;
+      color: #fff;
+      border-color: #111318;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .metric {
+      min-height: 68px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      display: grid;
+      align-content: center;
+      gap: 2px;
+    }
+
+    .metric b {
+      font-size: 1.24rem;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      line-height: 1.15;
+    }
+
+    .panel {
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 8px 26px rgba(17, 19, 24, 0.05);
+    }
+
+    .voice-panel {
+      padding: 12px;
+      margin: 0 0 12px;
+    }
+
+    .voice-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .voice-grid textarea {
+      min-height: 46px;
+      height: 46px;
+      max-height: 120px;
+      padding-top: 11px;
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      min-height: var(--tap);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: var(--radius);
+      padding: 0 13px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(83, 56, 201, 0.2);
+    }
+
+    .ghost-btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .status-line {
+      margin-top: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      min-height: 19px;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .exercise {
+      overflow: hidden;
+    }
+
+    .exercise-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+      padding: 13px 12px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .exercise-title {
+      min-width: 0;
+    }
+
+    .exercise-title h2 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .target {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 0 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .pill.compound {
+      background: #e5f0ff;
+      color: #174777;
+    }
+
+    .pill.isolation {
+      background: #e7f6ec;
+      color: #17623c;
+    }
+
+    .pill.logged {
+      background: #fff1db;
+      color: #8a4a08;
+    }
+
+    .set-count {
+      min-width: 46px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 0.95rem;
+    }
+
+    .set-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 78px 64px auto;
+      gap: 7px;
+      padding: 10px 12px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1;
+      margin: 0 0 5px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .field input {
+      min-height: 42px;
+      padding: 8px 10px;
+    }
+
+    .mini-btn {
+      min-width: 42px;
+      height: 42px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: #111318;
+      color: #fff;
+    }
+
+    .mini-btn.delete {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #f0c9cc;
+    }
+
+    .sets {
+      display: grid;
+    }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 48px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+
+    .set-row:last-child {
+      border-bottom: 0;
+    }
+
+    .set-num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-weight: 900;
+      font-size: 0.76rem;
+    }
+
+    .set-main {
+      min-width: 0;
+      display: grid;
+      gap: 2px;
+    }
+
+    .set-main b {
+      font-size: 0.92rem;
+      line-height: 1.15;
+    }
+
+    .set-main span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.15;
+    }
+
+    .empty {
+      min-height: 86px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 520px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      background: #f9fbfc;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .section-title {
+      margin: 16px 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .export-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .export-actions .ghost-btn,
+    .export-actions .primary-btn {
+      padding: 0 8px;
+      font-size: 0.85rem;
+    }
+
+    .danger-zone {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .danger-zone .ghost-btn {
+      color: var(--danger);
+      border-color: #f0c9cc;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      padding: 8px max(14px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-right));
+      background: rgba(249, 250, 251, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--line);
+    }
+
+    .bottom-nav-inner {
+      width: min(100%, 780px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .bottom-nav button {
+      min-height: 52px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .bottom-nav button[aria-selected="true"] {
+      color: #fff;
+      background: #111318;
+      border-color: #111318;
+    }
+
+    .bottom-nav svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      z-index: 30;
+      transform: translateX(-50%) translateY(18px);
+      width: min(calc(100% - 28px), 480px);
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: #111318;
+      color: #fff;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      font-size: 0.9rem;
+      line-height: 1.25;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dark {
+      color-scheme: dark;
+      --bg: #0f1115;
+      --panel: #171a20;
+      --panel-2: #222732;
+      --text: #f4f7fb;
+      --muted: #a1acb8;
+      --line: #2c3340;
+      --line-strong: #3b4654;
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      background: #0f1115;
+    }
+
+    body.dark {
+      background: linear-gradient(180deg, #111318 0%, #0f1115 100%);
+    }
+
+    body.dark .topbar,
+    body.dark .bottom-nav {
+      background: rgba(15, 17, 21, 0.9);
+    }
+
+    body.dark input,
+    body.dark textarea,
+    body.dark th {
+      background: #111318;
+    }
+
+    body.dark .brand-mark,
+    body.dark .day-strip button[aria-current="true"],
+    body.dark .bottom-nav button[aria-selected="true"],
+    body.dark .mini-btn {
+      background: #f4f7fb;
+      color: #111318;
+      border-color: #f4f7fb;
+    }
+
+    body.dark .pill.compound {
+      background: #153150;
+      color: #b8d9ff;
+    }
+
+    body.dark .pill.isolation {
+      background: #153323;
+      color: #bdf3d0;
+    }
+
+    body.dark .pill.logged {
+      background: #3a2913;
+      color: #ffd79a;
+    }
+
+    @media (min-width: 640px) {
+      .shell {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr 1.2fr;
+        align-items: start;
+      }
+
+      .day-strip {
+        grid-column: 1 / -1;
+      }
+
+      .voice-grid {
+        grid-template-columns: auto 1fr 112px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .set-form {
+        grid-template-columns: 1fr 66px 54px auto;
+      }
+
+      .export-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .brand h1 {
+        font-size: 0.98rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
+            <path d="M6 8v8M18 8v8M3.5 10.5v3M20.5 10.5v3M6 12h12" stroke="currentColor" stroke-linecap="round" stroke-width="2.1"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Workout Log</h1>
+          <p id="headline">Ready</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <span data-icon="sun"></span>
+      </button>
+    </header>
+
+    <div class="toolbar">
+      <div class="segmented" role="tablist" aria-label="Views">
+        <button type="button" data-view="log" aria-selected="true">Log</button>
+        <button type="button" data-view="week" aria-selected="false">Week</button>
+        <button type="button" data-view="export" aria-selected="false">Export</button>
+      </div>
+      <div class="date-row">
+        <label class="sr-only" for="workoutDate">Workout date</label>
+        <input id="workoutDate" type="date">
+        <button class="ghost-btn" id="todayBtn" type="button">Today</button>
+      </div>
+      <div class="day-strip" id="dayStrip" aria-label="Workout day"></div>
+    </div>
+
+    <main id="app"></main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <div class="bottom-nav-inner">
+      <button type="button" data-view="log" aria-selected="true">
+        <span data-icon="plus"></span>
+        <span>Log</span>
+      </button>
+      <button type="button" data-view="week" aria-selected="false">
+        <span data-icon="chart"></span>
+        <span>Week</span>
+      </button>
+      <button type="button" data-view="export" aria-selected="false">
+        <span data-icon="download"></span>
+        <span>Export</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "workout-log-v1";
+    const DB_NAME = "workout-log-db";
+    const DB_VERSION = 1;
+    const DB_STORE = "keyval";
+
+    const icons = {
+      plus: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-linecap="round"/></svg>',
+      mic: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" stroke="currentColor"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M9 21h6" stroke="currentColor" stroke-linecap="round"/></svg>',
+      stop: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h8v8H8z" stroke="currentColor" stroke-linejoin="round"/></svg>',
+      trash: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7l1-3h4l1 3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      download: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 4v10M8 10l4 4 4-4M5 20h14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      share: '<svg viewBox="0 0 24 24" fill="none"><path d="M16 6l-4-4-4 4M12 2v13M5 11v9h14v-9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      copy: '<svg viewBox="0 0 24 24" fill="none"><path d="M8 8h11v11H8zM5 16H4V4h12v1" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" fill="none"><path d="M5 19V5M5 19h14M9 16v-5M13 16V8M17 16v-3" stroke="currentColor" stroke-linecap="round"/></svg>',
+      sun: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-linecap="round"/></svg>',
+      moon: '<svg viewBox="0 0 24 24" fill="none"><path d="M20 15.5A8.2 8.2 0 0 1 8.5 4 8.4 8.4 0 1 0 20 15.5Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    };
+
+    const plan = [
+      {
+        id: "upper-a",
+        day: "Monday",
+        label: "Mon",
+        name: "Upper A",
+        focus: "Chest + arms",
+        exercises: [
+          exercise("bench-press", "Bench press", 3, "4-6", "Compound", "Chest", ["bench", "barbell bench", "bench press"]),
+          exercise("incline-db-press", "Incline DB press", 2, "6-10", "Compound", "Chest", ["incline press", "incline dumbbell press", "incline db", "incline db press"]),
+          exercise("close-lat-pulldown", "Lat pulldown, close neutral", 2, "8-10", "Compound", "Back", ["close lat pulldown", "neutral grip pulldown", "lat pulldown close", "lat pulldown"]),
+          exercise("seated-cable-row", "Seated cable row", 2, "10-12", "Compound", "Back", ["seated row", "cable row", "seated cable row"]),
+          exercise("barbell-curl", "Barbell curl", 2, "8-10", "Isolation", "Biceps", ["curl", "barbell curls", "barbell curl"]),
+          exercise("hammer-curl", "Hammer curl", 1, "10-15", "Isolation", "Biceps", ["hammer curls", "hammer curl"])
+        ]
+      },
+      {
+        id: "lower-a",
+        day: "Tuesday",
+        label: "Tue",
+        name: "Lower A",
+        focus: "Squat + hamstrings",
+        exercises: [
+          exercise("front-squat", "Front squat", 2, "4-6", "Compound", "Quads", ["front squat", "front squats"]),
+          exercise("leg-press", "Leg press", 2, "8-12", "Compound", "Quads", ["leg press"]),
+          exercise("leg-extension", "Leg extension", 2, "10-15", "Isolation", "Quads", ["leg extensions", "leg extension"]),
+          exercise("romanian-deadlift", "Romanian deadlift", 2, "8-10", "Compound", "Hamstrings", ["rdl", "romanian deadlift", "romanian deadlifts"]),
+          exercise("leg-curl", "Leg curl", 2, "10-15", "Isolation", "Hamstrings", ["leg curls", "leg curl"]),
+          exercise("standing-calf-raise", "Standing calf raise", 3, "12-15", "Isolation", "Calves", ["calf raise", "standing calves", "standing calf raise"])
+        ]
+      },
+      {
+        id: "upper-b",
+        day: "Thursday",
+        label: "Thu",
+        name: "Upper B",
+        focus: "Shoulders + back",
+        exercises: [
+          exercise("overhead-press", "Overhead press", 2, "4-6", "Compound", "Shoulders", ["ohp", "overhead press", "shoulder press"]),
+          exercise("lateral-raise", "Lateral raise", 2, "12-15", "Isolation", "Shoulders", ["lateral raises", "lateral raise", "side raise"]),
+          exercise("wide-lat-pulldown", "Lat pulldown, wide", 2, "8-10", "Compound", "Back", ["wide pulldown", "wide lat pulldown", "lat pulldown wide"]),
+          exercise("wide-cable-row", "Cable row, wide", 2, "10-12", "Compound", "Back", ["wide row", "wide cable row", "cable row wide"]),
+          exercise("tricep-pushdown", "Tricep pushdown", 2, "10-15", "Isolation", "Triceps", ["pushdown", "tricep pushdown", "triceps pushdown"]),
+          exercise("overhead-tricep-extension", "Overhead tricep extension", 1, "10-15", "Isolation", "Triceps", ["overhead extension", "overhead tricep extension", "triceps extension"])
+        ]
+      },
+      {
+        id: "lower-b",
+        day: "Friday",
+        label: "Fri",
+        name: "Lower B",
+        focus: "Hinge + single-leg",
+        exercises: [
+          exercise("deadlift", "Deadlift", 2, "4-6", "Compound", "Hamstrings", ["deadlift", "deadlifts"]),
+          exercise("bulgarian-split-squat", "Bulgarian split squat", 2, "8-10", "Compound", "Quads", ["bulgarian", "split squat", "bulgarian split squat"]),
+          exercise("hip-thrust", "Hip thrust", 2, "10-12", "Compound", "Glutes", ["hip thrust", "hip thrusts"]),
+          exercise("lower-b-leg-curl", "Leg curl", 2, "10-12", "Isolation", "Hamstrings", ["lower b leg curl", "lying leg curl", "seated leg curl"]),
+          exercise("lower-b-leg-extension", "Leg extension", 1, "12-15", "Isolation", "Quads", ["lower b leg extension", "single leg extension"]),
+          exercise("lower-b-calf-raise", "Standing calf raise", 2, "12-15", "Isolation", "Calves", ["lower b calf raise", "standing calf raises"])
+        ]
+      }
+    ];
+
+    const allExercises = plan.flatMap((workout) =>
+      workout.exercises.map((item) => ({ ...item, workoutId: workout.id, workoutName: workout.name, day: workout.day }))
+    );
+
+    let state = createDefaultState();
+    let recognition = null;
+    let listening = false;
+
+    function exercise(id, name, sets, reps, type, muscle, aliases) {
+      return { id, name, targetSets: sets, targetReps: reps, type, muscle, aliases };
+    }
+
+    function createDefaultState() {
+      return {
+        view: "log",
+        workoutId: workoutForToday().id,
+        activeDate: todayISO(),
+        logs: [],
+        drafts: {},
+        dark: false,
+        command: ""
+      };
+    }
+
+    async function loadState() {
+      const fallback = createDefaultState();
+      const saved = await readStoredState();
+      return normalizeState(saved, fallback);
+    }
+
+    async function readStoredState() {
+      try {
+        const saved = await idbGet(STORAGE_KEY);
+        if (saved && Array.isArray(saved.logs)) return saved;
+      } catch {
+        // Fall through to localStorage for older installs or blocked IndexedDB.
+      }
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved && Array.isArray(saved.logs)) {
+          idbSet(STORAGE_KEY, saved).catch(() => {});
+          return saved;
+        }
+      } catch {
+        return null;
+      }
+
+      return null;
+    }
+
+    function normalizeState(saved, fallback = createDefaultState()) {
+      if (!saved || !Array.isArray(saved.logs)) return fallback;
+      return {
+        ...fallback,
+        ...saved,
+        logs: saved.logs.filter(Boolean),
+        drafts: saved.drafts && typeof saved.drafts === "object" ? saved.drafts : {},
+        command: saved.command || ""
+      };
+    }
+
+    function saveState() {
+      const snapshot = JSON.parse(JSON.stringify(state));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+      } catch {
+        // IndexedDB remains the primary storage path.
+      }
+      idbSet(STORAGE_KEY, snapshot).catch(() => {});
+    }
+
+    function openAppDB() {
+      return new Promise((resolve, reject) => {
+        if (!("indexedDB" in window)) {
+          reject(new Error("IndexedDB unavailable"));
+          return;
+        }
+
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(DB_STORE)) {
+            db.createObjectStore(DB_STORE);
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbGet(key) {
+      const db = await openAppDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readonly");
+        const request = tx.objectStore(DB_STORE).get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+        tx.oncomplete = () => db.close();
+      });
+    }
+
+    async function idbSet(key, value) {
+      const db = await openAppDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).put(value, key);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
+    }
+
+    function todayISO() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
+    }
+
+    function workoutForToday() {
+      const day = new Date().getDay();
+      return plan.find((item) => ({ 1: "Monday", 2: "Tuesday", 4: "Thursday", 5: "Friday" }[day]) === item.day) || plan[0];
+    }
+
+    function currentWorkout() {
+      return plan.find((item) => item.id === state.workoutId) || plan[0];
+    }
+
+    function activeLogs() {
+      return state.logs
+        .filter((log) => log.date === state.activeDate && log.workoutId === state.workoutId)
+        .sort(sortLogs);
+    }
+
+    function sortLogs(a, b) {
+      return String(a.createdAt).localeCompare(String(b.createdAt));
+    }
+
+    function logsForExercise(exerciseId) {
+      return activeLogs().filter((log) => log.exerciseId === exerciseId);
+    }
+
+    function weekStartISO(dateISO) {
+      const date = new Date(`${dateISO}T12:00:00`);
+      const day = date.getDay();
+      const mondayOffset = day === 0 ? -6 : 1 - day;
+      date.setDate(date.getDate() + mondayOffset);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function weekLogs() {
+      const start = new Date(`${weekStartISO(state.activeDate)}T00:00:00`);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      return state.logs
+        .filter((log) => {
+          const date = new Date(`${log.date}T12:00:00`);
+          return date >= start && date < end;
+        })
+        .sort((a, b) => `${a.date}-${a.createdAt}`.localeCompare(`${b.date}-${b.createdAt}`));
+    }
+
+    function render() {
+      document.body.classList.toggle("dark", state.dark);
+      renderIcons();
+      renderToolbar();
+      renderHeadline();
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.setAttribute("aria-selected", String(button.dataset.view === state.view));
+      });
+
+      if (state.view === "log") renderLogView();
+      if (state.view === "week") renderWeekView();
+      if (state.view === "export") renderExportView();
+      saveState();
+    }
+
+    function renderIcons() {
+      document.querySelectorAll("[data-icon]").forEach((node) => {
+        node.innerHTML = icons[node.dataset.icon] || "";
+      });
+      const themeIcon = document.querySelector("#themeBtn [data-icon]");
+      if (themeIcon) {
+        themeIcon.dataset.icon = state.dark ? "moon" : "sun";
+        themeIcon.innerHTML = icons[themeIcon.dataset.icon];
+      }
+    }
+
+    function renderToolbar() {
+      document.getElementById("workoutDate").value = state.activeDate;
+      const strip = document.getElementById("dayStrip");
+      strip.innerHTML = plan.map((workout) => `
+        <button type="button" data-workout="${workout.id}" aria-current="${workout.id === state.workoutId}">
+          <strong>${workout.label}</strong>
+          <span>${workout.name}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderHeadline() {
+      const workout = currentWorkout();
+      const logs = activeLogs();
+      const volume = logs.reduce((total, log) => total + estimatedVolume(log), 0);
+      document.getElementById("headline").textContent =
+        `${workout.name} / ${logs.length} sets / ${formatNumber(volume)} lb`;
+    }
+
+    function renderLogView() {
+      const workout = currentWorkout();
+      const logs = activeLogs();
+      const target = workout.exercises.reduce((sum, item) => sum + item.targetSets, 0);
+      const volume = logs.reduce((total, log) => total + estimatedVolume(log), 0);
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <section class="metric-grid" aria-label="Workout metrics">
+          <div class="metric"><b>${logs.length}</b><span>Sets logged</span></div>
+          <div class="metric"><b>${target}</b><span>Target sets</span></div>
+          <div class="metric"><b>${formatNumber(volume)}</b><span>Est. volume</span></div>
+        </section>
+
+        <section class="voice-panel panel">
+          <div class="voice-grid">
+            <button class="icon-btn" id="voiceBtn" type="button" aria-label="${listening ? "Stop voice entry" : "Start voice entry"}">
+              <span data-icon="${listening ? "stop" : "mic"}"></span>
+            </button>
+            <label class="sr-only" for="commandInput">Voice or typed command</label>
+            <textarea id="commandInput" placeholder="bench press 185 for 6">${escapeHtml(state.command)}</textarea>
+            <button class="primary-btn" id="parseBtn" type="button">Add</button>
+          </div>
+          <div class="status-line">
+            <span id="voiceStatus">${voiceStatusText()}</span>
+            <span>${workout.day} / ${workout.focus}</span>
+          </div>
+        </section>
+
+        <section class="list" aria-label="Exercises">
+          ${workout.exercises.map(renderExercise).join("")}
+        </section>
+      `;
+      renderIcons();
+    }
+
+    function renderExercise(item) {
+      const logs = logsForExercise(item.id);
+      const draft = state.drafts[item.id] || {};
+      return `
+        <article class="exercise panel">
+          <div class="exercise-head">
+            <div class="exercise-title">
+              <h2>${item.name}</h2>
+              <div class="target">
+                <span>${item.targetSets} sets</span>
+                <span>${item.targetReps} reps</span>
+                <span class="pill ${item.type.toLowerCase()}">${item.type}</span>
+                <span class="pill logged">${logs.length}/${item.targetSets}</span>
+              </div>
+            </div>
+            <div class="set-count">${logs.length}</div>
+          </div>
+
+          <div class="set-form" data-exercise-form="${item.id}">
+            <div class="field">
+              <label for="${item.id}-weight">Weight</label>
+              <input id="${item.id}-weight" data-draft="${item.id}" data-field="weight" inputmode="decimal" placeholder="lb" value="${escapeHtml(draft.weight || "")}">
+            </div>
+            <div class="field">
+              <label for="${item.id}-reps">Reps</label>
+              <input id="${item.id}-reps" data-draft="${item.id}" data-field="reps" inputmode="numeric" placeholder="0" value="${escapeHtml(draft.reps || "")}">
+            </div>
+            <div class="field">
+              <label for="${item.id}-rir">RIR</label>
+              <input id="${item.id}-rir" data-draft="${item.id}" data-field="rir" inputmode="decimal" placeholder="-" value="${escapeHtml(draft.rir || "")}">
+            </div>
+            <button class="mini-btn" type="button" data-add-set="${item.id}" aria-label="Add set">
+              <span data-icon="plus"></span>
+            </button>
+          </div>
+
+          <div class="sets">
+            ${logs.length ? logs.map(renderSetRow).join("") : '<div class="empty">No sets logged yet.</div>'}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderSetRow(log) {
+      const rir = log.rir !== "" && log.rir != null ? ` / RIR ${escapeHtml(log.rir)}` : "";
+      const note = log.notes ? ` / ${escapeHtml(log.notes)}` : "";
+      return `
+        <div class="set-row">
+          <div class="set-num">${log.setNumber}</div>
+          <div class="set-main">
+            <b>${escapeHtml(log.weight)} x ${escapeHtml(log.reps)}</b>
+            <span>${escapeHtml(log.source)}${rir}${note}</span>
+          </div>
+          <button class="mini-btn delete" type="button" data-delete-set="${log.id}" aria-label="Delete set">
+            <span data-icon="trash"></span>
+          </button>
+        </div>
+      `;
+    }
+
+    function renderWeekView() {
+      const logs = weekLogs();
+      const byMuscle = groupByMuscle(logs);
+      const rows = Object.entries(byMuscle).map(([muscle, data]) => `
+        <tr>
+          <td><b>${muscle}</b></td>
+          <td>${data.sets}</td>
+          <td>${formatNumber(data.volume)}</td>
+          <td>${escapeHtml([...data.exercises].join(", "))}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("app").innerHTML = `
+        <section class="metric-grid" aria-label="Week metrics">
+          <div class="metric"><b>${logs.length}</b><span>Week sets</span></div>
+          <div class="metric"><b>${Object.keys(byMuscle).length}</b><span>Muscles hit</span></div>
+          <div class="metric"><b>${formatNumber(logs.reduce((sum, log) => sum + estimatedVolume(log), 0))}</b><span>Est. volume</span></div>
+        </section>
+
+        <div class="section-title">
+          <h2>Volume</h2>
+          <span>Week of ${weekStartISO(state.activeDate)}</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Muscle</th><th>Sets</th><th>Volume</th><th>Exercises</th></tr>
+            </thead>
+            <tbody>
+              ${rows || '<tr><td colspan="4">No sets this week.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-title">
+          <h2>Recent</h2>
+          <span>${logs.length} rows</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Workout</th><th>Exercise</th><th>Set</th><th>Weight</th><th>Reps</th></tr>
+            </thead>
+            <tbody>
+              ${logs.slice(-20).reverse().map((log) => `
+                <tr>
+                  <td>${log.date}</td>
+                  <td>${escapeHtml(log.workoutName)}</td>
+                  <td>${escapeHtml(log.exerciseName)}</td>
+                  <td>${log.setNumber}</td>
+                  <td>${escapeHtml(log.weight)}</td>
+                  <td>${escapeHtml(log.reps)}</td>
+                </tr>
+              `).join("") || '<tr><td colspan="6">No entries yet.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderExportView() {
+      const csv = toCSV(weekLogs());
+      document.getElementById("app").innerHTML = `
+        <section class="export-actions">
+          <button class="primary-btn" type="button" id="downloadBtn"><span data-icon="download"></span>CSV</button>
+          <button class="ghost-btn" type="button" id="shareBtn"><span data-icon="share"></span>Share</button>
+          <button class="ghost-btn" type="button" id="copyBtn"><span data-icon="copy"></span>Copy</button>
+          <button class="ghost-btn" type="button" id="backupBtn"><span data-icon="download"></span>Backup</button>
+          <button class="ghost-btn" type="button" id="importBtn"><span data-icon="share"></span>Import</button>
+        </section>
+        <input class="sr-only" id="importFile" type="file" accept="application/json,.json">
+        <label class="sr-only" for="csvPreview">CSV preview</label>
+        <textarea id="csvPreview" readonly>${escapeHtml(csv)}</textarea>
+        <div class="danger-zone">
+          <button class="ghost-btn" type="button" id="clearWeekBtn">Clear Week</button>
+        </div>
+      `;
+      renderIcons();
+    }
+
+    function groupByMuscle(logs) {
+      return logs.reduce((groups, log) => {
+        const muscle = log.muscle || "Other";
+        groups[muscle] ||= { sets: 0, volume: 0, exercises: new Set() };
+        groups[muscle].sets += 1;
+        groups[muscle].volume += estimatedVolume(log);
+        groups[muscle].exercises.add(log.exerciseName);
+        return groups;
+      }, {});
+    }
+
+    function estimatedVolume(log) {
+      const weight = Number.parseFloat(String(log.weight).replace(/[^0-9.]/g, ""));
+      const reps = Number.parseInt(log.reps, 10);
+      if (!Number.isFinite(weight) || !Number.isFinite(reps)) return 0;
+      return weight * reps;
+    }
+
+    function addSet(exerciseId, data) {
+      const workout = currentWorkout();
+      const item = workout.exercises.find((exerciseItem) => exerciseItem.id === exerciseId)
+        || allExercises.find((exerciseItem) => exerciseItem.id === exerciseId);
+      if (!item) return false;
+
+      const existing = state.logs.filter((log) =>
+        log.date === state.activeDate &&
+        log.workoutId === workout.id &&
+        log.exerciseId === exerciseId
+      );
+
+      const weight = cleanValue(data.weight);
+      const reps = cleanValue(data.reps);
+      if (!weight || !reps) return false;
+
+      state.logs.push({
+        id: cryptoId(),
+        date: state.activeDate,
+        workoutId: workout.id,
+        workoutName: workout.name,
+        day: workout.day,
+        exerciseId,
+        exerciseName: item.name,
+        muscle: item.muscle,
+        type: item.type,
+        targetSets: item.targetSets,
+        targetReps: item.targetReps,
+        setNumber: existing.length + 1,
+        weight,
+        reps,
+        rir: cleanValue(data.rir),
+        notes: cleanValue(data.notes),
+        source: data.source || "manual",
+        createdAt: new Date().toISOString()
+      });
+
+      state.drafts[exerciseId] = { weight, reps: "", rir: data.rir || "" };
+      render();
+      showToast(`${item.name}: ${weight} x ${reps}`);
+      return true;
+    }
+
+    function deleteSet(id) {
+      const log = state.logs.find((item) => item.id === id);
+      state.logs = state.logs.filter((item) => item.id !== id);
+      renumberSets(log);
+      render();
+    }
+
+    function renumberSets(deletedLog) {
+      if (!deletedLog) return;
+      state.logs
+        .filter((log) =>
+          log.date === deletedLog.date &&
+          log.workoutId === deletedLog.workoutId &&
+          log.exerciseId === deletedLog.exerciseId
+        )
+        .sort(sortLogs)
+        .forEach((log, index) => {
+          log.setNumber = index + 1;
+        });
+    }
+
+    function cleanValue(value) {
+      return String(value ?? "").trim();
+    }
+
+    function cryptoId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function parseCommand(text) {
+      const raw = cleanValue(text);
+      if (!raw) return { ok: false, message: "No command text." };
+
+      const match = findExercise(raw);
+      if (!match) return { ok: false, message: "No matching exercise." };
+
+      if (match.exercise.workoutId !== state.workoutId) {
+        state.workoutId = match.exercise.workoutId;
+      }
+
+      const sets = extractSets(raw, match.alias);
+      if (!sets.length) return { ok: false, message: "No weight and reps found." };
+
+      sets.forEach((set) => addSet(match.exercise.id, { ...set, source: "voice" }));
+      state.command = "";
+      saveState();
+      return { ok: true, message: `${sets.length} set${sets.length === 1 ? "" : "s"} added.` };
+    }
+
+    function findExercise(text) {
+      const normalized = normalizeText(text);
+      const aliasMatches = [];
+
+      allExercises.forEach((exerciseItem) => {
+        const aliases = [exerciseItem.name, ...exerciseItem.aliases].map(normalizeText);
+        aliases.forEach((alias) => {
+          if (normalized.includes(alias)) {
+            aliasMatches.push({ exercise: exerciseItem, alias, score: alias.length });
+          }
+        });
+      });
+
+      aliasMatches.sort((a, b) => b.score - a.score);
+      if (aliasMatches[0]) return aliasMatches[0];
+
+      const tokens = normalized.split(" ").filter(Boolean);
+      const fuzzy = allExercises
+        .map((exerciseItem) => {
+          const nameTokens = normalizeText(exerciseItem.name).split(" ").filter((token) => token.length > 2);
+          const hits = nameTokens.filter((token) => tokens.includes(token)).length;
+          return { exercise: exerciseItem, alias: normalizeText(exerciseItem.name), score: hits / Math.max(nameTokens.length, 1) };
+        })
+        .filter((item) => item.score >= 0.65)
+        .sort((a, b) => b.score - a.score);
+
+      return fuzzy[0] || null;
+    }
+
+    function extractSets(text, alias) {
+      let body = normalizeText(text)
+        .replace(alias, " ")
+        .replace(/\b(add|set|sets|logged|log|did|i did|pounds|pound|lbs|lb|reps|rep)\b/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const rirMatch = body.match(/\b(?:rir|r i r|reserve)\s*(\d+(?:\.\d+)?)\b/);
+      const rir = rirMatch ? rirMatch[1] : "";
+      if (rirMatch) body = body.replace(rirMatch[0], " ");
+
+      const notesMatch = body.match(/\bnote\s+(.+)$/);
+      const notes = notesMatch ? notesMatch[1].trim() : "";
+      if (notesMatch) body = body.replace(notesMatch[0], " ");
+
+      if (/\b(bodyweight|body weight|bw)\b/.test(body)) {
+        const repMatch = body.match(/\b(?:for|x|by)?\s*(\d{1,3})\b/);
+        return repMatch ? [{ weight: "BW", reps: repMatch[1], rir, notes }] : [];
+      }
+
+      const sets = [];
+      const pairPattern = /(\d+(?:\.\d+)?)\s*(?:x|by|for|with)\s*(\d{1,3})/g;
+      let match;
+      while ((match = pairPattern.exec(body))) {
+        sets.push({ weight: match[1], reps: match[2], rir, notes });
+      }
+
+      if (sets.length) return sets;
+
+      const reversePattern = /(\d{1,3})\s*(?:at|with)\s*(\d+(?:\.\d+)?)/g;
+      while ((match = reversePattern.exec(body))) {
+        sets.push({ weight: match[2], reps: match[1], rir, notes });
+      }
+
+      if (sets.length) return sets;
+
+      const numbers = body.match(/\d+(?:\.\d+)?/g) || [];
+      for (let index = 0; index < numbers.length - 1; index += 2) {
+        sets.push({ weight: numbers[index], reps: numbers[index + 1], rir, notes });
+      }
+      return sets;
+    }
+
+    function normalizeText(text) {
+      return replaceNumberWords(String(text).toLowerCase())
+        .replace(/dumbbells?/g, "db")
+        .replace(/triceps/g, "tricep")
+        .replace(/r\.?i\.?r\.?/g, "rir")
+        .replace(/times/g, "x")
+        .replace(/[^a-z0-9.\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function replaceNumberWords(text) {
+      const numbers = {
+        zero: 0,
+        one: 1,
+        two: 2,
+        three: 3,
+        four: 4,
+        five: 5,
+        six: 6,
+        seven: 7,
+        eight: 8,
+        nine: 9,
+        ten: 10,
+        eleven: 11,
+        twelve: 12,
+        thirteen: 13,
+        fourteen: 14,
+        fifteen: 15,
+        sixteen: 16,
+        seventeen: 17,
+        eighteen: 18,
+        nineteen: 19,
+        twenty: 20
+      };
+      return text.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\b/g, (word) => numbers[word]);
+    }
+
+    function voiceStatusText() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return "Voice unavailable in this browser.";
+      return listening ? "Listening" : "Voice ready";
+    }
+
+    function startVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast("Voice entry is not available in this browser.");
+        return;
+      }
+
+      if (listening && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      listening = true;
+      render();
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let index = event.resultIndex; index < event.results.length; index += 1) {
+          transcript += event.results[index][0].transcript;
+        }
+        state.command = transcript.trim();
+        const input = document.getElementById("commandInput");
+        if (input) input.value = state.command;
+
+        const latest = event.results[event.results.length - 1];
+        if (latest && latest.isFinal) {
+          const result = parseCommand(state.command);
+          showToast(result.message);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        listening = false;
+        render();
+        showToast(event.error === "not-allowed" ? "Microphone permission was blocked." : `Voice error: ${event.error}`);
+      };
+
+      recognition.onend = () => {
+        listening = false;
+        render();
+      };
+
+      try {
+        recognition.start();
+      } catch {
+        listening = false;
+        render();
+      }
+    }
+
+    function toCSV(logs) {
+      const headers = [
+        "date",
+        "day",
+        "workout",
+        "exercise",
+        "muscle",
+        "type",
+        "target_sets",
+        "target_reps",
+        "set_number",
+        "weight",
+        "reps",
+        "rir",
+        "notes",
+        "source",
+        "created_at"
+      ];
+
+      const rows = logs.map((log) => [
+        log.date,
+        log.day,
+        log.workoutName,
+        log.exerciseName,
+        log.muscle,
+        log.type,
+        log.targetSets,
+        log.targetReps,
+        log.setNumber,
+        log.weight,
+        log.reps,
+        log.rir,
+        log.notes,
+        log.source,
+        log.createdAt
+      ]);
+
+      return [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+    }
+
+    function csvCell(value) {
+      const text = String(value ?? "");
+      if (/[",\n]/.test(text)) return `"${text.replace(/"/g, '""')}"`;
+      return text;
+    }
+
+    function csvFilename() {
+      return `workout-log-week-of-${weekStartISO(state.activeDate)}.csv`;
+    }
+
+    function backupFilename() {
+      return `workout-log-backup-${todayISO()}.json`;
+    }
+
+    function downloadCSV() {
+      const blob = new Blob([toCSV(weekLogs())], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = csvFilename();
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function shareCSV() {
+      const csv = toCSV(weekLogs());
+      const file = new File([csv], csvFilename(), { type: "text/csv" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Workout log", text: "Workout log CSV" });
+        return;
+      }
+      await copyCSV();
+      showToast("CSV copied.");
+    }
+
+    async function copyCSV() {
+      const csv = toCSV(weekLogs());
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(csv);
+        showToast("CSV copied.");
+        return;
+      }
+      const preview = document.getElementById("csvPreview");
+      if (preview) {
+        preview.focus();
+        preview.select();
+        document.execCommand("copy");
+        showToast("CSV copied.");
+      }
+    }
+
+    function backupPayload() {
+      return JSON.stringify({
+        app: "Workout Log",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        state: {
+          ...state,
+          command: ""
+        }
+      }, null, 2);
+    }
+
+    function downloadBackup() {
+      const blob = new Blob([backupPayload()], { type: "application/json;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = backupFilename();
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("Backup downloaded.");
+    }
+
+    async function importBackup(file) {
+      if (!file) return;
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const incoming = normalizeState(parsed.state || parsed);
+      const mergedLogs = new Map(state.logs.map((log) => [log.id, log]));
+      incoming.logs.forEach((log) => {
+        if (log && log.id) mergedLogs.set(log.id, log);
+      });
+
+      state = normalizeState({
+        ...state,
+        ...incoming,
+        logs: [...mergedLogs.values()].sort((a, b) => `${a.date}-${a.createdAt}`.localeCompare(`${b.date}-${b.createdAt}`)),
+        drafts: { ...incoming.drafts, ...state.drafts },
+        view: "export",
+        command: ""
+      });
+      render();
+      showToast(`Imported ${incoming.logs.length} backed-up sets.`);
+    }
+
+    function clearWeek() {
+      if (!window.confirm("Clear this week's logged sets from this browser? Make a backup first if you may need them later.")) {
+        return;
+      }
+      const keep = new Set(weekLogs().map((log) => log.id));
+      state.logs = state.logs.filter((log) => !keep.has(log.id));
+      render();
+      showToast("Week cleared.");
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    document.addEventListener("click", async (event) => {
+      const viewButton = event.target.closest("[data-view]");
+      if (viewButton) {
+        state.view = viewButton.dataset.view;
+        render();
+        return;
+      }
+
+      const workoutButton = event.target.closest("[data-workout]");
+      if (workoutButton) {
+        state.workoutId = workoutButton.dataset.workout;
+        render();
+        return;
+      }
+
+      const addButton = event.target.closest("[data-add-set]");
+      if (addButton) {
+        const exerciseId = addButton.dataset.addSet;
+        const draft = state.drafts[exerciseId] || {};
+        if (!addSet(exerciseId, { ...draft, source: "manual" })) {
+          showToast("Weight and reps are needed.");
+        }
+        return;
+      }
+
+      const deleteButton = event.target.closest("[data-delete-set]");
+      if (deleteButton) {
+        deleteSet(deleteButton.dataset.deleteSet);
+        return;
+      }
+
+      if (event.target.closest("#themeBtn")) {
+        state.dark = !state.dark;
+        render();
+        return;
+      }
+
+      if (event.target.closest("#todayBtn")) {
+        state.activeDate = todayISO();
+        state.workoutId = workoutForToday().id;
+        render();
+        return;
+      }
+
+      if (event.target.closest("#voiceBtn")) {
+        startVoice();
+        return;
+      }
+
+      if (event.target.closest("#parseBtn")) {
+        const result = parseCommand(state.command || document.getElementById("commandInput").value);
+        showToast(result.message);
+        render();
+        return;
+      }
+
+      if (event.target.closest("#downloadBtn")) {
+        downloadCSV();
+        return;
+      }
+
+      if (event.target.closest("#shareBtn")) {
+        try {
+          await shareCSV();
+        } catch {
+          showToast("Share canceled.");
+        }
+        return;
+      }
+
+      if (event.target.closest("#copyBtn")) {
+        await copyCSV();
+        return;
+      }
+
+      if (event.target.closest("#backupBtn")) {
+        downloadBackup();
+        return;
+      }
+
+      if (event.target.closest("#importBtn")) {
+        document.getElementById("importFile")?.click();
+        return;
+      }
+
+      if (event.target.closest("#clearWeekBtn")) {
+        clearWeek();
+      }
+    });
+
+    document.addEventListener("input", (event) => {
+      const draftInput = event.target.closest("[data-draft]");
+      if (draftInput) {
+        const id = draftInput.dataset.draft;
+        const field = draftInput.dataset.field;
+        state.drafts[id] ||= {};
+        state.drafts[id][field] = draftInput.value;
+        saveState();
+        return;
+      }
+
+      if (event.target.id === "commandInput") {
+        state.command = event.target.value;
+        saveState();
+        return;
+      }
+
+      if (event.target.id === "workoutDate") {
+        state.activeDate = event.target.value || todayISO();
+        render();
+      }
+    });
+
+    document.addEventListener("change", async (event) => {
+      if (event.target.id !== "importFile") return;
+      try {
+        await importBackup(event.target.files?.[0]);
+      } catch {
+        showToast("Backup import failed.");
+      } finally {
+        event.target.value = "";
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      const form = event.target.closest("[data-exercise-form]");
+      if (!form) return;
+      event.preventDefault();
+      const exerciseId = form.dataset.exerciseForm;
+      const draft = state.drafts[exerciseId] || {};
+      if (!addSet(exerciseId, { ...draft, source: "manual" })) {
+        showToast("Weight and reps are needed.");
+      }
+    });
+
+    async function initApp() {
+      try {
+        state = await loadState();
+      } catch {
+        state = createDefaultState();
+      }
+      render();
+      registerServiceWorker();
+    }
+
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
