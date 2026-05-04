@@ -328,11 +328,21 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 8px 10px;
-      min-height: 48px;
+      padding: 10px 12px;
+      min-height: 56px;
       background: rgba(23, 28, 36, 0.62);
       border-color: rgba(44, 53, 68, 0.78);
       box-shadow: none;
+    }
+
+    .session-strip.active {
+      border-color: rgba(143, 183, 255, 0.35);
+      background: rgba(23, 28, 36, 0.78);
+    }
+
+    .session-strip.paused {
+      border-color: rgba(255, 208, 138, 0.25);
+      background: rgba(23, 28, 36, 0.7);
     }
 
     .session-head {
@@ -351,23 +361,34 @@
       min-width: 0;
       display: flex;
       align-items: baseline;
-      gap: 9px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .session-label {
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 950;
-      letter-spacing: 0;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
+    .session-label.paused-label {
+      color: var(--gold);
+    }
+
     .session-time {
-      font-size: 1.04rem;
+      font-size: 1.35rem;
       font-weight: 950;
       color: var(--text);
-      letter-spacing: 0;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      font-family: ui-monospace, 'Cascadia Code', 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .session-time.paused-time {
+      color: var(--gold);
+      opacity: 0.7;
     }
 
     .session-meta {
@@ -382,7 +403,17 @@
 
     .session-controls {
       display: flex;
-      gap: 6px;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .session-finish-btn {
+      min-height: 34px;
+      padding: 0 12px;
+      background: var(--green);
+      color: #08111f;
+      font-weight: 900;
+      border-radius: var(--radius);
     }
 
     .voice-panel {
@@ -682,6 +713,7 @@
 
     @media (max-width: 760px) {
       .segmented { display: none; }
+      .sync-chip { font-size: 0.65rem; padding: 0 7px; gap: 4px; }
       .sync-chip span:last-child { display: none; }
       .voice-grid {
         grid-template-columns: auto 1fr;
@@ -1199,8 +1231,34 @@
       }, []);
 
       useEffect(() => {
-        const id = window.setInterval(() => setClock(Date.now()), 1000);
+        const id = window.setInterval(() => setClock(Date.now()), 100);
         return () => window.clearInterval(id);
+      }, []);
+
+      // Auto-pause session when app goes to background (like Strong/Hevy)
+      useEffect(() => {
+        const handleVisibility = () => {
+          if (document.hidden) {
+            setState((prev) => {
+              if (!prev) return prev;
+              const session = sessionForActiveDate(prev);
+              if (session && !session.paused_at) {
+                const next = cloneState(prev);
+                const active = next.sessions.find((s) => s.id === session.id);
+                if (active) {
+                  active.paused_at = nowISO();
+                  active.updated_at = nowISO();
+                }
+                stateRef.current = next;
+                K3V_Storage.save(next);
+                return next;
+              }
+              return prev;
+            });
+          }
+        };
+        document.addEventListener("visibilitychange", handleVisibility);
+        return () => document.removeEventListener("visibilitychange", handleVisibility);
       }, []);
 
       useEffect(() => {
@@ -1324,6 +1382,8 @@
       const session = sessionForActiveDate(state);
       const elapsed = session ? sessionElapsedMs(session, clock) : 0;
       const setCount = setsForDate(state, state.activeDate).length;
+      const isPaused = session?.paused_at != null;
+      const isActive = session && !isPaused;
       if (!session) {
         return h("article", { class: "session-strip panel" },
           h("div", { class: "session-strip-main" },
@@ -1332,17 +1392,26 @@
           )
         );
       }
-      return h("article", { class: "session-strip panel" },
+      const stripClass = "session-strip panel" + (isActive ? " active" : isPaused ? " paused" : "");
+      return h("article", { class: stripClass },
         h("div", { class: "session-strip-main" },
-          h("span", { class: "session-label" }, session.paused_at ? "Session Paused" : "Session"),
-          h("span", { class: "session-time" }, formatDuration(elapsed)),
+          h("span", { class: "session-label" + (isPaused ? " paused-label" : "") }, isPaused ? "PAUSED" : "LIVE"),
+          h("span", { class: "session-time" + (isPaused ? " paused-time" : "") }, formatDuration(elapsed)),
           h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
           session?.notes && h("span", { class: "pill green" }, "notes")
         ),
         h("div", { class: "session-controls" },
-          session.paused_at ?
+          isPaused ?
             h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { resumeSession(draft); showToast("Workout resumed!"); }) }, "Resume") :
             h("button", { class: "ghost-btn", type: "button", onClick: () => updateState((draft) => { pauseSession(draft); showToast("Workout paused."); }) }, "Pause"),
+          h("button", { class: "session-finish-btn", type: "button", onClick: () => {
+            updateState((draft) => {
+              const active = activeSession(draft);
+              active.manual_duration_ms = sessionElapsedMs(active);
+              active.updated_at = nowISO();
+            });
+            showToast("Workout finished! Time saved.");
+          } }, "Finish"),
           h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
         )
       );
@@ -2077,7 +2146,8 @@
     function getOrCreateImportedSession(state, date) {
       let session = state.sessions.find((item) => item.date === date && item.day_id === state.activeDayId);
       if (!session) {
-        session = { id: cryptoId(), date, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO() };
+        const now = nowISO();
+        session = { id: cryptoId(), date, program_id: state.activeProgramId, day_id: state.activeDayId, session_start: now, started_at: now, updated_at: now, paused_total_ms: 0, paused_at: null, manual_duration_ms: null, notes: "" };
         state.sessions.push(session);
       }
       return session;
