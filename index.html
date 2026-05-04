@@ -1368,7 +1368,7 @@
             h("div", { class: "session-head" },
               h("div", null,
                 h("h2", null, formatDuration(displayMs)),
-                h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Editable elapsed time and daily notes." : "Starts when the first set is logged.")
+                h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Editable elapsed time and daily notes." : "Starts when the workout session begins.")
               )
             )
           ),
@@ -1468,7 +1468,7 @@
         h("div", { class: "set-num" }, set.set_number),
         h("div", { class: "row-main" },
           h("b", null, `${formatWeight(set.weight_lb)} x ${set.reps}`),
-          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}${set.time_logged ? ` at ${set.time_logged}` : ""}`)
+          h("span", null, `${set.rpe ? `RPE ${set.rpe} / ` : ""}${set.notes || "logged"}${Number.isFinite(Number(set.session_elapsed_ms)) ? ` at ${formatDuration(Number(set.session_elapsed_ms))}` : set.time_logged ? ` at ${set.time_logged}` : ""}`)
         ),
         h("button", { class: "mini-btn danger", type: "button", onClick: () => updateState((draft) => {
           draft.sets = draft.sets.filter((item) => item.id !== set.id);
@@ -1810,6 +1810,7 @@
       const session = activeSession(state);
       const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === block.exercise_id);
       const now = nowISO();
+      const elapsedMs = sessionElapsedMs(session);
       const timeLogged = new Date().toTimeString().slice(0, 8);
       state.sets.push({
         id: cryptoId(),
@@ -1823,6 +1824,7 @@
         rpe,
         notes,
         time_logged: timeLogged,
+        session_elapsed_ms: elapsedMs,
         created_at: now,
         updated_at: now
       });
@@ -1832,7 +1834,20 @@
     function activeSession(state) {
       let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === state.activeDayId);
       if (!session) {
-        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: state.activeDayId, started_at: nowISO(), updated_at: nowISO(), paused_total_ms: 0, paused_at: null, manual_duration_ms: null, notes: "" };
+        const now = nowISO();
+        session = {
+          id: cryptoId(),
+          date: state.activeDate,
+          program_id: state.activeProgramId,
+          day_id: state.activeDayId,
+          session_start: now,
+          started_at: now,
+          updated_at: now,
+          paused_total_ms: 0,
+          paused_at: null,
+          manual_duration_ms: null,
+          notes: ""
+        };
         state.sessions.push(session);
       }
       return session;
@@ -1860,7 +1875,7 @@
     function sessionElapsedMs(session, clock = Date.now()) {
       if (!session) return 0;
       if (Number.isFinite(Number(session.manual_duration_ms))) return Math.max(0, Number(session.manual_duration_ms));
-      const started = new Date(session.started_at || session.created_at || nowISO()).getTime();
+      const started = new Date(session.session_start || session.started_at || session.created_at || nowISO()).getTime();
       const paused = Number(session.paused_total_ms || 0);
       let elapsed = clock - started - paused;
       if (session.paused_at) {
