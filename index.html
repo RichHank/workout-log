@@ -615,6 +615,62 @@
       margin-top: 8px;
     }
 
+    .note-panel {
+      padding: 12px;
+      margin: 0 0 12px;
+    }
+
+    .note-panel textarea {
+      margin-top: 8px;
+      min-height: 92px;
+    }
+
+    .session-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .standards-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .standard-card {
+      padding: 12px;
+    }
+
+    .standard-bar {
+      position: relative;
+      height: 18px;
+      margin: 12px 0 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #253142 0 20%, #153150 20% 40%, #153323 40% 60%, #3a2913 60% 80%, #4b1d2b 80% 100%);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .standard-marker {
+      position: absolute;
+      top: -6px;
+      width: 4px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--text);
+      box-shadow: 0 0 0 2px #111318;
+    }
+
+    .standard-levels {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.15;
+      text-align: center;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -848,7 +904,7 @@
 
     const views = [
       ["log", "Log", "plus"],
-      ["progress", "PRs", "chart"],
+      ["progress", "Stats", "chart"],
       ["plan", "Plan", "calendar"],
       ["exercises", "Exercises", "dumbbell"],
       ["export", "Export", "download"],
@@ -877,6 +933,18 @@
     const muscles = ["Chest", "Back", "Shoulders", "Biceps", "Triceps", "Quads", "Hamstrings", "Glutes", "Calves", "Core", "Cardio"];
     const patterns = ["squat", "hinge", "press", "pull", "carry", "lunge", "core", "cardio"];
     const dayTypes = ["Strength", "Cardio", "Mobility", "Rest", "Custom"];
+    const standardLevels = ["untrained", "novice", "intermediate", "advanced", "elite"];
+    const ageBrackets = ["18-39", "40-49", "50-59", "60-69"];
+    const bodyweightBrackets = [120, 150, 180, 210, 240, 270];
+    const strengthStandardModels = {
+      "bench-press": { lift: "Bench Press", aliases: ["bench-press"], male: [0.65, 0.92, 1.23, 1.58, 1.95], female: [0.38, 0.55, 0.75, 0.95, 1.15] },
+      squat: { lift: "Squat", aliases: ["front-squat", "leg-press"], male: [0.85, 1.2, 1.55, 1.95, 2.45], female: [0.55, 0.8, 1.05, 1.35, 1.65] },
+      deadlift: { lift: "Deadlift", aliases: ["deadlift", "romanian-deadlift"], male: [1.0, 1.35, 1.75, 2.25, 2.75], female: [0.7, 1.0, 1.35, 1.7, 2.05] },
+      "overhead-press": { lift: "Overhead Press", aliases: ["overhead-press"], male: [0.38, 0.55, 0.72, 0.95, 1.12], female: [0.24, 0.35, 0.48, 0.62, 0.78] },
+      "barbell-row": { lift: "Barbell Row", aliases: ["seated-cable-row", "wide-cable-row"], male: [0.62, 0.88, 1.15, 1.45, 1.75], female: [0.42, 0.6, 0.82, 1.02, 1.22] },
+      "pull-up": { lift: "Pull-up", aliases: ["lat-pulldown-close", "lat-pulldown-wide"], male: [0.45, 0.65, 0.9, 1.12, 1.35], female: [0.28, 0.42, 0.58, 0.74, 0.9] }
+    };
+    const strengthStandards = buildStrengthStandards();
 
     const defaultExercises = [
       ex("bench-press", "Bench Press", "Chest", ["Triceps", "Shoulders"], "press", 180, 3, "4-6", ["bench", "barbell bench"]),
@@ -906,6 +974,7 @@
     let recognition = null;
     let listening = false;
     let restInterval = null;
+    let uiClock = null;
     let chartStart = 0;
     let dragData = null;
 
@@ -941,7 +1010,7 @@
         sessions: [],
         sets: [],
         drafts: {},
-        profile: { sex: "", bodyweight_lb: "", age: "", height: "" },
+        profile: { sex: "male", bodyweight_lb: "", age: "", height: "" },
         settings: { muted: false, sync: { provider: "gist", gistId: "", rememberToken: false, token: "", fileName: GIST_FILE, lastSyncAt: "" } },
         command: "",
         rest: null,
@@ -1145,9 +1214,30 @@
       const day = getDay();
       let session = state.sessions.find((item) => item.date === state.activeDate && item.day_id === day?.id);
       if (!session) {
-        session = { id: cryptoId(), date: state.activeDate, program_id: state.activeProgramId, day_id: day?.id, started_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+        session = {
+          id: cryptoId(),
+          date: state.activeDate,
+          program_id: state.activeProgramId,
+          day_id: day?.id,
+          started_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          notes: "",
+          timer_started_at: Date.now(),
+          timer_paused_at: null,
+          paused_total_ms: 0,
+          finished_at: null
+        };
         state.sessions.push(session);
       }
+      return ensureSessionFields(session);
+    }
+
+    function ensureSessionFields(session) {
+      session.notes ||= "";
+      session.timer_started_at ||= new Date(session.started_at || Date.now()).getTime();
+      session.paused_total_ms ||= 0;
+      if (session.timer_paused_at === undefined) session.timer_paused_at = null;
+      if (session.finished_at === undefined) session.finished_at = null;
       return session;
     }
 
@@ -1242,8 +1332,22 @@
       document.getElementById("app").innerHTML = `
         <section class="metric-grid">
           <div class="metric"><b>${sets.length}</b><span>Sets logged</span></div>
-          <div class="metric"><b>${target}</b><span>Target sets</span></div>
+          <div class="metric"><b data-session-timer="${session.id}">${formatDuration(sessionElapsedMs(session))}</b><span>Session time</span></div>
           <div class="metric"><b>${formatNumber(sets.reduce((sum, set) => sum + volume(set), 0))}</b><span>Est. volume</span></div>
+        </section>
+        <section class="note-panel panel">
+          <div class="row-between">
+            <div>
+              <b>Day Notes</b>
+              <div class="muted">${target} target sets / ${session.finished_at ? "finished" : session.timer_paused_at ? "paused" : "running"}</div>
+            </div>
+            <div class="session-actions">
+              <button class="ghost-btn" type="button" id="sessionToggleBtn">${session.timer_paused_at ? "Resume" : "Pause"}</button>
+              <button class="ghost-btn" type="button" id="sessionFinishBtn">${session.finished_at ? "Reopen" : "Finish"}</button>
+            </div>
+          </div>
+          <label class="sr-only" for="sessionNotes">Workout notes</label>
+          <textarea id="sessionNotes" data-session-notes="${session.id}" placeholder="How did this workout feel? Energy, soreness, aches, pump, sleep, anything worth remembering.">${escapeHtml(session.notes || "")}</textarea>
         </section>
         <section class="voice-panel panel">
           <div class="voice-grid">
@@ -1269,6 +1373,7 @@
       const exercise = getExercise(block.exercise_id);
       const logs = setsForExercise(block.exercise_id, sessionId);
       const draft = state.drafts[block.id] || {};
+      const timing = exerciseTiming(logs, activeSession());
       if (!exercise) return "";
       return `
         <article class="exercise panel">
@@ -1279,6 +1384,7 @@
                 <span>${block.sets} sets</span>
                 <span>${escapeHtml(block.rep_range)} reps</span>
                 <span>${formatTimer(block.rest_seconds)} rest</span>
+                <span data-exercise-time="${sessionId}|${exercise.id}">${timing.label}</span>
                 <span class="pill ${exercise.movement_pattern}">${escapeHtml(exercise.primary_muscle)}</span>
                 <span class="pill logged">${logs.length}/${block.sets}</span>
               </div>
@@ -1330,6 +1436,7 @@
       const ranked = mostLoggedExercises().slice(0, 5);
       const selected = state.progressExerciseId || "";
       const options = state.exercises.slice().sort(byName).map((exercise) => `<option value="${exercise.id}" ${exercise.id === selected ? "selected" : ""}>${escapeHtml(exercise.name)}</option>`).join("");
+      const profile = state.profile || {};
       document.getElementById("app").innerHTML = `
         <div class="section-title">
           <h2>PR Trendline</h2>
@@ -1345,6 +1452,22 @@
               <canvas data-pr-chart="${exercise.id}" width="520" height="220"></canvas>
             </article>
           `).join("") || '<div class="empty panel">Log sets to see PR trendlines.</div>'}
+        </section>
+        <div class="section-title">
+          <h2>Strength Standards</h2>
+          <span>Bodyweight, age, and sex adjusted bands</span>
+        </div>
+        <section class="panel" style="padding:12px; margin-bottom:12px">
+          <div class="form-grid">
+            <div class="field"><label>Sex</label><select data-profile-field="sex"><option value="male" ${profile.sex === "male" ? "selected" : ""}>Male</option><option value="female" ${profile.sex === "female" ? "selected" : ""}>Female</option></select></div>
+            <div class="field"><label>Bodyweight lb</label><input data-profile-field="bodyweight_lb" inputmode="decimal" value="${escapeHtml(profile.bodyweight_lb || "")}" placeholder="180"></div>
+            <div class="field"><label>Age</label><input data-profile-field="age" inputmode="numeric" value="${escapeHtml(profile.age || "")}" placeholder="32"></div>
+            <div class="field"><label>Height</label><input data-profile-field="height" value="${escapeHtml(profile.height || "")}" placeholder="optional"></div>
+          </div>
+          <p class="muted">These are benchmark bands for context, not coaching advice. Your current number uses the best logged estimated 1RM for matching lifts.</p>
+        </section>
+        <section class="standards-list">
+          ${renderStandardsList()}
         </section>
       `;
       chartStart = performance.now();
@@ -1505,6 +1628,11 @@
       const session = activeSession();
       const existing = state.sets.filter((set) => set.session_id === session.id && set.exercise_id === exercise.id);
       const now = new Date().toISOString();
+      if (session.finished_at) session.finished_at = null;
+      if (session.timer_paused_at) {
+        session.paused_total_ms += Date.now() - session.timer_paused_at;
+        session.timer_paused_at = null;
+      }
       state.sets.push({
         id: cryptoId(),
         session_id: session.id,
@@ -1687,6 +1815,67 @@
         </div>
       `;
       renderIcons(bar);
+    }
+
+    function sessionElapsedMs(session) {
+      ensureSessionFields(session);
+      const start = Number(session.timer_started_at);
+      const end = session.finished_at ? new Date(session.finished_at).getTime() : (session.timer_paused_at || Date.now());
+      return Math.max(0, end - start - Number(session.paused_total_ms || 0));
+    }
+
+    function toggleSessionTimer() {
+      const session = activeSession();
+      const now = Date.now();
+      if (session.finished_at) session.finished_at = null;
+      if (session.timer_paused_at) {
+        session.paused_total_ms += now - session.timer_paused_at;
+        session.timer_paused_at = null;
+      } else {
+        session.timer_paused_at = now;
+      }
+      session.updated_at = new Date().toISOString();
+      render();
+    }
+
+    function finishSession() {
+      const session = activeSession();
+      if (session.finished_at) {
+        session.finished_at = null;
+        if (!session.timer_paused_at) session.timer_started_at = Date.now() - sessionElapsedMs(session);
+      } else {
+        session.finished_at = new Date().toISOString();
+        session.timer_paused_at = null;
+      }
+      session.updated_at = new Date().toISOString();
+      render();
+    }
+
+    function exerciseTiming(logs, session) {
+      if (!logs.length) return { elapsedMs: 0, avgRestMs: 0, label: "not started" };
+      const times = logs.map((set) => new Date(set.created_at || set.updated_at).getTime()).filter(Number.isFinite).sort((a, b) => a - b);
+      const first = times[0];
+      const last = times.length > 1 ? times[times.length - 1] : (session.finished_at ? new Date(session.finished_at).getTime() : Date.now());
+      const gaps = times.slice(1).map((time, index) => time - times[index]).filter((gap) => gap > 0);
+      const avgRestMs = gaps.length ? gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length : 0;
+      return {
+        elapsedMs: Math.max(0, last - first),
+        avgRestMs,
+        label: `${formatDuration(Math.max(0, last - first))} work${avgRestMs ? ` / ${formatDuration(avgRestMs)} avg rest` : ""}`
+      };
+    }
+
+    function updateLiveTimers() {
+      document.querySelectorAll("[data-session-timer]").forEach((node) => {
+        const session = state.sessions.find((item) => item.id === node.dataset.sessionTimer);
+        if (session) node.textContent = formatDuration(sessionElapsedMs(session));
+      });
+      document.querySelectorAll("[data-exercise-time]").forEach((node) => {
+        const [sessionId, exerciseId] = node.dataset.exerciseTime.split("|");
+        const session = state.sessions.find((item) => item.id === sessionId);
+        if (!session) return;
+        node.textContent = exerciseTiming(setsForExercise(exerciseId, sessionId), session).label;
+      });
     }
 
     function notifyRestDone() {
@@ -2054,6 +2243,93 @@
       });
     }
 
+    function buildStrengthStandards() {
+      const ageMultipliers = { "18-39": 1, "40-49": 0.92, "50-59": 0.82, "60-69": 0.7 };
+      return Object.entries(strengthStandardModels).flatMap(([liftId, model]) =>
+        ["male", "female"].flatMap((sex) =>
+          bodyweightBrackets.flatMap((bodyweight) =>
+            ageBrackets.flatMap((age) =>
+              standardLevels.map((level, index) => ({
+                lift_id: liftId,
+                lift: model.lift,
+                sex,
+                bodyweight_bracket_lb: bodyweight,
+                age_bracket: age,
+                level,
+                one_rm_lb: Math.round(bodyweight * model[sex][index] * ageMultipliers[age] / 5) * 5
+              }))
+            )
+          )
+        )
+      );
+    }
+
+    function renderStandardsList() {
+      const sex = state.profile.sex || "male";
+      const bodyweight = Number(state.profile.bodyweight_lb) || 180;
+      const age = Number(state.profile.age) || 30;
+      const bracket = nearest(bodyweightBrackets, bodyweight);
+      const ageBracket = ageToBracket(age);
+      return Object.entries(strengthStandardModels).map(([liftId, model]) => {
+        const standards = strengthStandards.filter((row) =>
+          row.lift_id === liftId &&
+          row.sex === sex &&
+          row.bodyweight_bracket_lb === bracket &&
+          row.age_bracket === ageBracket
+        );
+        const best = bestE1RMForModel(model);
+        const elite = standards.find((row) => row.level === "elite")?.one_rm_lb || 1;
+        const position = Math.min(100, Math.max(0, best ? (best / elite) * 100 : 0));
+        const level = best ? currentStandardLevel(best, standards) : "no data";
+        return `
+          <article class="standard-card panel">
+            <div class="row-between">
+              <div>
+                <b>${escapeHtml(model.lift)}</b>
+                <div class="muted">${sex} / ${bracket} lb / age ${ageBracket}</div>
+              </div>
+              <div class="row-main" style="text-align:right">
+                <b>${best ? `${Math.round(best)} lb` : "--"}</b>
+                <span>${escapeHtml(level)}</span>
+              </div>
+            </div>
+            <div class="standard-bar" aria-label="${escapeHtml(model.lift)} standards">
+              <span class="standard-marker" style="left: calc(${position}% - 2px)"></span>
+            </div>
+            <div class="standard-levels">
+              ${standards.map((row) => `<span>${row.level}<br>${row.one_rm_lb}</span>`).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function bestE1RMForModel(model) {
+      const ids = new Set(model.aliases);
+      return state.sets
+        .filter((set) => ids.has(set.exercise_id) || model.aliases.some((alias) => normalizeText(set.exercise).includes(normalizeText(alias))))
+        .reduce((best, set) => Math.max(best, Number(set.weight_lb || 0) * (1 + Number(set.reps || 0) / 30)), 0);
+    }
+
+    function currentStandardLevel(best, standards) {
+      let level = "below untrained";
+      standards.forEach((row) => {
+        if (best >= row.one_rm_lb) level = row.level;
+      });
+      return level;
+    }
+
+    function ageToBracket(age) {
+      if (age >= 60) return "60-69";
+      if (age >= 50) return "50-59";
+      if (age >= 40) return "40-49";
+      return "18-39";
+    }
+
+    function nearest(values, target) {
+      return values.reduce((best, value) => Math.abs(value - target) < Math.abs(best - target) ? value : best, values[0]);
+    }
+
     function drawCharts() {
       document.querySelectorAll("[data-pr-chart]").forEach((canvas) => drawPRChart(canvas, canvas.dataset.prChart));
       const elapsed = performance.now() - chartStart;
@@ -2190,6 +2466,8 @@
         render();
         return;
       }
+      if (event.target.closest("#sessionToggleBtn")) return toggleSessionTimer();
+      if (event.target.closest("#sessionFinishBtn")) return finishSession();
       if (event.target.closest("#voiceBtn")) return startVoice();
       if (event.target.closest("#parseBtn")) {
         const result = parseCommand(state.command || document.getElementById("commandInput").value);
@@ -2262,6 +2540,21 @@
         saveState();
         return;
       }
+      if (event.target.dataset.sessionNotes) {
+        const session = state.sessions.find((item) => item.id === event.target.dataset.sessionNotes);
+        if (session) {
+          session.notes = event.target.value;
+          session.updated_at = new Date().toISOString();
+          saveState();
+        }
+        return;
+      }
+      if (event.target.dataset.profileField) {
+        state.profile[event.target.dataset.profileField] = event.target.value;
+        saveState();
+        if (state.view === "progress") renderProgressView();
+        return;
+      }
       if (event.target.id === "exerciseSearch") state.exerciseQuery = event.target.value;
       if (event.target.id === "exerciseMuscle") state.exerciseMuscle = event.target.value;
       if (event.target.id === "exercisePattern") state.exercisePattern = event.target.value;
@@ -2273,6 +2566,12 @@
     });
 
     document.addEventListener("change", async (event) => {
+      if (event.target.dataset.profileField) {
+        state.profile[event.target.dataset.profileField] = event.target.value;
+        saveState();
+        if (state.view === "progress") renderProgressView();
+        return;
+      }
       if (event.target.id === "workoutDate") {
         state.activeDate = event.target.value || todayISO();
         render();
@@ -2463,6 +2762,15 @@
       return `${min}:${String(sec).padStart(2, "0")}`;
     }
 
+    function formatDuration(ms) {
+      const totalSeconds = Math.max(0, Math.floor(Number(ms || 0) / 1000));
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
     function shortDayLabel(index, label) {
       return label.split(" ")[0].slice(0, 3) || `D${index + 1}`;
     }
@@ -2506,6 +2814,7 @@
       if (state.rest?.running) {
         restInterval = setInterval(tickRest, 250);
       }
+      if (!uiClock) uiClock = setInterval(updateLiveTimers, 1000);
       render();
       registerServiceWorker();
     }

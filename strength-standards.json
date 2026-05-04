@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "unit": "lb",
+  "description": "Starter strength-standard model for app-side comparison bands. The app expands these ratios into sex, bodyweight, age, and level rows at runtime.",
+  "levels": ["untrained", "novice", "intermediate", "advanced", "elite"],
+  "bodyweight_brackets_lb": [120, 150, 180, 210, 240, 270],
+  "age_multipliers": {
+    "18-39": 1,
+    "40-49": 0.92,
+    "50-59": 0.82,
+    "60-69": 0.7
+  },
+  "models": [
+    {
+      "lift_id": "bench-press",
+      "lift": "Bench Press",
+      "male_ratios": [0.65, 0.92, 1.23, 1.58, 1.95],
+      "female_ratios": [0.38, 0.55, 0.75, 0.95, 1.15]
+    },
+    {
+      "lift_id": "squat",
+      "lift": "Squat",
+      "male_ratios": [0.85, 1.2, 1.55, 1.95, 2.45],
+      "female_ratios": [0.55, 0.8, 1.05, 1.35, 1.65]
+    },
+    {
+      "lift_id": "deadlift",
+      "lift": "Deadlift",
+      "male_ratios": [1, 1.35, 1.75, 2.25, 2.75],
+      "female_ratios": [0.7, 1, 1.35, 1.7, 2.05]
+    },
+    {
+      "lift_id": "overhead-press",
+      "lift": "Overhead Press",
+      "male_ratios": [0.38, 0.55, 0.72, 0.95, 1.12],
+      "female_ratios": [0.24, 0.35, 0.48, 0.62, 0.78]
+    },
+    {
+      "lift_id": "barbell-row",
+      "lift": "Barbell Row",
+      "male_ratios": [0.62, 0.88, 1.15, 1.45, 1.75],
+      "female_ratios": [0.42, 0.6, 0.82, 1.02, 1.22]
+    },
+    {
+      "lift_id": "pull-up",
+      "lift": "Pull-up",
+      "male_ratios": [0.45, 0.65, 0.9, 1.12, 1.35],
+      "female_ratios": [0.28, 0.42, 0.58, 0.74, 0.9]
+    }
+  ],
+  "sources": [
+    "https://exrx.net/Testing/WeightLifting/StrengthStandards",
+    "https://exrx.net/Testing/WeightLifting/BenchStandards",
+    "https://strengthlevel.com/strength-standards"
+  ]
+}
