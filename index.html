@@ -323,8 +323,16 @@
       grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
     }
 
-    .session-panel {
-      padding: 12px;
+    .session-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      min-height: 48px;
+      background: rgba(23, 28, 36, 0.62);
+      border-color: rgba(44, 53, 68, 0.78);
+      box-shadow: none;
     }
 
     .session-head {
@@ -332,21 +340,44 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
     }
 
     .session-head h2 {
       margin: 0;
-      font-size: 1rem;
+      font-size: 1.12rem;
+    }
+
+    .session-strip-main {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .session-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0;
+      text-transform: uppercase;
     }
 
     .session-time {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 1.04rem;
       font-weight: 950;
-      font-size: 1.18rem;
-      white-space: nowrap;
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .session-meta {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .session-edit-btn {
+      min-height: 34px;
+      padding: 0 10px;
     }
 
     .voice-panel {
@@ -647,10 +678,6 @@
     @media (max-width: 760px) {
       .segmented { display: none; }
       .sync-chip span:last-child { display: none; }
-      .session-head {
-        align-items: stretch;
-        flex-direction: column;
-      }
       .voice-grid {
         grid-template-columns: auto 1fr;
       }
@@ -1282,44 +1309,86 @@
       const day = getDay(state);
       const blocks = (day?.blocks || []).slice().sort(byOrder);
       return h("section", { class: "stack" },
-        h(SessionPanel, { state, updateState, clock, showToast }),
+        h(SessionPanel, { state, updateState, clock, showToast, openModal }),
         h(VoicePanel, { state, updateState, showToast, listening, setListening, recognitionRef }),
         blocks.length ? blocks.map((block) => h(ExerciseBlock, { key: block.id, state, block, updateState, showToast, openModal })) : h("div", { class: "empty panel" }, "No exercises on this day yet. Add blocks from Plan.")
       );
     }
 
-    function SessionPanel({ state, updateState, clock, showToast }) {
+    function SessionPanel({ state, updateState, clock, showToast, openModal }) {
       const session = sessionForActiveDate(state);
       const elapsed = session ? sessionElapsedMs(session, clock) : 0;
-      return h("article", { class: "session-panel panel" },
-        h("div", { class: "session-head" },
-          h("div", null,
-            h("h2", null, "Session Timer"),
-            h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Tracks this workout day. Edit it anytime." : "Starts when the first set is logged.")
-          ),
-          h("div", { class: "session-time" }, formatDuration(elapsed))
+      const setCount = setsForDate(state, state.activeDate).length;
+      return h("article", { class: "session-strip panel" },
+        h("div", { class: "session-strip-main" },
+          h("span", { class: "session-label" }, "Session"),
+          h("span", { class: "session-time" }, formatDuration(elapsed)),
+          h("span", { class: "session-meta" }, `${setCount} set${setCount === 1 ? "" : "s"}`),
+          session?.notes && h("span", { class: "pill green" }, "notes")
         ),
-        h("div", { class: "form-grid" },
-          h(FieldInput, { label: "Set elapsed time", value: state.sessionTimeDraft ?? "", placeholder: "75m or 1:15:00", onInput: (value) => updateState((draft) => { draft.sessionTimeDraft = value; }, { localOnly: true }) }),
-          h("div", { class: "field" },
-            h("label", null, "Controls"),
-            h("div", { class: "row-actions", style: "grid-template-columns:repeat(3, minmax(0, 1fr))" },
-              h("button", { class: "ghost-btn", type: "button", onClick: () => adjustSessionDuration(updateState, -300000) }, "-5m"),
-              h("button", { class: "ghost-btn", type: "button", onClick: () => setSessionDurationFromDraft(state, updateState, showToast) }, "Set"),
-              h("button", { class: "ghost-btn", type: "button", onClick: () => adjustSessionDuration(updateState, 300000) }, "+5m")
+        h("button", { class: "ghost-btn session-edit-btn", type: "button", onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) })) }, "Edit")
+      );
+    }
+
+    function SessionEditorModal({ state, updateState, showToast, onClose }) {
+      const session = sessionForActiveDate(state);
+      const [displayMs, setDisplayMs] = useState(session ? sessionElapsedMs(session) : 0);
+      const [timeDraft, setTimeDraft] = useState("");
+      const [notes, setNotes] = useState(session?.notes || "");
+      const commitDuration = (ms) => {
+        updateState((draft) => {
+          const active = activeSession(draft);
+          active.manual_duration_ms = Math.max(0, ms);
+          active.updated_at = nowISO();
+          draft.sessionTimeDraft = "";
+        });
+        setDisplayMs(Math.max(0, ms));
+      };
+      return h(Modal, { title: "Session Details", onClose },
+        h("div", { class: "stack" },
+          h("div", { class: "panel", style: "padding:12px" },
+            h("div", { class: "session-head" },
+              h("div", null,
+                h("h2", null, formatDuration(displayMs)),
+                h("p", { class: "muted", style: "margin:4px 0 0" }, session ? "Editable elapsed time and daily notes." : "Starts when the first set is logged.")
+              )
             )
-          )
-        ),
-        h("textarea", {
-          style: "margin-top:10px",
-          placeholder: "How did the workout feel today?",
-          value: session?.notes || "",
-          onInput: (event) => updateState((draft) => {
-            const active = activeSession(draft);
-            active.notes = event.currentTarget.value;
-            active.updated_at = nowISO();
-          })
-        })
+          ),
+          h("div", { class: "form-grid" },
+            h(FieldInput, { label: "Set elapsed time", value: timeDraft, placeholder: "75m or 1:15:00", onInput: setTimeDraft }),
+            h("div", { class: "field" },
+              h("label", null, "Controls"),
+              h("div", { class: "row-actions", style: "grid-template-columns:repeat(3, minmax(0, 1fr))" },
+                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs - 300000) }, "-5m"),
+                h("button", { class: "ghost-btn", type: "button", onClick: () => {
+                  const ms = parseDurationInput(timeDraft);
+                  if (!Number.isFinite(ms)) {
+                    showToast("Use 75m, 1:15, or 1:15:00.");
+                    return;
+                  }
+                  commitDuration(ms);
+                  setTimeDraft("");
+                  showToast("Session time updated.");
+                } }, "Set"),
+                h("button", { class: "ghost-btn", type: "button", onClick: () => commitDuration(displayMs + 300000) }, "+5m")
+              )
+            )
+          ),
+          h("textarea", {
+            placeholder: "How did the workout feel today?",
+            value: notes,
+            onInput: (event) => {
+              const value = event.currentTarget.value;
+              setNotes(value);
+              updateState((draft) => {
+                const active = activeSession(draft);
+                active.notes = value;
+                active.updated_at = nowISO();
+              });
+            }
+          }),
+          h("button", { class: "primary-btn", type: "button", onClick: onClose }, "Done")
+        )
       );
     }
 
