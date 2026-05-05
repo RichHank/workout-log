@@ -1787,7 +1787,7 @@
         [state?.sets, state?.activeDate]
       );
       const activeSession_ = state ? sessionForActiveDate(state) : null;
-      const liveElapsedMs = activeSession_ && !activeSession_.finished_at ? sessionElapsedMs(activeSession_, liveClock) : 0;
+      const liveElapsedMs = activeSession_ && !activeSession_.finished_at ? sessionElapsedMs(activeSession_, clock) : 0;
 
       if (!state) return h("main", { class: "app-shell" }, h("div", { class: "empty panel" }, "Loading K3VSYNC..."));
 
@@ -1845,7 +1845,7 @@
               ))
             )
           ),
-          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock: liveClock, listening, setListening, recognitionRef }),
+          state.view === "log" && h(LogView, { state, updateState, showToast, openModal: setModal, clock: clock, listening, setListening, recognitionRef }),
           state.view === "progress" && h(ProgressView, { state, updateState }),
           state.view === "plan" && h(PlanView, { state, updateState, showToast, openModal: setModal }),
           state.view === "exercises" && h(ExercisesView, { state, updateState, showToast, openModal: setModal }),
@@ -1953,7 +1953,17 @@
               onClick: () => openModal(h(SessionEditorModal, { state, updateState, showToast, onClose: () => openModal(null) }))
             }, "Edit")
           )
-        ),
+        ));
+
+    function SessionEditorModal({ state, updateState, showToast, onClose }) {
+      const session = sessionForActiveDate(state);
+      const [displayMs, setDisplayMs] = useState(session ? sessionElapsedMs(session) : 0);
+      const [timeDraft, setTimeDraft] = useState("");
+      const [notes, setNotes] = useState(session?.notes || "");
+      const commitDuration = (ms) => {
+        updateState((draft) => {
+          const active = activeSession(draft);
+          bump(active, { manual_duration_ms: Math.max(0, ms), manual_duration_set_at: nowISO() });
           draft.sessionTimeDraft = "";
         });
         setDisplayMs(Math.max(0, ms));
