@@ -1811,6 +1811,9 @@
               )
             ),
             h("div", { class: "topbar-right" },
+              activeSession_ && h("div", { class: "sync-chip", "data-state": activeSession_.paused_at ? "paused" : "syncing" },
+                h("i", { class: "sync-dot" }),
+                h("span", null, formatDuration(liveElapsedMs))
               ),
               h("div", { class: "sync-chip", "data-state": syncStatus.state },
                 h("i", { class: "sync-dot" }),
@@ -1954,6 +1957,7 @@
             }, "Edit")
           )
         ));
+    }
 
     function SessionEditorModal({ state, updateState, showToast, onClose }) {
       const session = sessionForActiveDate(state);

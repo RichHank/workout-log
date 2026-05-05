@@ -1,4 +1,4 @@
-const CACHE_NAME = "k3vsync-v1";
+const CACHE_NAME = "k3vsync-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
