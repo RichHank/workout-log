@@ -22,7 +22,7 @@ Live app: https://richhank.github.io/workout-log/
 - Program/day/block data model.
 - Add exercise and swap exercise flows.
 - Basic plan editor with drag reorder, rest-day type, and new-plan wizard.
-- Rest timer based on `Date.now()` deltas with vibrate/audio notification and mute-ready settings storage.
+- Rest timer feature has been removed.
 - CSV schema:
 
 ```csv
